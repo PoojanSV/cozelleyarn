@@ -1,4 +1,5 @@
-/* Shared by index.html and admin.html. Firebase web keys are safe to be public; the RULES protect your data. */
+/* Shared by every page and admin.html. Firebase (sign-in + Firestore data) web keys are safe to be public; the RULES protect your data.
+   Images are NOT stored in Firebase: they live on Cloudinary, see assets/js/cloudinary.js. */
 const FIREBASE_CONFIG={
   apiKey:"AIzaSyA54Vz_46paWinrnIk4Pxjv8OD5Hi9MXFI",
   authDomain:"ems-45c2c.firebaseapp.com",
@@ -8,10 +9,13 @@ const FIREBASE_CONFIG={
   appId:"1:432371886956:web:14f3628ea215a940972149",
   measurementId:"G-PDJN7GNNPS"
 };
+/* Customer accounts: the phone number is the username. Firebase Auth needs an email-shaped id, so the phone number is turned into
+   <digits>@CUSTOMER_DOMAIN. No email is ever sent to it. If you change this value, change it in firebase/firestore.rules too. */
+const CUSTOMER_DOMAIN='cozelle-phone.com';
 const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
 /* remote values win, anything missing falls back to the defaults below (arrays are replaced whole) */
 function deepMerge(base,over){if(!isObj(base)||!isObj(over))return over===undefined?base:over;const o={...base};for(const k in over)o[k]=deepMerge(base[k],over[k]);
- if(base===DEFAULT_DATA){o.menu=DEFAULT_DATA.menu;o.footer={...o.footer,columns:DEFAULT_DATA.footer.columns}} /* menu + footer links always come from this file */
+ if(base===DEFAULT_DATA){o.menu=DEFAULT_DATA.menu;o.pay=DEFAULT_DATA.pay;o.acct=DEFAULT_DATA.acct;o.footer={...o.footer,columns:DEFAULT_DATA.footer.columns}} /* menu, footer links, checkout and account wording always come from this file */
  return o}
 
 /* Images that used to sit next to the HTML files now live in assets/img/.
@@ -35,7 +39,7 @@ const U=(id,w=900)=>`https://unsplash.com/photos/${id}/download?force=true&w=${w
 const DEFAULT_DATA={
  theme:{cream:'#f4e8d3',sand:'#ecd8bd',copper:'#b5693f','copper-d':'#8e4a2a',rose:'#d49a78',cocoa:'#4a2b1b','model-radius':'76px'},
  site:{title:'Cozelle · Wrapped in comfort',name:'Cozelle',brand:'COZELLE',tagline:'Wrapped in comfort',loaderMark:'♥',
-  logo:'assets/img/cozelle-logo.png',background:'',whatsapp:'917046975673',currency:'₹',locale:'en-IN',copyright:'© 2026 Cozelle. All rights reserved.'},
+  logo:'assets/img/cozelle-logo.png',background:'',whatsapp:'917046975673',upiId:'',upiName:'Cozelle',gstin:'',gstPct:5,gstMode:'inclusive',currency:'₹',locale:'en-IN',copyright:'© 2026 Cozelle. All rights reserved.'},
  hero:{eyebrow:'',title:'Wrapped in comfort,',accent:'one stitch at a time.',lead:'',
   modelImage:U('VjE0Lt9Ix_8',1200),modelAlt:'Woman in a cream wool sweater'},
  collection:{title:'The cosy',accent:'collection'},
@@ -74,6 +78,36 @@ const DEFAULT_DATA={
  /* product.html: wording, plus the lines shown under every product. Each product can also have description, gallery [{image,alt}] and details [{label,value}] (edit them in admin.html) */
  product:{back:'Back to collection',about:'About this piece',details:'Details',category:'Category',qty:'Quantity',related:'You may also like',notFound:'We could not find that piece.',zoom:'View larger',close:'Close',prev:'Previous photo',next:'Next photo',
   assurances:[{text:'Free delivery across India'},{text:'30-day easy returns'},{text:'Finished by hand and checked before it ships'}]},
+ /* checkout: pay by UPI QR + payment screenshot. The UPI ID itself is set in admin.html > Site. */
+ pay:{proceed:'Pay with UPI',continue:'Continue to payment',title:'Pay with UPI',scan:'Scan with any UPI app',qrLabel:'UPI payment QR code',amount:'Amount to pay',payee:'Paying to',
+  copy:'Copy',copied:'Copied',ref:'Order ID',openApp:'Open UPI app',pickApp:'Pay with your UPI app',appHint:'Tap your app, pay, then come back here and attach the screenshot.',apps:{gpay:'Google Pay',phonepe:'PhonePe',paytm:'Paytm',any:'Other UPI app'},step:'After paying, attach a screenshot of the payment',attach:'Attach payment screenshot',change:'Change screenshot',
+  utr:'UPI transaction ID (optional)',utrPh:'12-digit UTR from your payment app',place:'I have paid, place my order',uploading:'Uploading screenshot…',placing:'Sending your order…',back:'Back to details',
+  notReady:'Online payment is not set up yet. Please try again later.',needShot:'Please attach the payment screenshot first.',imgOnly:'Please choose an image file.',tooBig:'That image is too large. Please choose a smaller screenshot.',
+  failed:'We could not send your order. Please check your connection and try again.',doneTitle:'Order received',doneText:'Thank you! We will check your payment and confirm your order shortly.',doneBtn:'Continue shopping'},
+ /* prices, discount and GST wording (bag, checkout, My orders) */
+ tax:{total:'Total',items:'Items',discount:'Discount',gst:'GST',gstIncl:'Includes GST',off:'off',gstin:'GSTIN'},
+ /* customer accounts + orders (assets/js/account.js). Phone number = username, 6-digit PIN = password. */
+ acct:{account:'Account',login:'Log in',signup:'Create account',logout:'Log out',orders:'My orders',menuLogin:'Log in / Sign up',
+  loginTitle:'Welcome back',signupTitle:'Create your account',title:'My account',
+  phone:'Phone number',name:'Your name',pin:'6-digit PIN',pinNew:'Create a 6-digit PIN',show:'Show',hide:'Hide',
+  pinHint:'Six digits you will remember. You log in with your phone number and this PIN.',
+  gateHint:'Your phone number is your username. Use this PIN to log in later and see your orders. Ordered before? Enter your PIN to log in.',
+  signupHint:'No email needed. Your phone number is your username.',
+  orderingAs:'Ordering as',notYou:'Not you? Log out',
+  loginBtn:'Log in',signupBtn:'Create account',loggingIn:'Logging in…',creating:'Please wait…',
+  needLogin:'Log in to see your orders.',ordersTitle:'Your orders',noOrders:'You have not placed an order yet.',browse:'Browse the collection',
+  loadingOrders:'Loading your orders…',ordersErr:'We could not load your orders right now. Please try again later.',
+  orderId:'Order ID',total:'Total',utr:'UPI transaction ID',viewOrders:'View my orders',
+  forgot:'Forgot your PIN? Message us on WhatsApp',forgotMsg:'Hi, I forgot my Cozelle PIN. My phone number is ',
+  status:{new:'Payment being checked',confirmed:'Confirmed',shipped:'Shipped',delivered:'Delivered',cancelled:'Cancelled'},
+  steps:['Placed','Confirmed','Shipped','Delivered'],
+  err:{phone:'Please enter a valid phone number (10 digits).',pin:'Your PIN must be exactly 6 digits.',name:'Please enter your name.',
+   wrong:'That phone number and PIN do not match.',
+   exists:'This phone number already has an account. Please log in instead.',
+   existsWrong:'This phone number already has an account, and that PIN does not match. Enter your PIN, or message us on WhatsApp if you forgot it.',
+   tooMany:'Too many attempts. Please wait a few minutes and try again.',network:'Please check your connection and try again.',
+   unavailable:'Accounts are not available right now. Please try again later.',policy:'That PIN was not accepted. Please try a different 6-digit PIN.',
+   generic:'Something went wrong. Please try again.',sessionLost:'You are no longer logged in. Please go back and continue again.'}},
  /* an item with no href is plain text; href:'wa' becomes the WhatsApp link */
  footer:{blurb:'Get new yarn drops and knitting notes in your inbox.',columns:[
   {title:'Explore',items:[{label:'Collection',href:'collection.html'},{label:'About us',href:'about.html'},{label:'Contact us',href:'contact.html'}]},
@@ -90,4 +124,29 @@ const DEFAULT_DATA={
   menuTitle:'Menu',bagTitle:'Your bag',empty:'Your bag is empty',browse:'Browse the collection',subtotal:'Subtotal',
   delivery:'Delivery is free across India.',checkout:'Order on WhatsApp',orderTitle:'New order',total:'Total',
   decrease:'Decrease',increase:'Increase',remove:'Remove',emailPh:'Your email',join:'Join',thanks:'Thank you, you’re on the list'}
+};
+
+/* ================= Prices: discount + GST (shared by every page and admin.html) =================
+   product.price = the full price. product.discount = percent off (0 = none). product.gst = GST % for that product (empty = shop default site.gstPct).
+   site.gstMode 'inclusive' = prices already contain GST (it is only shown); 'exclusive' = GST is added on top at the bag. */
+const Price={
+ cfg(){return (typeof D!=='undefined'&&D&&D.site)||(typeof state!=='undefined'&&state&&state.site)||DEFAULT_DATA.site},
+ tx(){return (typeof D!=='undefined'&&D&&D.tax)||DEFAULT_DATA.tax},
+ money(n){const s=this.cfg(),v=Math.round(Number(n||0)*100)/100;return (s.currency||'')+v.toLocaleString(s.locale||'en-IN',{minimumFractionDigits:Number.isInteger(v)?0:2,maximumFractionDigits:2})},
+ pct(p){const d=Number(p&&p.discount);return d>0&&d<100?d:0},
+ unit(p){const d=this.pct(p),m=Number(p.price)||0;return d?Math.round(m*(100-d)/100):m},
+ rate(p){const g=p&&p.gst,r=(g===undefined||g===null||g==='')?Number(this.cfg().gstPct):Number(g);return r>0?r:0},
+ incl(){return this.cfg().gstMode!=='exclusive'},
+ calc(rows,cart){let mrp=0,net=0,gst=0,rates=new Set();const inc=this.incl();
+  rows.forEach(p=>{const q=Number(cart[p.id])||0,line=this.unit(p)*q,r=this.rate(p);mrp+=(Number(p.price)||0)*q;net+=line;if(r>0)rates.add(r);gst+=inc?line-line/(1+r/100):line*r/100});
+  gst=Math.round(gst*100)/100;net=Math.round(net*100)/100;
+  return {mrp,net,discount:Math.round((mrp-net)*100)/100,gst,incl:inc,rate:rates.size===1?[...rates][0]:0,total:Math.round((inc?net:net+gst)*100)/100}},
+ /* price markup: current price, old price struck through, "x% off" */
+ html(p){const d=this.pct(p);return d?`<span class="pnow">${this.money(this.unit(p))}</span> <s class="pmrp">${this.money(p.price)}</s> <span class="poff">${d}% ${this.tx().off}</span>`:this.money(p.price)},
+ badge(p){const d=this.pct(p);return d?`<span class="dbadge">−${d}%</span>`:''},
+ /* lines shown above the total in the bag / payment step */
+ brk(c){const t=this.tx(),r=(a,b,k)=>`<div class="br${k?' '+k:''}"><span>${a}</span><span>${b}</span></div>`;let h='';
+  if(c.discount>0)h+=r(t.items,this.money(c.mrp))+r(t.discount,'−'+this.money(c.discount),'off');
+  if(c.gst>0)h+=c.incl?r(t.gstIncl+(c.rate?' ('+c.rate+'%)':''),this.money(c.gst),'mut'):r(t.gst+(c.rate?' ('+c.rate+'%)':''),'+'+this.money(c.gst));
+  return h}
 };

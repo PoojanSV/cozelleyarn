@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cozelle Admin</title>
+<style>
+:root{--copper:#b5693f;--copper-d:#8e4a2a;--cocoa:#4a2b1b;--line:rgba(181,105,63,.3)}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f0e4;color:var(--cocoa)}
+[hidden]{display:none!important}
+.center{min-height:100vh;display:grid;place-items:center}
+.card{background:#fff;border-radius:22px;padding:34px;width:min(380px,92vw);display:grid;gap:12px;box-shadow:0 24px 60px -34px rgba(74,43,27,.55)}
+.card h1{font:500 30px Georgia,serif;color:var(--copper-d)}
+input,textarea,select{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:inherit;text-transform:none;letter-spacing:0}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--copper);outline-offset:1px}
+input[type=color]{padding:3px;height:42px}input[type=checkbox]{width:18px;height:18px}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:9px 14px;background:rgba(181,105,63,.14);color:var(--copper-d)}
+button:hover{background:rgba(181,105,63,.25)}button.pri{background:var(--copper);color:#fff}button.pri:hover{background:var(--copper-d)}
+#app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+#nav{background:var(--copper-d);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow:auto}
+#nav h2{font:500 24px Georgia,serif;color:#f4e8d3;padding:4px 14px 14px;letter-spacing:.12em}
+#nav button{text-align:left;background:none;color:#f4e8d3;padding:10px 14px}#nav button.on,#nav button:hover{background:rgba(255,255,255,.16)}
+#nav small{margin-top:auto;color:#f4e8d3;opacity:.7;font-size:11px;word-break:break-all;padding:10px 14px}
+main{padding:0 30px 70px;max-width:920px;width:100%}
+.bar{position:sticky;top:0;z-index:5;background:#f7f0e4;display:flex;justify-content:space-between;align-items:center;padding:18px 0;gap:10px;flex-wrap:wrap}
+.bar h1{font:500 30px Georgia,serif}.bar div{display:flex;gap:8px;align-items:center}.bar a{color:var(--copper-d)}
+.blk{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;display:grid;gap:14px}
+.blk h3{display:flex;justify-content:space-between;align-items:center;font:600 13px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--copper-d)}
+.blk h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:#8a7360}
+label.f{display:grid;gap:5px}label.f>span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper-d)}
+label.chk{display:flex;align-items:center;gap:10px}label.chk>span{font-size:14px;letter-spacing:0;text-transform:none;color:inherit}
+details.it{border:1px solid var(--line);border-radius:14px;padding:0 14px}
+summary{cursor:pointer;padding:12px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:500}
+.in{display:grid;gap:14px;padding-bottom:16px}.ctl{display:flex;gap:4px}.ctl button{padding:4px 10px}
+.img{display:flex;gap:10px;align-items:center}.img img{width:54px;height:54px;object-fit:cover;border-radius:10px;background:#eadcc6;flex:none}
+.up{position:relative;flex:none}.up input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.mut{color:#8a7360}
+#msg{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--copper-d);color:#fff;padding:12px 22px;border-radius:30px;z-index:9;max-width:90vw}
+#msg.err{background:#a3321f}
+@media(max-width:760px){#app{grid-template-columns:1fr}#nav{position:static;height:auto;flex-direction:row;flex-wrap:wrap}#nav h2,#nav small{display:none}main{padding:0 14px 60px}}
+</style></head>
+<body>
+<div class="center" id="login" hidden>
+ <form class="card" id="lf"><h1>Cozelle admin</h1><input id="em" type="email" placeholder="Email" required autocomplete="username"><input id="pw" type="password" placeholder="Password" required autocomplete="current-password">
+ <button class="pri">Sign in</button><p id="lerr" class="mut"></p></form>
+</div>
+<div id="app" hidden>
+ <aside id="nav"></aside>
+ <main><div class="bar"><h1 id="ttl"></h1><div><a href="index.html" target="_blank">View site ↗</a><button class="pri" id="save">Save changes</button></div></div><div id="view"></div></main>
+</div>
+<div id="msg" hidden></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="assets/js/cozelle-data.js"></script>
+<script>
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth=firebase.auth(),db=firebase.firestore(),st=firebase.storage();
+const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const getp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+const setp=(o,p,v)=>{const ks=p.split('.'),l=ks.pop();ks.reduce((a,k)=>a[k]??(a[k]={}),o)[l]=v};
+const rid=()=>Math.random().toString(36).slice(2,8);
+let state={},oldIds=[],cur='Products',tm;const open=new Set(),NEWS={};
+function flash(m,err){const e=$('msg');e.textContent=m;e.className=err?'err':'';e.hidden=false;clearTimeout(tm);tm=setTimeout(()=>e.hidden=true,err?6000:2200)}
+
+/* ---------- what can be edited (everything on the site) ---------- */
+const T='t',A='a',I='i',N='n',C='c',B='b',S='s';
+const TABS={
+ Products:[{path:'products',title:'Products (use ↑ ↓ to change the order they appear in)',item:'name',new:()=>({id:'p-'+rid(),name:'New product',category:'',price:0,image:'',featured:false,active:true}),
+  f:[['name','Name'],['category','Category'],['price','Price',N],['image','Photo',I],['description','Description',A],['featured','Show at the top of the home page',B,false],['active','Visible on the site',B,true],
+   {path:'gallery',title:'More photos',item:'alt',new:()=>({image:'',alt:''}),f:[['image','Photo',I],['alt','Short description']]}]}],
+ 'Home page':[
+  {path:'hero',title:'Top of the page',f:[['title','Heading'],['accent','Heading, second line (coloured)'],['modelImage','Photo',I]]},
+  {path:'collection',title:'Collection heading',f:[['title','Title'],['accent','Coloured word']]},
+  {path:'story',title:'Our promise (also shown on the About page)',item:'title',new:()=>({title:'New point',text:''}),f:[['title','Title'],['text','Text',A]]},
+  {path:'reviews',title:'Customer reviews',item:'name',new:()=>({name:'Name',rating:5,text:''}),f:[['name','Name'],['rating','Stars (1 to 5)',N],['text','Review',A]]}],
+ 'About us':[
+  {path:'about',title:'About us page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Our story (leave a blank line between paragraphs)',A],['image','Photo (leave empty for no photo)',I]]}],
+ 'Contact us':[
+  {path:'contact',title:'Contact page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Short intro',A],['email','Email (leave empty to hide)'],['address','Address (leave empty to hide)',A],['hours','Opening hours (leave empty to hide)']]}],
+ Site:[
+  {path:'site',title:'Shop details',f:[['name','Shop name'],['brand','Name shown in the header'],['tagline','Tagline'],['logo','Logo',I],['whatsapp','WhatsApp number with country code, digits only (orders and contact messages go here)'],['currency','Currency symbol'],['copyright','Copyright line']]}],
+ Orders:[]
+};
+
+/* ---------- form rendering ---------- */
+function rF(f,pre){
+ if(!Array.isArray(f))return rB(f,pre);
+ const [k,l,t=T,x]=f,p=pre+'.'+k,v=getp(state,p),d=`data-p="${p}" data-t="${t}"`;
+ if(t===B)return `<label class="f chk"><input type="checkbox" ${d} ${(v===undefined?x:v)?'checked':''}><span>${l}</span></label>`;
+ let inp;
+ if(t===A)inp=`<textarea rows="3" ${d}>${esc(v)}</textarea>`;
+ else if(t===S)inp=`<select ${d}>${x.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
+ else if(t===I)inp=`<div class="img"><img src="${esc(v)}" alt=""><input ${d} value="${esc(v)}" placeholder="Paste a link, or upload →"><label class="up"><button type="button">Upload</button><input type="file" accept="image/*" data-up="${p}"></label></div>`;
+ else inp=`<input ${t===N?'type="number" step="any"':t===C?'type="color"':''} ${d} value="${esc(v)}">`;
+ return `<label class="f"><span>${l}</span>${inp}</label>`;
+}
+function rB(b,pre){
+ const p=pre?pre+'.'+b.path:b.path;
+ const head=`<h3>${b.title||''}${b.item?`<button data-a="add" data-p="${p}">+ Add</button>`:''}</h3>`;
+ if(!b.item)return `<section class="blk">${head}${b.f.map(f=>rF(f,p)).join('')}</section>`;
+ NEWS[p.replace(/\.\d+/g,'')]=b.new;
+ const arr=getp(state,p)||[];
+ return `<section class="blk">${head}${arr.map((it,i)=>{const k=p+'.'+i;
+  return `<details class="it" data-k="${k}" ${open.has(k)?'open':''}><summary><span>${esc(it[b.item]||'Item '+(i+1))}</span><span class="ctl"><button data-a="up" data-p="${p}" data-i="${i}">↑</button><button data-a="dn" data-p="${p}" data-i="${i}">↓</button><button data-a="del" data-p="${p}" data-i="${i}">✕</button></span></summary><div class="in">${b.f.map(f=>rF(f,k)).join('')}</div></details>`}).join('')||'<p class="mut">Nothing here yet. Press + Add.</p>'}</section>`;
+}
+function show(){
+ $('ttl').textContent=cur;
+ $('nav').innerHTML='<h2>COZELLE</h2>'+Object.keys(TABS).map(t=>`<button class="${t===cur?'on':''}" data-tab="${t}">${t}</button>`).join('')+`<small>Signed in as<br>${esc(auth.currentUser.email)}<br>UID: ${auth.currentUser.uid}</small><button data-out>Sign out</button>`;
+ $('save').hidden=cur==='Orders';
+ if(cur==='Orders')return orders();
+ $('view').innerHTML=TABS[cur].map(b=>rB(b,'')).join('');
+}
+async function orders(){
+ const v=$('view');v.innerHTML='<p class="mut">Loading…</p>';
+ try{const q=await db.collection('orders').orderBy('createdAt','desc').limit(60).get(),cs=state.site?.currency||'';
+  v.innerHTML=q.empty?'<p class="mut">No orders yet.</p>':q.docs.map(d=>{const o=d.data(),c=o.customer||{};
+   return `<section class="blk"><h3><span>${esc(c.name||'Customer')} · ${esc(cs)}${Number(o.total).toLocaleString('en-IN')}</span><small>${o.createdAt?o.createdAt.toDate().toLocaleString():''}</small></h3>
+   <div>${Object.entries(c).map(([k,x])=>`<div><b>${esc(k)}:</b> ${esc(x)}</div>`).join('')}</div>
+   <div>${(o.items||[]).map(i=>`${esc(i.name)} × ${i.qty}`).join('<br>')}</div>
+   <div class="ctl"><select data-oid="${d.id}">${['new','confirmed','shipped','delivered','cancelled'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select><button data-od="${d.id}">Delete</button></div></section>`}).join('');
+ }catch(e){v.innerHTML=`<p class="mut">Could not load orders: ${esc(e.message)}</p>`}
+}
+
+/* ---------- events ---------- */
+document.addEventListener('toggle',e=>{const k=e.target.dataset?.k;if(k)e.target.open?open.add(k):open.delete(k)},true);
+const dirty=()=>$('save').textContent='Save changes •';
+document.addEventListener('click',async e=>{
+ let b=e.target.closest('[data-tab]');if(b){cur=b.dataset.tab;show();return}
+ if(e.target.closest('[data-out]')){auth.signOut();return}
+ if(b=e.target.closest('[data-od]')){if(confirm('Delete this order?')){await db.collection('orders').doc(b.dataset.od).delete();orders()}return}
+ b=e.target.closest('[data-a]');if(!b)return;e.preventDefault();
+ const {a,p,i}=b.dataset;let arr=getp(state,p);if(!arr){arr=[];setp(state,p,arr)}
+ if(a==='add'){const n=NEWS[p.replace(/\.\d+/g,'')];arr.push(n?n():{});open.add(p+'.'+(arr.length-1))}
+ else{const j=+i;if(a==='del'){if(!confirm('Delete this item?'))return;arr.splice(j,1);open.clear()}
+  else{const k=a==='up'?j-1:j+1;if(k<0||k>=arr.length)return;[arr[j],arr[k]]=[arr[k],arr[j]];open.clear()}}
+ show();dirty();
+});
+document.addEventListener('input',e=>{
+ const t=e.target,p=t.dataset.p;if(!p)return;
+ const ty=t.dataset.t,v=ty===B?t.checked:ty===N?(t.value===''?0:Number(t.value)):t.value;
+ setp(state,p,v);if(ty===I)t.closest('.img').querySelector('img').src=v;dirty();
+});
+document.addEventListener('change',async e=>{
+ const t=e.target;
+ if(t.dataset.oid){await db.collection('orders').doc(t.dataset.oid).update({status:t.value});flash('Order updated');return}
+ if(!t.dataset.up||!t.files[0])return;
+ const f=t.files[0];flash('Uploading…');
+ try{const r=st.ref('site/'+Date.now()+'-'+f.name.replace(/[^\w.-]/g,'_'));await r.put(f);const url=await r.getDownloadURL();
+  setp(state,t.dataset.up,url);const bx=t.closest('.img');bx.querySelector('input[data-p]').value=url;bx.querySelector('img').src=url;dirty();flash('Uploaded. Remember to Save.')}
+ catch(err){flash('Upload failed: '+err.message,1)}
+});
+$('save').onclick=async()=>{
+ try{const {products=[],...site}=state;products.forEach((p,i)=>{if(!p.id)p.id='p-'+rid();p.order=i+1});
+  const b=db.batch();b.set(db.doc('site/main'),site);
+  products.forEach(p=>b.set(db.collection('products').doc(p.id),p));
+  oldIds.filter(id=>!products.some(p=>p.id===id)).forEach(id=>b.delete(db.collection('products').doc(id)));
+  await b.commit();oldIds=products.map(p=>p.id);$('save').textContent='Save changes';flash('Saved. Your site is updated.');
+ }catch(err){flash(err.code==='permission-denied'?'Not allowed: paste your UID (bottom-left) into firebase/firestore.rules and firebase/storage.rules and publish them.':'Save failed: '+err.message,1)}
+};
+$('lf').onsubmit=async e=>{e.preventDefault();$('lerr').textContent='';
+ try{await auth.signInWithEmailAndPassword($('em').value,$('pw').value)}catch(err){$('lerr').textContent=err.message}};
+
+/* ---------- start ---------- */
+auth.onAuthStateChanged(async u=>{
+ $('login').hidden=!!u;$('app').hidden=!u;if(!u)return;
+ try{const [s,p]=await Promise.all([db.doc('site/main').get(),db.collection('products').get()]);
+  state=deepMerge(clone(DEFAULT_DATA),s.exists?s.data():{});fixAssets(state);
+  state.products=(s.exists?p.docs.map(d=>({id:d.id,...d.data()})):clone(DEFAULT_DATA.products)).sort((x,y)=>(x.order??0)-(y.order??0));fixAssets(state);
+  oldIds=p.docs.map(d=>d.id);
+  if(!s.exists)flash('Nothing saved yet. Showing starter content. Press Save to publish it.');
+ }catch(err){state=clone(DEFAULT_DATA);flash('Could not read Firestore: '+err.message,1)}
+ show();
+});
+</script>
+</body></html>

@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cozelle · Wrapped in comfort</title>
+<link rel="icon" type="image/png" href="assets/img/cozelle-logo.png">
+<link rel="apple-touch-icon" href="assets/img/cozelle-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -87,10 +89,12 @@ h1 em{display:block;color:var(--copper)}
  -webkit-mask-image:linear-gradient(to top,#000 0,#000 22%,transparent 58%);mask-image:linear-gradient(to top,#000 0,#000 22%,transparent 58%)}
 .info h3{font-family:var(--serif);font-weight:500;font-size:24px;line-height:1.1}
 .info p{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.75;margin-top:4px}
+.info .stock{text-transform:none;letter-spacing:0;font-size:12px;opacity:.9;margin-top:5px}.info .stock.out{color:#ffd2c5}
 .price{color:#f3cba8;font-size:14px;letter-spacing:.05em;margin-top:4px}
 .arch{position:relative;z-index:3;display:block;width:100%;padding:11px 0 13px;text-align:center;font-size:11px;letter-spacing:.28em;text-transform:uppercase;font-weight:500;color:var(--cream);
  background:linear-gradient(120deg,var(--copper-d),var(--copper),var(--rose));background-size:200% 100%;border-radius:50% 50% 0 0/100% 100% 0 0;transition:background-position .6s,letter-spacing .4s}
 .arch:hover{background-position:100% 0;letter-spacing:.36em}
+.arch:disabled,.co:disabled{opacity:.55;cursor:not-allowed}
 
 section{padding:clamp(60px,10vh,110px) clamp(18px,4vw,60px) 10px}
 .sec-head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:44px}
@@ -292,7 +296,7 @@ const live=()=>(D.products||[]).filter(p=>p.active!==false).sort((a,b)=>(a.order
 const money=n=>(D.site.currency||'')+Number(n).toLocaleString(D.site.locale||'en-IN');
 const href=h=>h==='wa'?'https://wa.me/'+D.site.whatsapp:h;
 const drawer=$('drawer'),list=$('cartList'),count=$('count'),sub=$('subtotal'),bag=$('bag'),tEl=$('toast');
-let tt;function toast(m){tEl.textContent=m;tEl.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>tEl.classList.remove('show'),2200)}
+let tt;function toast(m,viewBag=false){tEl.replaceChildren();const text=document.createElement('span');text.textContent=m;tEl.append(text);tEl.classList.toggle('has-action',viewBag);if(viewBag){const action=document.createElement('button');action.type='button';action.className='toast-action';action.textContent='View bag';action.setAttribute('aria-label','View your bag');action.onclick=()=>{clearTimeout(tt);tEl.classList.remove('show');bag.click()};tEl.append(action)}tEl.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>tEl.classList.remove('show'),viewBag?4500:2200)}
 
 /* data-text / data-src / data-alt / data-ph / data-aria="path.in.DATA" fill the static markup */
 const BIND={text:0,src:'src',alt:'alt',ph:'placeholder',aria:'aria-label'};
@@ -300,7 +304,7 @@ function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).for
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
  if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
-const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div></div><button class="arch" data-add="${esc(p.id)}">${esc(D.ui.addToBag)}</button></div></article>`;
+const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
 
 let cur=0,rt;
 function renderReviews(){
@@ -331,14 +335,14 @@ function render(data){
  /* the Collection link opens collection.html (no sub-categories listed) */
  $('menuNav').innerHTML=(D.menu.links||[]).map(l=>{const h=l.href==='index.html'?'#top':href(l.href);return `<a href="${esc(h)}">${esc(l.label)}</a>`}).join('');
  renderReviews();
- Object.keys(cart).forEach(k=>{if(!ps.some(p=>p.id===k)||!(cart[k]>0))delete cart[k]});
+ Object.keys(cart).forEach(k=>{const p=ps.find(x=>x.id===k);if(!p||!(cart[k]>0)||Stock.tracked(p)&&Stock.count(p)===0)delete cart[k];else if(Stock.tracked(p))cart[k]=Math.min(cart[k],Stock.count(p))});
  renderFields();renderCart();observe();
 }
 
 function renderCart(){
  const u=D.ui,rows=live().filter(p=>cart[p.id]),q=rows.reduce((s,p)=>s+cart[p.id],0);
  count.textContent=q;{const c=Price.calc(rows,cart),bk=document.getElementById('brk');sub.textContent=Price.money(c.total);if(bk)bk.innerHTML=Price.brk(c)};drawer.classList.toggle('empty',!q);
- list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(cld(p.image,160))}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${Price.html(p)}</div><div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}">+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
+ list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(cld(p.image,160))}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<div class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</div>`:''}<div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}" ${Stock.tracked(p)&&cart[p.id]>=Stock.count(p)?'disabled':''}>+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
  try{localStorage.setItem('cozelle-cart',JSON.stringify(cart))}catch(e){}
 }
 let cust={};try{cust=JSON.parse(localStorage.getItem('cozelle-customer'))||{}}catch(e){}
@@ -348,11 +352,11 @@ function renderFields(){
   const input=f.type==='textarea'?`<textarea ${a}>${v}</textarea>`:`<input type="${esc(f.type||'text')}" value="${v}" ${a}${f.pattern?` pattern="${esc(f.pattern)}"`:''}${f.hint?` title="${esc(f.hint)}"`:''}>`;
   return `<label class="${f.half?'half':''}"><span>${esc(f.label)}</span>${input}</label>`}).join('');
 }
-function setQty(k,d){cart[k]=(cart[k]||0)+d;if(cart[k]<=0)delete cart[k];renderCart()}
+function setQty(k,d){const p=live().find(x=>x.id===k);if(!p)return;const next=(cart[k]||0)+d;if(Stock.tracked(p)&&next>Stock.count(p)){toast(`Only ${Stock.count(p)} in stock`);return}cart[k]=next;if(cart[k]<=0)delete cart[k];renderCart()}
 const close=()=>{B.classList.remove('menu-open','cart-open');drawer.classList.remove('details')};
 document.addEventListener('click',e=>{
  let b=e.target.closest('[data-add]');
- if(b){const p=live().find(x=>x.id===b.dataset.add);setQty(b.dataset.add,1);bag.classList.remove('bump');void bag.offsetWidth;bag.classList.add('bump');toast(p.name+' '+D.ui.added);return}
+ if(b){const p=live().find(x=>x.id===b.dataset.add);setQty(b.dataset.add,1);bag.classList.remove('bump');void bag.offsetWidth;bag.classList.add('bump');toast(p.name+' '+D.ui.added,true);return}
  if(b=e.target.closest('[data-k]')){setQty(b.dataset.k,+b.dataset.q);return}
  if(b=e.target.closest('[data-rm]')){delete cart[b.dataset.rm];renderCart();return}
  if(e.target.closest('[data-close]')||e.target.id==='scrim'||e.target.closest('#menu nav a'))close();

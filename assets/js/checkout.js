@@ -193,13 +193,12 @@
    /* One tap per UPI app, with the QR kept alongside as a fallback. */
    const q = url.slice(url.indexOf('?')), ios = /iphone|ipad|ipod/i.test(navigator.userAgent), ap = t.apps;
    const links = [
-    { name: ap.gpay, href: (ios ? 'gpay://upi/pay' : 'tez://upi/pay') + q, logo: 'https://api.iconify.design/logos:google-pay.svg?height=36' },
-    { name: ap.phonepe, href: 'phonepe://pay' + q, logo: 'https://api.iconify.design/simple-icons:phonepe.svg?color=%235F259F' },
-    { name: ap.paytm, href: 'paytmmp://pay' + q, logo: 'https://api.iconify.design/simple-icons:paytm.svg?color=%2300BAF2' },
+    { name: ap.gpay, href: (ios ? 'gpay://upi/pay' : 'tez://upi/pay') + q, logo: 'assets/img/google-pay.svg' },
+    { name: ap.phonepe, href: 'phonepe://pay' + q, logo: 'assets/img/phonepe.svg' },
+    { name: ap.paytm, href: 'paytmmp://pay' + q, logo: 'assets/img/paytm.svg' },
     { name: ap.any, href: url, logo: 'assets/img/upi-mark.svg', any: true }
    ];
-   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(a => '<a href="' + esc(a.href) + '" aria-label="' + esc(a.name) + '" title="' + esc(a.name) + '"' + (a.any ? ' class="any"' : '') + '><img src="' + esc(a.logo) + '" alt="" loading="eager"><span class="pay-app-name">' + esc(a.name) + '</span></a>').join('') + '<p>' + esc(t.appHint) + '</p>';
-   g('payApps').querySelectorAll('img').forEach(img => img.addEventListener('error', () => { img.hidden = true; img.parentElement.classList.add('logo-fallback'); }));
+   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(a => '<a href="' + esc(a.href) + '" aria-label="' + esc(a.name) + '" title="' + esc(a.name) + '"' + (a.any ? ' class="any"' : '') + '><img src="' + esc(a.logo) + '" alt="" loading="eager"></a>').join('') + '<p>' + esc(t.appHint) + '</p>';
    g('payApps').hidden = false;
    setBtn(t.place, true);
   } else {

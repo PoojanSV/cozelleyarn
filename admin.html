@@ -33,6 +33,8 @@ summary{cursor:pointer;padding:12px 0;display:flex;justify-content:space-between
 .img{display:flex;gap:10px;align-items:center}.img img{width:54px;height:54px;object-fit:cover;border-radius:10px;background:#eadcc6;flex:none}
 .up{position:relative;flex:none}.up input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
 .mut{color:#8a7360}
+.shot{display:grid;gap:6px;justify-items:start}.shot img{display:block;max-width:min(240px,100%);max-height:380px;object-fit:contain;border-radius:12px;background:#eadcc6;min-height:90px}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;background:rgba(181,105,63,.14);color:var(--copper-d);font-size:12px}
 #msg{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--copper-d);color:#fff;padding:12px 22px;border-radius:30px;z-index:9;max-width:90vw}
 #msg.err{background:#a3321f}
 @media(max-width:760px){#app{grid-template-columns:1fr}#nav{position:static;height:auto;flex-direction:row;flex-wrap:wrap}#nav h2,#nav small{display:none}main{padding:0 14px 60px}}
@@ -44,18 +46,19 @@ summary{cursor:pointer;padding:12px 0;display:flex;justify-content:space-between
 </div>
 <div id="app" hidden>
  <aside id="nav"></aside>
- <main><div class="bar"><h1 id="ttl"></h1><div><a href="index.html" target="_blank">View site ↗</a><button class="pri" id="save">Save changes</button></div></div><div id="view"></div></main>
+ <main><div class="bar"><h1 id="ttl"></h1><div><a href="index.html" target="_blank">View site ↗</a><button id="mig" title="Copies every image that is not on Cloudinary yet (local files, Unsplash, old Firebase links) to Cloudinary">Move images to Cloudinary</button><button class="pri" id="save">Save changes</button></div></div><div id="view"></div></main>
 </div>
 <div id="msg" hidden></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 firebase.initializeApp(FIREBASE_CONFIG);
-const auth=firebase.auth(),db=firebase.firestore(),st=firebase.storage();
+/* Firebase = sign-in + Firestore data. Every image goes to Cloudinary (assets/js/cloudinary.js). */
+const auth=firebase.auth(),db=firebase.firestore();
 const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const getp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
@@ -80,7 +83,7 @@ const TABS={
  'Contact us':[
   {path:'contact',title:'Contact page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Short intro',A],['email','Email (leave empty to hide)'],['address','Address (leave empty to hide)',A],['hours','Opening hours (leave empty to hide)']]}],
  Site:[
-  {path:'site',title:'Shop details',f:[['name','Shop name'],['brand','Name shown in the header'],['tagline','Tagline'],['logo','Logo',I],['whatsapp','WhatsApp number with country code, digits only (orders and contact messages go here)'],['currency','Currency symbol'],['copyright','Copyright line']]}],
+  {path:'site',title:'Shop details',f:[['name','Shop name'],['brand','Name shown in the header'],['tagline','Tagline'],['logo','Logo',I],['upiId','UPI ID that receives payments, for example shopname@okhdfcbank'],['upiName','Name shown in the customer\'s UPI app'],['whatsapp','WhatsApp number with country code, digits only (used for the Contact page and the WhatsApp link, not for orders)'],['currency','Currency symbol'],['copyright','Copyright line']]}],
  Orders:[]
 };
 
@@ -92,7 +95,7 @@ function rF(f,pre){
  let inp;
  if(t===A)inp=`<textarea rows="3" ${d}>${esc(v)}</textarea>`;
  else if(t===S)inp=`<select ${d}>${x.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
- else if(t===I)inp=`<div class="img"><img src="${esc(v)}" alt=""><input ${d} value="${esc(v)}" placeholder="Paste a link, or upload →"><label class="up"><button type="button">Upload</button><input type="file" accept="image/*" data-up="${p}"></label></div>`;
+ else if(t===I)inp=`<div class="img"><img src="${esc(cld(v,120))}" alt=""><input ${d} value="${esc(v)}" placeholder="Paste a link, or upload →"><label class="up"><button type="button">Upload</button><input type="file" accept="image/*" data-up="${p}"></label></div>`;
  else inp=`<input ${t===N?'type="number" step="any"':t===C?'type="color"':''} ${d} value="${esc(v)}">`;
  return `<label class="f"><span>${l}</span>${inp}</label>`;
 }
@@ -108,15 +111,21 @@ function rB(b,pre){
 function show(){
  $('ttl').textContent=cur;
  $('nav').innerHTML='<h2>COZELLE</h2>'+Object.keys(TABS).map(t=>`<button class="${t===cur?'on':''}" data-tab="${t}">${t}</button>`).join('')+`<small>Signed in as<br>${esc(auth.currentUser.email)}<br>UID: ${auth.currentUser.uid}</small><button data-out>Sign out</button>`;
- $('save').hidden=cur==='Orders';
+ $('save').hidden=$('mig').hidden=cur==='Orders';
  if(cur==='Orders')return orders();
  $('view').innerHTML=TABS[cur].map(b=>rB(b,'')).join('');
 }
 async function orders(){
  const v=$('view');v.innerHTML='<p class="mut">Loading…</p>';
  try{const q=await db.collection('orders').orderBy('createdAt','desc').limit(60).get(),cs=state.site?.currency||'';
-  v.innerHTML=q.empty?'<p class="mut">No orders yet.</p>':q.docs.map(d=>{const o=d.data(),c=o.customer||{};
-   return `<section class="blk"><h3><span>${esc(c.name||'Customer')} · ${esc(cs)}${Number(o.total).toLocaleString('en-IN')}</span><small>${o.createdAt?o.createdAt.toDate().toLocaleString():''}</small></h3>
+  v.innerHTML=q.empty?'<p class="mut">No orders yet.</p>':q.docs.map(d=>{const o=d.data(),c=o.customer||{},pm=o.payment||{};
+   const title=[pm.ref,c.name||'Customer'].filter(Boolean).map(esc).join(' · ')+' · '+esc(cs)+Number(o.total).toLocaleString('en-IN');
+   const tag=`<span class="tag">UPI · ${esc(cs)}${Number(pm.amount??o.total).toLocaleString('en-IN')} to ${esc(pm.upiId||'')}${pm.utr?' · UTR '+esc(pm.utr):''}</span>`;
+   const pay=isCld(pm.screenshotUrl)?`<div class="shot">${tag}<a href="${esc(pm.screenshotUrl)}" target="_blank" rel="noopener" title="Open full size"><img alt="Payment screenshot" src="${esc(cld(pm.screenshotUrl,480))}"></a></div>`
+    :pm.screenshotPath?`<div class="shot">${tag}<span class="mut">Older order: screenshot is in Firebase Storage (${esc(pm.screenshotPath)}).</span></div>`
+    :'<div><span class="tag">No payment screenshot</span></div>';
+   return `<section class="blk"><h3><span>${title}</span><small>${o.createdAt?o.createdAt.toDate().toLocaleString():''}</small></h3>
+   ${pay}
    <div>${Object.entries(c).map(([k,x])=>`<div><b>${esc(k)}:</b> ${esc(x)}</div>`).join('')}</div>
    <div>${(o.items||[]).map(i=>`${esc(i.name)} × ${i.qty}`).join('<br>')}</div>
    <div class="ctl"><select data-oid="${d.id}">${['new','confirmed','shipped','delivered','cancelled'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select><button data-od="${d.id}">Delete</button></div></section>`}).join('');
@@ -129,7 +138,7 @@ const dirty=()=>$('save').textContent='Save changes •';
 document.addEventListener('click',async e=>{
  let b=e.target.closest('[data-tab]');if(b){cur=b.dataset.tab;show();return}
  if(e.target.closest('[data-out]')){auth.signOut();return}
- if(b=e.target.closest('[data-od]')){if(confirm('Delete this order?')){await db.collection('orders').doc(b.dataset.od).delete();orders()}return}
+ if(b=e.target.closest('[data-od]')){if(confirm('Delete this order? Its payment screenshot stays in your Cloudinary Media Library (delete it there if you want it gone).')){await db.collection('orders').doc(b.dataset.od).delete();orders()}return}
  b=e.target.closest('[data-a]');if(!b)return;e.preventDefault();
  const {a,p,i}=b.dataset;let arr=getp(state,p);if(!arr){arr=[];setp(state,p,arr)}
  if(a==='add'){const n=NEWS[p.replace(/\.\d+/g,'')];arr.push(n?n():{});open.add(p+'.'+(arr.length-1))}
@@ -140,24 +149,49 @@ document.addEventListener('click',async e=>{
 document.addEventListener('input',e=>{
  const t=e.target,p=t.dataset.p;if(!p)return;
  const ty=t.dataset.t,v=ty===B?t.checked:ty===N?(t.value===''?0:Number(t.value)):t.value;
- setp(state,p,v);if(ty===I)t.closest('.img').querySelector('img').src=v;dirty();
+ setp(state,p,v);if(ty===I)t.closest('.img').querySelector('img').src=cld(v,120);dirty();
 });
 document.addEventListener('change',async e=>{
  const t=e.target;
  if(t.dataset.oid){await db.collection('orders').doc(t.dataset.oid).update({status:t.value});flash('Order updated');return}
  if(!t.dataset.up||!t.files[0])return;
- const f=t.files[0];flash('Uploading…');
- try{const r=st.ref('site/'+Date.now()+'-'+f.name.replace(/[^\w.-]/g,'_'));await r.put(f);const url=await r.getDownloadURL();
-  setp(state,t.dataset.up,url);const bx=t.closest('.img');bx.querySelector('input[data-p]').value=url;bx.querySelector('img').src=url;dirty();flash('Uploaded. Remember to Save.')}
+ const f=t.files[0];
+ if(!/^image\//.test(f.type)){flash('Please choose an image file.',1);return}
+ if(f.size>10*1024*1024){flash('That image is over 10 MB. Please choose a smaller one.',1);return}
+ flash('Uploading to Cloudinary…');
+ try{const url=(await cldUpload(f,{preset:CLOUDINARY.sitePreset,tags:['site']})).secure_url;
+  setp(state,t.dataset.up,url);const bx=t.closest('.img');bx.querySelector('input[data-p]').value=url;bx.querySelector('img').src=cld(url,120);dirty();flash('Uploaded. Remember to Save.')}
  catch(err){flash('Upload failed: '+err.message,1)}
+ t.value='';
 });
+/* ---------- move every image that is not on Cloudinary yet (local files, Unsplash, old Firebase links) ---------- */
+const imgPaths=()=>['site.logo','site.background','hero.modelImage','about.image'].concat((state.products||[]).flatMap((p,i)=>[`products.${i}.image`,...(p.gallery||[]).map((_,j)=>`products.${i}.gallery.${j}.image`)]));
+$('mig').onclick=async()=>{
+ const todo=imgPaths().map(p=>[p,getp(state,p)]).filter(([p,v])=>typeof v==='string'&&v.trim()&&!isCld(v));
+ if(!todo.length){flash('Every image is already on Cloudinary.');return}
+ if(!confirm(`Copy ${todo.length} image${todo.length>1?'s':''} to Cloudinary and switch the site to them?\nYou still press "Save changes" afterwards.`))return;
+ const seen={},fail=[];let ok=0;$('mig').disabled=true;
+ for(let n=0;n<todo.length;n++){const [p,v]=todo[n];flash(`Moving image ${n+1} of ${todo.length}…`);
+  try{
+   if(!seen[v]){
+    let src=v;
+    if(!/^https?:\/\//i.test(v)){const r=await fetch(v);if(!r.ok)throw new Error('file not found');src=await r.blob()}
+    seen[v]=(await cldUpload(src,{preset:CLOUDINARY.sitePreset,tags:['site','migrated'],filename:v.split('?')[0].split('/').pop()||'image'})).secure_url;
+   }
+   setp(state,p,seen[v]);ok++;
+  }catch(err){fail.push(`${p} (${err.message})`)}
+ }
+ $('mig').disabled=false;show();if(ok)dirty();
+ flash(fail.length?`Moved ${ok}, failed ${fail.length}: ${fail[0]}${fail.length>1?' …':''}`:`Moved ${ok} image${ok>1?'s':''} to Cloudinary. Press Save changes.`,!!fail.length);
+ if(fail.length)console.warn('Images that could not be moved:',fail);
+};
 $('save').onclick=async()=>{
  try{const {products=[],...site}=state;products.forEach((p,i)=>{if(!p.id)p.id='p-'+rid();p.order=i+1});
   const b=db.batch();b.set(db.doc('site/main'),site);
   products.forEach(p=>b.set(db.collection('products').doc(p.id),p));
   oldIds.filter(id=>!products.some(p=>p.id===id)).forEach(id=>b.delete(db.collection('products').doc(id)));
   await b.commit();oldIds=products.map(p=>p.id);$('save').textContent='Save changes';flash('Saved. Your site is updated.');
- }catch(err){flash(err.code==='permission-denied'?'Not allowed: paste your UID (bottom-left) into firebase/firestore.rules and firebase/storage.rules and publish them.':'Save failed: '+err.message,1)}
+ }catch(err){flash(err.code==='permission-denied'?'Not allowed: paste your UID (bottom-left) into firebase/firestore.rules and publish it.':'Save failed: '+err.message,1)}
 };
 $('lf').onsubmit=async e=>{e.preventDefault();$('lerr').textContent='';
  try{await auth.signInWithEmailAndPassword($('em').value,$('pw').value)}catch(err){$('lerr').textContent=err.message}};

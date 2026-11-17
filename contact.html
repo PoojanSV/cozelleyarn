@@ -143,12 +143,15 @@ body.menu-open,body.cart-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<link rel="stylesheet" href="assets/css/checkout.css">
+<link rel="stylesheet" href="assets/css/account.css">
+<link rel="stylesheet" href="assets/css/pricing.css">
 </head>
 <body>
 
 <div class="page">
   <header>
-    <a class="brand" href="index.html" data-aria="site.name"><img data-src="site.logo" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
+    <a class="brand" href="index.html" data-aria="site.name"><img data-src="site.logo" data-w="240" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
     <div class="hctl">
       <button class="bag" id="bag" data-aria="ui.openBag"><span class="bi"></span><b id="bagCount">0</b></button>
       <button class="burger" id="burger" data-aria="ui.openMenu"><i></i><i></i><i></i></button>
@@ -192,18 +195,20 @@ body.menu-open,body.cart-open{overflow:hidden}
   <div class="ph-head"><h2 class="t-bag" data-text="ui.bagTitle"></h2><h2 class="t-det" data-text="checkout.title"></h2><button class="x" data-close data-aria="ui.closeBag">×</button></div>
   <ul id="cartList"></ul>
   <div class="emp"><p data-text="ui.empty"></p><button class="co" id="shopBtn" data-text="ui.browse"></button></div>
-  <div class="df"><div class="sum"><span data-text="ui.subtotal"></span><strong id="subtotal">0</strong></div><small data-text="ui.delivery"></small><button class="co" id="checkout" data-text="ui.checkout"></button></div>
+  <div class="df"><div class="brk" id="brk"></div><div class="sum"><span data-text="tax.total"></span><strong id="subtotal">0</strong></div><small data-text="ui.delivery"></small><button class="co" id="checkout" data-text="pay.proceed"></button></div>
   <form class="cof" id="coForm">
     <div class="cof-sum"><span data-text="ui.total"></span><strong id="coTotal"></strong></div>
     <div class="cof-grid" id="coFields"></div>
-    <button class="co" type="submit" data-text="checkout.submit"></button>
+    <button class="co" type="submit" data-text="pay.continue"></button>
     <button class="cof-back" type="button" id="coBack" data-text="checkout.back"></button>
   </form>
 </aside>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
@@ -212,11 +217,6 @@ async function loadData(){
  const [s,p]=await Promise.all([db.doc('site/main').get(),db.collection('products').get()]);
  if(!s.exists)return DEFAULT_DATA;
  return fixAssets({...deepMerge(DEFAULT_DATA,s.data()),products:p.docs.map(d=>({id:d.id,...d.data()}))});
-}
-async function saveOrder(rows){
- if(!db)return;
- await db.collection('orders').add({customer:{...cust},items:rows.map(p=>({id:p.id,name:p.name,qty:cart[p.id],price:p.price})),
-  total:rows.reduce((t,p)=>t+p.price*cart[p.id],0),status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
 }
 
 /* ================= engine ================= */
@@ -234,13 +234,13 @@ let tt;function toast(m){tEl.textContent=m;tEl.classList.add('show');clearTimeou
 const BIND={text:0,src:'src',alt:'alt',ph:'placeholder',aria:'aria-label'};
 function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).forEach(e=>{
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
- if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],v);if(k==='src')e.style.display=''}})}
+ if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
 
 function renderCart(){
  const u=D.ui,rows=live().filter(p=>cart[p.id]),q=rows.reduce((s,p)=>s+cart[p.id],0);
- bagCount.textContent=q;sub.textContent=money(rows.reduce((s,p)=>s+p.price*cart[p.id],0));drawer.classList.toggle('empty',!q);
- list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(p.image)}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${money(p.price)}</div><div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}">+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
+ bagCount.textContent=q;{const c=Price.calc(rows,cart),bk=document.getElementById('brk');sub.textContent=Price.money(c.total);if(bk)bk.innerHTML=Price.brk(c)};drawer.classList.toggle('empty',!q);
+ list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(cld(p.image,160))}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${Price.html(p)}</div><div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}">+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
  try{localStorage.setItem('cozelle-cart',JSON.stringify(cart))}catch(e){}
 }
 let cust={};try{cust=JSON.parse(localStorage.getItem('cozelle-customer'))||{}}catch(e){}
@@ -255,7 +255,7 @@ function setQty(k,d){cart[k]=(cart[k]||0)+d;if(cart[k]<=0)delete cart[k];renderC
 function render(data){
  D=data;
  Object.entries(D.theme||{}).forEach(([k,v])=>root.style.setProperty('--'+k,v));
- root.style.setProperty('--bg-image',D.site.background?`url("${D.site.background}")`:'none');
+ root.style.setProperty('--bg-image',D.site.background?`url("${cld(D.site.background,1920,{eco:1})}")`:'none');
  bind();
  const cols=D.footer.columns||[];$('contact').style.setProperty('--fcols',Math.max(cols.length,1));
  $('fcols').innerHTML=cols.map(c=>`<div><h5>${esc(c.title)}</h5><ul>${(c.items||[]).map(i=>i.href?`<li><a href="${esc(href(i.href))}">${esc(i.label)}</a></li>`:`<li>${esc(i.label)}</li>`).join('')}</ul></div>`).join('');
@@ -273,14 +273,6 @@ $('nl').onsubmit=e=>{e.preventDefault();toast(D.ui.thanks);e.target.reset()};
 $('checkout').onclick=()=>{if(!live().some(p=>cart[p.id]))return;$('coTotal').textContent=sub.textContent;drawer.classList.add('details');const f=$('coFields').querySelector('input,textarea');if(f&&!f.value)setTimeout(()=>f.focus(),450)};
 $('coBack').onclick=()=>drawer.classList.remove('details');
 $('coForm').addEventListener('input',e=>{if(!e.target.name)return;cust[e.target.name]=e.target.value;try{localStorage.setItem('cozelle-customer',JSON.stringify(cust))}catch(_){}});
-$('coForm').onsubmit=async e=>{
- e.preventDefault();
- const rows=live().filter(p=>cart[p.id]);if(!rows.length)return;
- const who=(D.checkout.fields||[]).map(f=>[f.label,(cust[f.key]||'').trim()]).filter(x=>x[1]).map(x=>`${x[0]}: ${x[1]}`);
- const msg=[`*${D.ui.orderTitle} - ${D.site.name}*`,'',...rows.map((p,i)=>`${i+1}. ${p.name} x ${cart[p.id]} - ${money(p.price*cart[p.id])}`),'',`*${D.ui.total}: ${sub.textContent}*`,'',`*${D.checkout.customer}*`,...who].join('\n');
- try{await Promise.race([saveOrder(rows),new Promise(r=>setTimeout(r,2500))])}catch(err){console.warn('order not saved',err)}
- location.href='https://wa.me/'+D.site.whatsapp+'?text='+encodeURIComponent(msg);
-};
 document.addEventListener('click',e=>{
  let b=e.target.closest('[data-k]');
  if(b){setQty(b.dataset.k,+b.dataset.q);return}
@@ -312,5 +304,9 @@ $('cform').onsubmit=e=>{
 
 loadData().catch(e=>{console.error('loadData failed, using defaults',e);return DEFAULT_DATA}).then(render);
 </script>
+<script src="assets/js/vendor/qrcode.js"></script>
+<script src="assets/js/account.js"></script>
+<script src="assets/js/checkout.js"></script>
+<script src="assets/js/cookies.js"></script>
 </body>
 </html>

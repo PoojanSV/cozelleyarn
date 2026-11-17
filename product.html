@@ -181,12 +181,15 @@ body.menu-open,body.cart-open{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<link rel="stylesheet" href="assets/css/checkout.css">
+<link rel="stylesheet" href="assets/css/account.css">
+<link rel="stylesheet" href="assets/css/pricing.css">
 </head>
 <body>
 
 <div class="page">
   <header>
-    <a class="brand" href="index.html" data-aria="site.name"><img data-src="site.logo" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
+    <a class="brand" href="index.html" data-aria="site.name"><img data-src="site.logo" data-w="240" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
     <div class="hctl">
       <button class="bag" id="bag" data-aria="ui.openBag"><span class="bi"></span><b id="bagCount">0</b></button>
       <button class="burger" id="burger" data-aria="ui.openMenu"><i></i><i></i><i></i></button>
@@ -218,11 +221,11 @@ body.menu-open,body.cart-open{overflow:hidden}
   <div class="ph-head"><h2 class="t-bag" data-text="ui.bagTitle"></h2><h2 class="t-det" data-text="checkout.title"></h2><button class="x" data-close data-aria="ui.closeBag">×</button></div>
   <ul id="cartList"></ul>
   <div class="emp"><p data-text="ui.empty"></p><button class="co" id="shopBtn" data-text="ui.browse"></button></div>
-  <div class="df"><div class="sum"><span data-text="ui.subtotal"></span><strong id="subtotal">0</strong></div><small data-text="ui.delivery"></small><button class="co" id="checkout" data-text="ui.checkout"></button></div>
+  <div class="df"><div class="brk" id="brk"></div><div class="sum"><span data-text="tax.total"></span><strong id="subtotal">0</strong></div><small data-text="ui.delivery"></small><button class="co" id="checkout" data-text="pay.proceed"></button></div>
   <form class="cof" id="coForm">
     <div class="cof-sum"><span data-text="ui.total"></span><strong id="coTotal"></strong></div>
     <div class="cof-grid" id="coFields"></div>
-    <button class="co" type="submit" data-text="checkout.submit"></button>
+    <button class="co" type="submit" data-text="pay.continue"></button>
     <button class="cof-back" type="button" id="coBack" data-text="checkout.back"></button>
   </form>
 </aside>
@@ -231,7 +234,9 @@ body.menu-open,body.cart-open{overflow:hidden}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true"><button class="lbx" data-lbclose aria-label="Close">×</button><button class="lbp" id="lbp" aria-label="Previous photo">‹</button><img id="lbImg" alt=""><button class="lbn" id="lbn" aria-label="Next photo">›</button></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 /* ================= data (same source as the other pages) ================= */
@@ -241,11 +246,6 @@ async function loadData(){
  const [s,p]=await Promise.all([db.doc('site/main').get(),db.collection('products').get()]);
  if(!s.exists)return DEFAULT_DATA;
  return fixAssets({...deepMerge(DEFAULT_DATA,s.data()),products:p.docs.map(d=>({id:d.id,...d.data()}))});
-}
-async function saveOrder(rows){
- if(!db)return;
- await db.collection('orders').add({customer:{...cust},items:rows.map(p=>({id:p.id,name:p.name,qty:cart[p.id],price:p.price})),
-  total:rows.reduce((t,p)=>t+p.price*cart[p.id],0),status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
 }
 
 /* Wording for this page. Edit it in admin.html > Product page. */
@@ -269,18 +269,18 @@ let tt;function toast(m){tEl.textContent=m;tEl.classList.add('show');clearTimeou
 const BIND={text:0,src:'src',alt:'alt',ph:'placeholder',aria:'aria-label'};
 function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).forEach(e=>{
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
- if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],v);if(k==='src')e.style.display=''}})}
+ if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
-const card=p=>`<article class="card"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(p.image)}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(p.image)}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a><div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${money(p.price)}</div></div><button class="arch" data-add="${esc(p.id)}">${esc(D.ui.addToBag)}</button></div></article>`;
+const card=p=>`<article class="card"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div></div><button class="arch" data-add="${esc(p.id)}">${esc(D.ui.addToBag)}</button></div></article>`;
 
 /* ================= product page ================= */
 let P=null,pq=1,imgs=[],gi=0;
 const PW=()=>D.product;
 function showImg(i){
  gi=(i+imgs.length)%imgs.length;const m=imgs[gi],mi=$('mainImg');
- mi.style.display='';mi.src=m.src;mi.alt=m.alt;
+ mi.style.display='';mi.src=cld(m.src,1400);mi.alt=m.alt;
  document.querySelectorAll('.tb').forEach((b,k)=>b.setAttribute('aria-current',k===gi));
- if(!$('lb').hidden){$('lbImg').src=m.src;$('lbImg').alt=m.alt}
+ if(!$('lb').hidden){$('lbImg').src=cld(m.src,2000);$('lbImg').alt=m.alt}
 }
 function renderProduct(){
  const main=$('prod'),w=PW(),id=new URLSearchParams(location.search).get('id');
@@ -293,12 +293,12 @@ function renderProduct(){
  main.innerHTML=`<a class="back" href="collection.html">← ${esc(w.back)}</a>
  <div class="pgrid">
   <div class="gal">
-   <div class="main ph"><img id="mainImg" src="${esc(imgs[0]?.src)}" alt="${esc(P.name)}"><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
-   ${many?`<div class="thumbs">${imgs.map((m,k)=>`<button class="tb ph" data-img="${k}" aria-label="${esc(m.alt)}" aria-current="${k===0}"><img src="${esc(m.src)}" alt=""></button>`).join('')}</div>`:''}
+   <div class="main ph"><img id="mainImg" src="${esc(cld(imgs[0]?.src,1400))}" alt="${esc(P.name)}"><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
+   ${many?`<div class="thumbs">${imgs.map((m,k)=>`<button class="tb ph" data-img="${k}" aria-label="${esc(m.alt)}" aria-current="${k===0}"><img src="${esc(cld(m.src,200))}" alt=""></button>`).join('')}</div>`:''}
   </div>
   <div class="pinfo">
    <div><div class="pcat">${esc(P.category||'')}</div><h1>${esc(P.name)}</h1></div>
-   <div class="pprice">${money(P.price)}</div>
+   <div class="pprice">${Price.html(P)}</div>
    ${P.description?`<p class="pdesc">${esc(P.description)}</p>`:''}
    <div class="buy"><div class="qty" role="group" aria-label="${esc(w.qty)}"><button data-pq="-1" aria-label="${esc(D.ui.decrease)}">−</button><span id="pqty" aria-live="polite">${pq}</span><button data-pq="1" aria-label="${esc(D.ui.increase)}">+</button></div><button class="co" data-padd>${esc(D.ui.addToBag)}</button></div>
    ${(w.assurances||[]).length?`<ul class="assure">${w.assurances.filter(a=>a&&a.text).map(a=>`<li>${esc(a.text)}</li>`).join('')}</ul>`:''}
@@ -313,7 +313,7 @@ function render(data){
  D=data;
  D.product={...PRODUCT,...(D.product||{})};
  Object.entries(D.theme||{}).forEach(([k,v])=>root.style.setProperty('--'+k,v));
- root.style.setProperty('--bg-image',D.site.background?`url("${D.site.background}")`:'none');
+ root.style.setProperty('--bg-image',D.site.background?`url("${cld(D.site.background,1920,{eco:1})}")`:'none');
  document.title=D.site.title||D.site.name;
  bind();
  const cols=D.footer.columns||[];$('contact').style.setProperty('--fcols',Math.max(cols.length,1));
@@ -327,8 +327,8 @@ function render(data){
 /* ================= bag + checkout (same behaviour as the home page; the bag is shared through localStorage) ================= */
 function renderCart(){
  const u=D.ui,rows=live().filter(p=>cart[p.id]),q=rows.reduce((s,p)=>s+cart[p.id],0);
- bagCount.textContent=q;sub.textContent=money(rows.reduce((s,p)=>s+p.price*cart[p.id],0));drawer.classList.toggle('empty',!q);
- list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(p.image)}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${money(p.price)}</div><div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}">+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
+ bagCount.textContent=q;{const c=Price.calc(rows,cart),bk=document.getElementById('brk');sub.textContent=Price.money(c.total);if(bk)bk.innerHTML=Price.brk(c)};drawer.classList.toggle('empty',!q);
+ list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(cld(p.image,160))}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${Price.html(p)}</div><div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}">+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
  try{localStorage.setItem('cozelle-cart',JSON.stringify(cart))}catch(e){}
 }
 let cust={};try{cust=JSON.parse(localStorage.getItem('cozelle-customer'))||{}}catch(e){}
@@ -349,21 +349,13 @@ $('nl').onsubmit=e=>{e.preventDefault();toast(D.ui.thanks);e.target.reset()};
 $('checkout').onclick=()=>{if(!live().some(p=>cart[p.id]))return;$('coTotal').textContent=sub.textContent;drawer.classList.add('details');const f=$('coFields').querySelector('input,textarea');if(f&&!f.value)setTimeout(()=>f.focus(),450)};
 $('coBack').onclick=()=>drawer.classList.remove('details');
 $('coForm').addEventListener('input',e=>{if(!e.target.name)return;cust[e.target.name]=e.target.value;try{localStorage.setItem('cozelle-customer',JSON.stringify(cust))}catch(_){}});
-$('coForm').onsubmit=async e=>{
- e.preventDefault();
- const rows=live().filter(p=>cart[p.id]);if(!rows.length)return;
- const who=(D.checkout.fields||[]).map(f=>[f.label,(cust[f.key]||'').trim()]).filter(x=>x[1]).map(x=>`${x[0]}: ${x[1]}`);
- const msg=[`*${D.ui.orderTitle} - ${D.site.name}*`,'',...rows.map((p,i)=>`${i+1}. ${p.name} x ${cart[p.id]} - ${money(p.price*cart[p.id])}`),'',`*${D.ui.total}: ${sub.textContent}*`,'',`*${D.checkout.customer}*`,...who].join('\n');
- try{await Promise.race([saveOrder(rows),new Promise(r=>setTimeout(r,2500))])}catch(err){console.warn('order not saved',err)}
- location.href='https://wa.me/'+D.site.whatsapp+'?text='+encodeURIComponent(msg);
-};
 document.addEventListener('click',e=>{
  let b=e.target.closest('[data-padd]');
  if(b&&P){setQty(P.id,pq);bag.classList.remove('bump');void bag.offsetWidth;bag.classList.add('bump');toast(P.name+' '+D.ui.added);return}
  if(b=e.target.closest('[data-pq]')){pq=Math.min(99,Math.max(1,pq+ +b.dataset.pq));$('pqty').textContent=pq;return}
  if(b=e.target.closest('[data-img]')){showImg(+b.dataset.img);return}
  if(b=e.target.closest('[data-gn]')){showImg(gi+ +b.dataset.gn);return}
- if(e.target.closest('#mz')){$('lb').hidden=false;$('lbImg').src=imgs[gi].src;$('lbImg').alt=imgs[gi].alt;const many=imgs.length>1;$('lbp').hidden=$('lbn').hidden=!many;B.style.overflow='hidden';return}
+ if(e.target.closest('#mz')){$('lb').hidden=false;$('lbImg').src=cld(imgs[gi].src,2000);$('lbImg').alt=imgs[gi].alt;const many=imgs.length>1;$('lbp').hidden=$('lbn').hidden=!many;B.style.overflow='hidden';return}
  if(e.target.closest('#lbp')){showImg(gi-1);return}
  if(e.target.closest('#lbn')){showImg(gi+1);return}
  if(e.target.closest('[data-lbclose]')||e.target.id==='lb'){closeLb();return}
@@ -383,5 +375,9 @@ document.addEventListener('error',e=>{if(e.target.tagName==='IMG')e.target.style
 loadData().catch(e=>{console.error('loadData failed, using defaults',e);return DEFAULT_DATA}).then(render);
 window.Cozelle={render,get data(){return D}};
 </script>
+<script src="assets/js/vendor/qrcode.js"></script>
+<script src="assets/js/account.js"></script>
+<script src="assets/js/checkout.js"></script>
+<script src="assets/js/cookies.js"></script>
 </body>
 </html>

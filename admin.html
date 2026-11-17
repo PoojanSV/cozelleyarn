@@ -2,42 +2,63 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cozelle Admin</title>
 <style>
-:root{--copper:#b5693f;--copper-d:#8e4a2a;--cocoa:#4a2b1b;--line:rgba(181,105,63,.3)}
+:root{--copper:#2f2a26;--copper-d:#5e554c;--cocoa:#2b2622;--accent:#b5693f;--bg:#faf8f4;--line:rgba(60,50,40,.12);--ok:#2f7d4f;--bad:#a3321f;--warn:#c98a1b;--mut:#8a8178}
 *{box-sizing:border-box;margin:0}
-body{font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;background:#f7f0e4;color:var(--cocoa)}
+body{font:14.5px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:#2b2622}
 [hidden]{display:none!important}
-.center{min-height:100vh;display:grid;place-items:center}
-.card{background:#fff;border-radius:22px;padding:34px;width:min(380px,92vw);display:grid;gap:12px;box-shadow:0 24px 60px -34px rgba(74,43,27,.55)}
+.center{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#faf8f4,#f0ebe2)}
+.card{background:#fff;border-radius:24px;padding:36px;width:min(390px,92vw);display:grid;gap:12px;box-shadow:0 30px 70px -44px rgba(43,38,34,.45)}
 .card h1{font:500 30px Georgia,serif;color:var(--copper-d)}
-input,textarea,select{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:inherit;text-transform:none;letter-spacing:0}
+input,textarea,select{font:inherit;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:inherit}
 input:focus,textarea:focus,select:focus{outline:2px solid var(--copper);outline-offset:1px}
-input[type=color]{padding:3px;height:42px}input[type=checkbox]{width:18px;height:18px}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:9px 14px;background:rgba(181,105,63,.14);color:var(--copper-d)}
-button:hover{background:rgba(181,105,63,.25)}button.pri{background:var(--copper);color:#fff}button.pri:hover{background:var(--copper-d)}
-#app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
-#nav{background:var(--copper-d);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow:auto}
-#nav h2{font:500 24px Georgia,serif;color:#f4e8d3;padding:4px 14px 14px;letter-spacing:.12em}
-#nav button{text-align:left;background:none;color:#f4e8d3;padding:10px 14px}#nav button.on,#nav button:hover{background:rgba(255,255,255,.16)}
-#nav small{margin-top:auto;color:#f4e8d3;opacity:.7;font-size:11px;word-break:break-all;padding:10px 14px}
-main{padding:0 30px 70px;max-width:920px;width:100%}
-.bar{position:sticky;top:0;z-index:5;background:#f7f0e4;display:flex;justify-content:space-between;align-items:center;padding:18px 0;gap:10px;flex-wrap:wrap}
-.bar h1{font:500 30px Georgia,serif}.bar div{display:flex;gap:8px;align-items:center}.bar a{color:var(--copper-d)}
-.blk{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;display:grid;gap:14px}
-.blk h3{display:flex;justify-content:space-between;align-items:center;font:600 13px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--copper-d)}
-.blk h3 small{font-weight:400;letter-spacing:0;text-transform:none;color:#8a7360}
+input[type=checkbox]{width:18px;height:18px}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:rgba(60,50,40,.07);color:#3b342e;transition:.15s}
+button:hover{background:rgba(60,50,40,.13)}button.pri{background:var(--copper);color:#fff}button.pri:hover{background:#4a423b}button:disabled{opacity:.5;cursor:wait}
+#app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+#nav{background:#f3efe8;border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow:auto}
+#nav h2{font:500 24px Georgia,serif;color:#2b2622;padding:4px 14px 16px;letter-spacing:.14em}#nav h2 small{display:block;font:11px system-ui;letter-spacing:.3em;text-transform:uppercase;opacity:.55}
+#nav>button{text-align:left;background:none;color:#5e554c;padding:10px 14px;display:flex;align-items:center;gap:10px;border-radius:12px}
+#nav>button:hover{background:rgba(60,50,40,.06)}#nav>button.on{background:#fff;color:#2b2622;font-weight:600;box-shadow:inset 3px 0 0 var(--accent),0 1px 0 var(--line)}
+#nav em{margin-left:auto;background:var(--accent);color:#fff;font-style:normal;font-size:12px;font-weight:700;border-radius:20px;padding:0 8px}
+.nf{margin-top:auto;display:grid;gap:6px;padding:12px 6px 0;border-top:1px solid var(--line)}.nf span{color:#5e554c;opacity:.8;font-size:12px;word-break:break-all;padding:0 8px}
+.nf button{background:rgba(60,50,40,.07);color:#3b342e;font-size:13px}
+main{padding:0 30px 80px;max-width:1240px;width:100%}
+.bar{position:sticky;top:0;z-index:5;background:rgba(250,248,244,.92);backdrop-filter:blur(8px);display:flex;justify-content:space-between;align-items:center;padding:18px 0;gap:10px;flex-wrap:wrap}
+.bar h1{font:500 30px Georgia,serif}.bar div{display:flex;gap:10px;align-items:center}.bar a{color:#5e554c;text-decoration:none}.bar a:hover{color:#2b2622}
+.blk,.box{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;display:grid;gap:14px;box-shadow:0 1px 0 var(--line)}
+.blk h3,.box h3{display:flex;justify-content:space-between;align-items:center;font:600 12.5px system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--copper-d)}
+.box h3 button{text-transform:none;letter-spacing:0;font-weight:400}
 label.f{display:grid;gap:5px}label.f>span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--copper-d)}
 label.chk{display:flex;align-items:center;gap:10px}label.chk>span{font-size:14px;letter-spacing:0;text-transform:none;color:inherit}
-details.it{border:1px solid var(--line);border-radius:14px;padding:0 14px}
-summary{cursor:pointer;padding:12px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:500}
-.in{display:grid;gap:14px;padding-bottom:16px}.ctl{display:flex;gap:4px}.ctl button{padding:4px 10px}
+details.it{border:1px solid var(--line);border-radius:14px;padding:0 14px;background:#fffdfa}details.it[open]{background:#fff;box-shadow:0 10px 30px -24px rgba(43,38,34,.5)}
+summary{cursor:pointer;padding:10px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:500;list-style:none}summary::-webkit-details-marker{display:none}
+.sl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}.sl .th{width:44px;height:44px;border-radius:10px;object-fit:cover;background:#eadcc6;flex:none}
+.sm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-weight:400;color:var(--mut)}.sm s{opacity:.7}.sm b{color:#2b2622}
+.in{display:grid;gap:14px;padding:4px 0 16px}.ctl{display:flex;gap:4px}.ctl button{padding:4px 10px}
 .img{display:flex;gap:10px;align-items:center}.img img{width:54px;height:54px;object-fit:cover;border-radius:10px;background:#eadcc6;flex:none}
 .up{position:relative;flex:none}.up input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
-.mut{color:#8a7360}
-.shot{display:grid;gap:6px;justify-items:start}.shot img{display:block;max-width:min(240px,100%);max-height:380px;object-fit:contain;border-radius:12px;background:#eadcc6;min-height:90px}
-.tag{display:inline-block;padding:2px 10px;border-radius:20px;background:rgba(181,105,63,.14);color:var(--copper-d);font-size:12px}
-#msg{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--copper-d);color:#fff;padding:12px 22px;border-radius:30px;z-index:9;max-width:90vw}
-#msg.err{background:#a3321f}
-@media(max-width:760px){#app{grid-template-columns:1fr}#nav{position:static;height:auto;flex-direction:row;flex-wrap:wrap}#nav h2,#nav small{display:none}main{padding:0 14px 60px}}
+.mut{color:var(--mut)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row input,.row select{width:auto;flex:1;min-width:130px}
+.tag{display:inline-block;padding:2px 10px;border-radius:20px;background:rgba(60,50,40,.08);color:#5e554c;font-size:12px;white-space:nowrap}.tag.off{background:#eee;color:#777}.tag.sale{background:#f4e6df;color:#9a4a2c;font-weight:600}
+.pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.new{background:#fbefd3;color:#8a5a00}.pill.confirmed{background:#dcecf5;color:#25607f}.pill.shipped{background:#e9e1f4;color:#5d3f8c}.pill.delivered{background:#d9eede;color:#1f6a3d}.pill.cancelled{background:#f6dcd7;color:var(--bad)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.chip{background:#fff;border:1px solid var(--line)}.chip.on{background:var(--copper);color:#fff;border-color:var(--copper)}.chip b{margin-left:4px;opacity:.75}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:16px}
+.kpi{background:#fff;border-radius:18px;padding:16px 18px;box-shadow:0 1px 0 var(--line)}.kpi small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.kpi strong{display:block;font:500 28px Georgia,serif;color:#2b2622;margin:4px 0 2px}.kpi span{font-size:12px;color:var(--mut)}
+.kpi.hot strong{color:var(--warn)}
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:16px}.grid2.b{grid-template-columns:1fr 1fr}.cv{position:relative;height:270px}
+.alert{background:#fbefd3;color:#7a4e00;border-radius:14px;padding:12px 16px;margin-bottom:16px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);padding:6px 8px}td{padding:10px 8px;border-top:1px solid var(--line)}tr[data-goto]{cursor:pointer}tr[data-goto]:hover{background:#faf5ec}td.r,th.r{text-align:right}
+.tb{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}.tb input{flex:1;min-width:200px;width:auto}
+details.o{background:#fff;border-radius:16px;margin-bottom:10px;padding:0 18px;box-shadow:0 1px 0 var(--line)}
+details.o summary{display:grid;grid-template-columns:110px 1fr auto auto auto;gap:12px;padding:14px 0}details.o summary .amt{font-weight:600}
+.ob{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:4px 0 18px}.ob h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-d);margin-bottom:6px}.ob a{color:#2b2622;text-decoration:underline}
+.ob .l{display:flex;justify-content:space-between;gap:10px;padding:3px 0}.ob .l.t{border-top:1px solid var(--line);margin-top:4px;padding-top:8px;font-weight:700}.ob .l.g{color:var(--ok)}
+.ob s{opacity:.55}.shot img{display:block;max-width:220px;max-height:340px;object-fit:contain;border-radius:12px;background:#eadcc6;margin-top:8px;min-height:80px}
+.oc{grid-column:1/-1;display:flex;gap:10px;align-items:center}.oc select{width:auto}
+#msg{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2f2a26;color:#fff;padding:12px 22px;border-radius:30px;z-index:9;max-width:90vw;box-shadow:0 10px 30px -10px rgba(0,0,0,.4)}#msg.err{background:var(--bad)}
+@media(max-width:900px){.grid2,.grid2.b,.ob{grid-template-columns:1fr}details.o summary{grid-template-columns:1fr auto}}
+@media(max-width:760px){#app{grid-template-columns:1fr}#nav{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:10px}#nav h2,.nf span{display:none}#nav>button{white-space:nowrap}.nf{margin:0;flex-direction:row;border:0;padding:0}main{padding:0 14px 60px}.bar h1{font-size:24px}}
 </style></head>
 <body>
 <div class="center" id="login" hidden>
@@ -46,45 +67,56 @@ summary{cursor:pointer;padding:12px 0;display:flex;justify-content:space-between
 </div>
 <div id="app" hidden>
  <aside id="nav"></aside>
- <main><div class="bar"><h1 id="ttl"></h1><div><a href="index.html" target="_blank">View site ↗</a><button id="mig" title="Copies every image that is not on Cloudinary yet (local files, Unsplash, old Firebase links) to Cloudinary">Move images to Cloudinary</button><button class="pri" id="save">Save changes</button></div></div><div id="view"></div></main>
+ <main><div class="bar"><h1 id="ttl"></h1><div><a href="index.html" target="_blank">View site ↗</a><button class="pri" id="save">Save changes</button></div></div><div id="view"></div></main>
 </div>
 <div id="msg" hidden></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 firebase.initializeApp(FIREBASE_CONFIG);
 /* Firebase = sign-in + Firestore data. Every image goes to Cloudinary (assets/js/cloudinary.js). */
 const auth=firebase.auth(),db=firebase.firestore();
-const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o));
+const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o)),sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const getp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
 const setp=(o,p,v)=>{const ks=p.split('.'),l=ks.pop();ks.reduce((a,k)=>a[k]??(a[k]={}),o)[l]=v};
+const delp=(o,p)=>{const ks=p.split('.'),l=ks.pop(),t=ks.reduce((a,k)=>a==null?a:a[k],o);if(t)delete t[l]};
 const rid=()=>Math.random().toString(36).slice(2,8);
-let state={},oldIds=[],cur='Products',tm;const open=new Set(),NEWS={};
-function flash(m,err){const e=$('msg');e.textContent=m;e.className=err?'err':'';e.hidden=false;clearTimeout(tm);tm=setTimeout(()=>e.hidden=true,err?6000:2200)}
+let state={},oldIds=[],cur='Dashboard',tm,ORD=[],ordState='loading',range='30',ofilter='all',oq='',isDirty=false;
+const open=new Set(),openO=new Set(),NEWS={},charts=[];
+const inr=n=>Price.money(n);
+const ST=['new','confirmed','shipped','delivered','cancelled'],STL={new:'Payment to verify',confirmed:'Confirmed',shipped:'Shipped',delivered:'Delivered',cancelled:'Cancelled'};
+const SALE=s=>s==='confirmed'||s==='shipped'||s==='delivered';
+const tms=o=>o.createdAt&&o.createdAt.toMillis?o.createdAt.toMillis():0;
+const NAVS=['Dashboard','Orders','Products','Home page','About us','Contact us','Settings'];
+function flash(m,err){const e=$('msg');e.textContent=m;e.className=err?'err':'';e.hidden=false;clearTimeout(tm);tm=setTimeout(()=>e.hidden=true,err?6000:2400)}
 
-/* ---------- what can be edited (everything on the site) ---------- */
-const T='t',A='a',I='i',N='n',C='c',B='b',S='s';
+/* ---------- what can be edited ---------- */
+const T='t',A='a',I='i',N='n',O='o',B='b',S='s';
+const prodMeta=it=>{const d=Price.pct(it);return `${d?`<b>${inr(Price.unit(it))}</b> <s>${inr(it.price)}</s> <span class="tag sale">−${d}%</span>`:inr(it.price)}${it.active===false?'<span class="tag off">Hidden</span>':''}${it.featured?'<span class="tag">Featured</span>':''}`};
 const TABS={
- Products:[{path:'products',title:'Products (use ↑ ↓ to change the order they appear in)',item:'name',new:()=>({id:'p-'+rid(),name:'New product',category:'',price:0,image:'',featured:false,active:true}),
-  f:[['name','Name'],['category','Category'],['price','Price',N],['image','Photo',I],['description','Description',A],['featured','Show at the top of the home page',B,false],['active','Visible on the site',B,true],
-   {path:'gallery',title:'More photos',item:'alt',new:()=>({image:'',alt:''}),f:[['image','Photo',I],['alt','Short description']]}]}],
+ Products:[{path:'products',title:'Products (↑ ↓ changes the order on the site)',item:'name',
+  sum:it=>`<img class="th" src="${esc(cld(it.image,80))}" alt=""><b class="sn">${esc(it.name||'Untitled')}</b><span class="sm">${prodMeta(it)}</span>`,
+  new:()=>({id:'p-'+rid(),name:'New product',category:'',price:0,discount:0,image:'',featured:false,active:true}),
+  f:[['name','Name'],['category','Category'],['price','Price (full price, before discount)',N],['discount','Discount % (0 = no discount)',N],['gst','GST % for this product (leave empty to use the shop rate)',O],['image','Photo',I],['description','Description',A],['featured','Show at the top of the home page',B,false],['active','Visible on the site',B,true],
+   {path:'gallery',title:'More photos',item:'alt',new:()=>({image:'',alt:''}),f:[['image','Photo',I],['alt','Short description']]},
+   {path:'details',title:'Details table (e.g. Material, Size)',item:'label',new:()=>({label:'',value:''}),f:[['label','Label'],['value','Value']]}]}],
  'Home page':[
   {path:'hero',title:'Top of the page',f:[['title','Heading'],['accent','Heading, second line (coloured)'],['modelImage','Photo',I]]},
   {path:'collection',title:'Collection heading',f:[['title','Title'],['accent','Coloured word']]},
   {path:'story',title:'Our promise (also shown on the About page)',item:'title',new:()=>({title:'New point',text:''}),f:[['title','Title'],['text','Text',A]]},
   {path:'reviews',title:'Customer reviews',item:'name',new:()=>({name:'Name',rating:5,text:''}),f:[['name','Name'],['rating','Stars (1 to 5)',N],['text','Review',A]]}],
- 'About us':[
-  {path:'about',title:'About us page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Our story (leave a blank line between paragraphs)',A],['image','Photo (leave empty for no photo)',I]]}],
- 'Contact us':[
-  {path:'contact',title:'Contact page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Short intro',A],['email','Email (leave empty to hide)'],['address','Address (leave empty to hide)',A],['hours','Opening hours (leave empty to hide)']]}],
- Site:[
-  {path:'site',title:'Shop details',f:[['name','Shop name'],['brand','Name shown in the header'],['tagline','Tagline'],['logo','Logo',I],['upiId','UPI ID that receives payments, for example shopname@okhdfcbank'],['upiName','Name shown in the customer\'s UPI app'],['whatsapp','WhatsApp number with country code, digits only (used for the Contact page and the WhatsApp link, not for orders)'],['currency','Currency symbol'],['copyright','Copyright line']]}],
- Orders:[]
+ 'About us':[{path:'about',title:'About us page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Our story (leave a blank line between paragraphs)',A],['image','Photo (leave empty for no photo)',I]]}],
+ 'Contact us':[{path:'contact',title:'Contact page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Short intro',A],['email','Email (leave empty to hide)'],['address','Address (leave empty to hide)',A],['hours','Opening hours (leave empty to hide)']]}],
+ Settings:[
+  {path:'site',title:'Shop details',f:[['name','Shop name'],['brand','Name shown in the header'],['tagline','Tagline'],['logo','Logo',I],['whatsapp','WhatsApp number with country code, digits only (Contact page and WhatsApp link)'],['currency','Currency symbol'],['copyright','Copyright line']]},
+  {path:'site',title:'Payments (UPI)',f:[['upiId','UPI ID that receives payments, e.g. shopname@okhdfcbank'],['upiName','Name shown in the customer\'s UPI app']]},
+  {path:'site',title:'GST',f:[['gstin','GSTIN (optional, saved with every order)'],['gstPct','Default GST % (a product can override it)',N],['gstMode','How GST is applied',S,[['inclusive','Already included in my prices (shown as "Includes GST")'],['exclusive','Added on top of my prices at the bag']]]]}]
 };
 
 /* ---------- form rendering ---------- */
@@ -94,9 +126,9 @@ function rF(f,pre){
  if(t===B)return `<label class="f chk"><input type="checkbox" ${d} ${(v===undefined?x:v)?'checked':''}><span>${l}</span></label>`;
  let inp;
  if(t===A)inp=`<textarea rows="3" ${d}>${esc(v)}</textarea>`;
- else if(t===S)inp=`<select ${d}>${x.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('')}</select>`;
+ else if(t===S)inp=`<select ${d}>${x.map(o=>`<option value="${esc(o[0])}" ${(v===undefined?x[0][0]:v)===o[0]?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`;
  else if(t===I)inp=`<div class="img"><img src="${esc(cld(v,120))}" alt=""><input ${d} value="${esc(v)}" placeholder="Paste a link, or upload →"><label class="up"><button type="button">Upload</button><input type="file" accept="image/*" data-up="${p}"></label></div>`;
- else inp=`<input ${t===N?'type="number" step="any"':t===C?'type="color"':''} ${d} value="${esc(v)}">`;
+ else inp=`<input ${t===N||t===O?'type="number" step="any" min="0"':''} ${d} value="${esc(v)}">`;
  return `<label class="f"><span>${l}</span>${inp}</label>`;
 }
 function rB(b,pre){
@@ -106,40 +138,132 @@ function rB(b,pre){
  NEWS[p.replace(/\.\d+/g,'')]=b.new;
  const arr=getp(state,p)||[];
  return `<section class="blk">${head}${arr.map((it,i)=>{const k=p+'.'+i;
-  return `<details class="it" data-k="${k}" ${open.has(k)?'open':''}><summary><span>${esc(it[b.item]||'Item '+(i+1))}</span><span class="ctl"><button data-a="up" data-p="${p}" data-i="${i}">↑</button><button data-a="dn" data-p="${p}" data-i="${i}">↓</button><button data-a="del" data-p="${p}" data-i="${i}">✕</button></span></summary><div class="in">${b.f.map(f=>rF(f,k)).join('')}</div></details>`}).join('')||'<p class="mut">Nothing here yet. Press + Add.</p>'}</section>`;
+  return `<details class="it" data-k="${k}" data-ik="${b.item}" ${b.sum?`data-s="${esc(((it.name||'')+' '+(it.category||'')).toLowerCase())}"`:''} ${open.has(k)?'open':''}><summary><span class="sl">${b.sum?b.sum(it):`<span class="sn">${esc(it[b.item]||'Item '+(i+1))}</span>`}</span><span class="ctl"><button data-a="up" data-p="${p}" data-i="${i}">↑</button><button data-a="dn" data-p="${p}" data-i="${i}">↓</button><button data-a="del" data-p="${p}" data-i="${i}">×</button></span></summary><div class="in">${b.f.map(f=>rF(f,k)).join('')}</div></details>`}).join('')||'<p class="mut">Nothing here yet. Press + Add.</p>'}</section>`;
+}
+function prodTools(){
+ const cats=[...new Set((state.products||[]).map(p=>p.category).filter(Boolean))];
+ return `<section class="blk"><h3>Sale tools</h3><div class="row"><select id="saleCat"><option value="">All products</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select><input id="salePct" type="number" min="1" max="95" placeholder="Discount %"><button class="pri" data-sale="apply">Apply discount</button><button data-sale="clear">Remove discount</button></div><span class="mut">Sets the discount on every product in the chosen category. Press “Save changes” afterwards. Each product can also be edited below.</span></section>
+ <div class="tb"><input id="psearch" placeholder="Search products…"><span class="mut" style="align-self:center">${(state.products||[]).length} products</span></div>`;
 }
 function show(){
- $('ttl').textContent=cur;
- $('nav').innerHTML='<h2>COZELLE</h2>'+Object.keys(TABS).map(t=>`<button class="${t===cur?'on':''}" data-tab="${t}">${t}</button>`).join('')+`<small>Signed in as<br>${esc(auth.currentUser.email)}<br>UID: ${auth.currentUser.uid}</small><button data-out>Sign out</button>`;
- $('save').hidden=$('mig').hidden=cur==='Orders';
- if(cur==='Orders')return orders();
- $('view').innerHTML=TABS[cur].map(b=>rB(b,'')).join('');
+ charts.splice(0).forEach(c=>{try{c.destroy()}catch(e){}});
+ const y=scrollY;$('ttl').textContent=cur;nav();
+ const content=cur!=='Dashboard'&&cur!=='Orders';$('save').hidden=!content;
+ if(cur==='Dashboard')dash();else if(cur==='Orders')ordersView();
+ else $('view').innerHTML=(cur==='Products'?prodTools():'')+TABS[cur].map(b=>rB(b,'')).join('');
+ scrollTo(0,y);
 }
-async function orders(){
- const v=$('view');v.innerHTML='<p class="mut">Loading…</p>';
- try{const q=await db.collection('orders').orderBy('createdAt','desc').limit(60).get(),cs=state.site?.currency||'';
-  v.innerHTML=q.empty?'<p class="mut">No orders yet.</p>':q.docs.map(d=>{const o=d.data(),c=o.customer||{},pm=o.payment||{};
-   const title=[pm.ref,c.name||'Customer'].filter(Boolean).map(esc).join(' · ')+' · '+esc(cs)+Number(o.total).toLocaleString('en-IN');
-   const tag=`<span class="tag">UPI · ${esc(cs)}${Number(pm.amount??o.total).toLocaleString('en-IN')} to ${esc(pm.upiId||'')}${pm.utr?' · UTR '+esc(pm.utr):''}</span>`;
-   const pay=isCld(pm.screenshotUrl)?`<div class="shot">${tag}<a href="${esc(pm.screenshotUrl)}" target="_blank" rel="noopener" title="Open full size"><img alt="Payment screenshot" src="${esc(cld(pm.screenshotUrl,480))}"></a></div>`
-    :pm.screenshotPath?`<div class="shot">${tag}<span class="mut">Older order: screenshot is in Firebase Storage (${esc(pm.screenshotPath)}).</span></div>`
-    :'<div><span class="tag">No payment screenshot</span></div>';
-   return `<section class="blk"><h3><span>${title}</span><small>${o.createdAt?o.createdAt.toDate().toLocaleString():''}</small></h3>
-   ${pay}
-   <div>${Object.entries(c).map(([k,x])=>`<div><b>${esc(k)}:</b> ${esc(x)}</div>`).join('')}</div>
-   <div>${(o.items||[]).map(i=>`${esc(i.name)} × ${i.qty}`).join('<br>')}</div>
-   <div class="ctl"><select data-oid="${d.id}">${['new','confirmed','shipped','delivered','cancelled'].map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}</select><button data-od="${d.id}">Delete</button></div></section>`}).join('');
- }catch(e){v.innerHTML=`<p class="mut">Could not load orders: ${esc(e.message)}</p>`}
+function nav(){
+ const pend=ORD.filter(o=>o.status==='new').length;
+ $('nav').innerHTML='<h2>COZELLE<small>Admin</small></h2>'+NAVS.map(t=>`<button class="${t===cur?'on':''}" data-tab="${t}">${t}${t==='Orders'&&pend?`<em>${pend}</em>`:''}</button>`).join('')+`<div class="nf"><span>${esc(auth.currentUser.email)}</span><button data-uid title="Paste this UID into firebase/firestore.rules">Copy my UID</button><button data-out>Sign out</button></div>`;
+}
+
+/* ---------- orders data ---------- */
+async function loadOrders(){
+ ordState='loading';
+ try{const q=await db.collection('orders').orderBy('createdAt','desc').limit(1000).get();ORD=q.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})}));ordState='ok'}
+ catch(e){ORD=[];ordState='err:'+(e.code==='permission-denied'?'permission denied. Paste your UID into firebase/firestore.rules and publish the rules.':e.message)}
+}
+const parts=o=>{const p=o.pricing;if(p)return {mrp:+p.mrp||0,disc:+p.discount||0,gst:+p.gst||0,incl:p.gstMode!=='exclusive'};return {mrp:sum(o.items||[],i=>(+i.price||0)*(+i.qty||0)),disc:0,gst:0,incl:true}};
+const fdate=o=>tms(o)?new Date(tms(o)).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}):'';
+const pad=n=>String(n).padStart(2,'0'),dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+
+/* ---------- dashboard ---------- */
+function dash(){
+ const v=$('view');
+ if(ordState==='loading'){v.innerHTML='<p class="mut">Loading your sales…</p>';return}
+ if(ordState.startsWith('err')){v.innerHTML=`<div class="box"><h3>Could not load orders</h3><p>${esc(ordState.slice(4))}</p><div><button data-oref>Try again</button></div></div>`;return}
+ const days=range==='all'?0:+range,since=days?Date.now()-days*864e5:0;
+ const inR=ORD.filter(o=>tms(o)>=since),sales=inR.filter(o=>SALE(o.status)),pend=ORD.filter(o=>o.status==='new');
+ const rev=sum(sales,o=>+o.total||0),n=sales.length,units=sum(sales,o=>sum(o.items||[],i=>+i.qty||0)),gst=sum(sales,o=>parts(o).gst),disc=sum(sales,o=>parts(o).disc);
+ const k=(l,val,s,c)=>`<div class="kpi ${c||''}"><small>${l}</small><strong>${val}</strong><span>${s}</span></div>`;
+ const recent=ORD.slice(0,6);
+ v.innerHTML=`<div class="chips">${[['7','7 days'],['30','30 days'],['90','90 days'],['all','All time']].map(([r,l])=>`<button class="chip ${range===r?'on':''}" data-range="${r}">${l}</button>`).join('')}<button class="chip" data-oref style="margin-left:auto">Refresh</button></div>
+ <div class="kpis">${k('Sales',inr(rev),'confirmed, shipped &amp; delivered')+k('Orders',n,units+' item'+(units===1?'':'s')+' sold')+k('Average order',inr(n?rev/n:0),'per order')+k('Discounts given',inr(disc),'off full prices')+k('GST in sales',inr(gst),'collected / included')+k('To verify',pend.length,pend.length?inr(sum(pend,o=>+o.total||0))+' waiting':'all clear',pend.length?'hot':'')}</div>
+ ${pend.length?`<div class="alert"><span><b>${pend.length}</b> order${pend.length>1?'s are':' is'} waiting for a payment check. Match the amount in your UPI app, then confirm.</span><button data-gofilter="new">Review now</button></div>`:''}
+ ${typeof Chart==='undefined'?'<div class="box mut">Charts could not load (check your internet connection and refresh).</div>':`<div class="grid2"><div class="box"><h3>Sales over time</h3><div class="cv"><canvas id="c1"></canvas></div></div><div class="box"><h3>Orders by status</h3><div class="cv"><canvas id="c2"></canvas></div></div></div>
+ <div class="grid2 b"><div class="box"><h3>Top products</h3><div class="cv"><canvas id="c3"></canvas></div></div><div class="box"><h3>Sales by category</h3><div class="cv"><canvas id="c4"></canvas></div></div></div>`}
+ <div class="box"><h3>Recent orders <button data-tab="Orders">View all</button></h3>${recent.length?`<div style="overflow-x:auto"><table><tr><th>Order</th><th>Customer</th><th class="r">Total</th><th>Status</th><th>Placed</th></tr>${recent.map(o=>`<tr data-goto="${o.id}"><td>${esc((o.payment||{}).ref||o.id.slice(0,8))}</td><td>${esc((o.customer||{}).name||'')}</td><td class="r">${inr(o.total)}</td><td><span class="pill ${esc(o.status)}">${esc(STL[o.status]||o.status)}</span></td><td>${fdate(o)}</td></tr>`).join('')}</table></div>`:'<p class="mut">No orders yet. They will appear here as soon as customers pay.</p>'}</div>`;
+ if(typeof Chart!=='undefined')drawCharts(inR,sales,days);
+}
+function drawCharts(inR,sales,days){
+ Chart.defaults.font.family='system-ui,sans-serif';Chart.defaults.color='#6b5646';
+ const COL=['#4a423b','#8a8178','#b9b0a3','#6b8f71','#b5693f','#d9d2c6','#a9b8a3'],SC={new:'#e0a02b',confirmed:'#3b7ea1',shipped:'#7a5ea8',delivered:'#2f7d4f',cancelled:'#a3321f'};
+ const mk=(id,cfg)=>{const el=$(id);if(el)charts.push(new Chart(el,cfg))};
+ /* time buckets */
+ let keys=[];const monthly=!days;
+ if(monthly){const first=sales.length?Math.min(...sales.map(tms)):Date.now(),d=new Date(first);d.setDate(1);const end=new Date();while(d<=end){keys.push(d.getFullYear()+'-'+pad(d.getMonth()+1));d.setMonth(d.getMonth()+1)}}
+ else for(let i=days-1;i>=0;i--)keys.push(dkey(new Date(Date.now()-i*864e5)));
+ const bk=o=>{const d=new Date(tms(o));return monthly?d.getFullYear()+'-'+pad(d.getMonth()+1):dkey(d)};
+ const rv={},ct={};sales.forEach(o=>{const x=bk(o);rv[x]=(rv[x]||0)+(+o.total||0);ct[x]=(ct[x]||0)+1});
+ const lab=x=>monthly?new Date(+x.slice(0,4),+x.slice(5,7)-1,1).toLocaleDateString('en-IN',{month:'short',year:'2-digit'}):new Date(+x.slice(0,4),+x.slice(5,7)-1,+x.slice(8)).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+ const base={responsive:true,maintainAspectRatio:false};
+ mk('c1',{type:'bar',data:{labels:keys.map(lab),datasets:[{label:'Sales',data:keys.map(x=>rv[x]||0),backgroundColor:'#4a423b',borderRadius:6,yAxisID:'y'},{type:'line',label:'Orders',data:keys.map(x=>ct[x]||0),borderColor:'#b5693f',backgroundColor:'#b5693f',tension:.3,pointRadius:2,yAxisID:'y1'}]},
+  options:{...base,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label==='Sales'?' Sales '+inr(c.parsed.y):' Orders '+c.parsed.y}}},scales:{x:{ticks:{maxTicksLimit:10}},y:{beginAtZero:true,ticks:{callback:v=>inr(v)}},y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},ticks:{precision:0}}}}});
+ const sc=ST.map(s=>inR.filter(o=>o.status===s).length);
+ mk('c2',{type:'doughnut',data:{labels:ST.map(s=>STL[s]),datasets:[{data:sc,backgroundColor:ST.map(s=>SC[s]),borderWidth:0}]},options:{...base,cutout:'62%',plugins:{legend:{position:'bottom'}}}});
+ const byP={},byC={},cat=id=>((state.products||[]).find(p=>p.id===id)||{}).category||'Other';
+ sales.forEach(o=>(o.items||[]).forEach(i=>{const r=(+i.price||0)*(+i.qty||0);byP[i.name]=(byP[i.name]||0)+r;const c=cat(i.id);byC[c]=(byC[c]||0)+r}));
+ const tp=Object.entries(byP).sort((a,b)=>b[1]-a[1]).slice(0,6),tc=Object.entries(byC).sort((a,b)=>b[1]-a[1]);
+ mk('c3',{type:'bar',data:{labels:tp.map(x=>x[0]),datasets:[{data:tp.map(x=>x[1]),backgroundColor:'#4a423b',borderRadius:6}]},options:{...base,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+inr(c.parsed.x)}}},scales:{x:{beginAtZero:true,ticks:{callback:v=>inr(v)}}}}});
+ mk('c4',{type:'doughnut',data:{labels:tc.map(x=>x[0]),datasets:[{data:tc.map(x=>x[1]),backgroundColor:COL,borderWidth:0}]},options:{...base,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>' '+c.label+': '+inr(c.parsed)}}}}});
+}
+
+/* ---------- orders ---------- */
+const hay=o=>[(o.payment||{}).ref,(o.customer||{}).name,(o.customer||{}).phone,(o.customer||{}).city,(o.payment||{}).utr,o.id].join(' ').toLowerCase();
+function ordersView(){
+ const v=$('view');
+ if(ordState==='loading'){v.innerHTML='<p class="mut">Loading orders…</p>';return}
+ if(ordState.startsWith('err')){v.innerHTML=`<div class="box"><h3>Could not load orders</h3><p>${esc(ordState.slice(4))}</p><div><button data-oref>Try again</button></div></div>`;return}
+ const cn=s=>ORD.filter(o=>o.status===s).length;
+ v.innerHTML=`<div class="tb"><input id="oq" placeholder="Search order ID, name, phone, UTR…" value="${esc(oq)}"><button data-oref>Refresh</button><button data-csv>Export CSV</button></div>
+ <div class="chips">${['all',...ST].map(s=>`<button class="chip ${ofilter===s?'on':''}" data-of="${s}">${s==='all'?'All':STL[s]}<b>${s==='all'?ORD.length:cn(s)}</b></button>`).join('')}</div><div id="olist"></div>`;
+ olist();
+}
+function olist(){
+ const q=oq.trim().toLowerCase(),l=ORD.filter(o=>(ofilter==='all'||o.status===ofilter)&&(!q||hay(o).includes(q)));
+ $('olist').innerHTML=l.length?l.map(ocard).join(''):'<p class="mut">No orders match.</p>';
+}
+function ocard(o){
+ const c=o.customer||{},pm=o.payment||{},pt=parts(o),ph=String(c.phone||'').replace(/\D/g,''),wa=ph?'https://wa.me/'+(ph.length===10?'91'+ph:ph):'';
+ const items=(o.items||[]).map(i=>{const q=+i.qty||0,u=+i.price||0,m=+i.mrp||0;return `<div class="l"><span>${esc(i.name)} × ${q}</span><span>${m>u?`<s>${inr(m*q)}</s> `:''}${inr(u*q)}</span></div>`}).join('');
+ const shot=/^https:\/\/res\.cloudinary\.com\//.test(pm.screenshotUrl||'')?`<div class="shot"><a href="${esc(pm.screenshotUrl)}" target="_blank" rel="noopener" title="Open full size"><img alt="Payment screenshot" src="${esc(cld(pm.screenshotUrl,480))}"></a></div>`:pm.screenshotPath?`<p class="mut">Older order: screenshot is in Firebase Storage (${esc(pm.screenshotPath)}).</p>`:'<p class="mut">No payment screenshot.</p>';
+ return `<details class="o" data-ok="${o.id}" ${openO.has(o.id)?'open':''}><summary><b>${esc(pm.ref||o.id.slice(0,8))}</b><span>${esc(c.name||'Customer')}</span><span class="amt">${inr(o.total)}</span><span class="pill ${esc(o.status)}">${esc(STL[o.status]||o.status)}</span><span class="mut">${fdate(o)}</span></summary>
+ <div class="ob"><div><h4>Customer</h4><div>${esc(c.name||'')}</div>${c.phone?`<div><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>${wa?` · <a href="${wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div>`:''}<div>${esc([c.address,c.city,c.pincode].filter(Boolean).join(', '))}</div>${c.notes?`<div class="mut">Note: ${esc(c.notes)}</div>`:''}</div>
+ <div><h4>Items</h4>${items}${pt.disc>0?`<div class="l g"><span>Discount</span><span>−${inr(pt.disc)}</span></div>`:''}${pt.gst>0?`<div class="l"><span>${pt.incl?'Includes GST':'GST'}</span><span>${pt.incl?'':'+'}${inr(pt.gst)}</span></div>`:''}<div class="l t"><span>Total paid</span><span>${inr(o.total)}</span></div></div>
+ <div><h4>Payment</h4><span class="tag">UPI · ${inr(pm.amount??o.total)} to ${esc(pm.upiId||'')}</span>${pm.utr?`<div>UTR: <b>${esc(pm.utr)}</b></div>`:''}${o.pricing&&o.pricing.gstin?`<div class="mut">GSTIN ${esc(o.pricing.gstin)}</div>`:''}</div><div>${shot}</div>
+ <div class="oc"><select data-oid="${o.id}">${ST.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${STL[s]}</option>`).join('')}</select><button data-od="${o.id}">Delete order</button></div></div></details>`;
+}
+function exportCsv(){
+ const q=oq.trim().toLowerCase(),l=ORD.filter(o=>(ofilter==='all'||o.status===ofilter)&&(!q||hay(o).includes(q)));
+ const e=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+ const rows=[['Order','Date','Status','Name','Phone','Address','City','Pincode','Items','Full price','Discount','GST','GST mode','Total','UTR']].concat(l.map(o=>{const c=o.customer||{},pm=o.payment||{},pt=parts(o);return [pm.ref||o.id,tms(o)?new Date(tms(o)).toISOString().slice(0,16).replace('T',' '):'',o.status,c.name,c.phone,c.address,c.city,c.pincode,(o.items||[]).map(i=>i.name+' x'+i.qty).join('; '),pt.mrp,pt.disc,pt.gst,pt.incl?'included':'added',o.total,pm.utr]}));
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(e).join(',')).join('\n')],{type:'text/csv'}));a.download='cozelle-orders-'+dkey(new Date())+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
 
 /* ---------- events ---------- */
-document.addEventListener('toggle',e=>{const k=e.target.dataset?.k;if(k)e.target.open?open.add(k):open.delete(k)},true);
-const dirty=()=>$('save').textContent='Save changes •';
+document.addEventListener('toggle',e=>{const t=e.target,k=t.dataset&&t.dataset.k,ok=t.dataset&&t.dataset.ok;if(k)t.open?open.add(k):open.delete(k);if(ok)t.open?openO.add(ok):openO.delete(ok)},true);
+const dirty=()=>{isDirty=true;$('save').textContent='Save changes •'};
+addEventListener('beforeunload',e=>{if(isDirty){e.preventDefault();e.returnValue=''}});
+addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'&&!$('save').hidden){e.preventDefault();$('save').click()}});
 document.addEventListener('click',async e=>{
- let b=e.target.closest('[data-tab]');if(b){cur=b.dataset.tab;show();return}
- if(e.target.closest('[data-out]')){auth.signOut();return}
- if(b=e.target.closest('[data-od]')){if(confirm('Delete this order? Its payment screenshot stays in your Cloudinary Media Library (delete it there if you want it gone).')){await db.collection('orders').doc(b.dataset.od).delete();orders()}return}
- b=e.target.closest('[data-a]');if(!b)return;e.preventDefault();
+ const c=e.target.closest.bind(e.target);let b;
+ if(b=c('[data-tab]')){cur=b.dataset.tab;show();scrollTo(0,0);return}
+ if(c('[data-out]')){if(!isDirty||confirm('You have unsaved changes. Sign out anyway?'))auth.signOut();return}
+ if(c('[data-uid]')){try{await navigator.clipboard.writeText(auth.currentUser.uid);flash('UID copied')}catch(x){prompt('Your UID',auth.currentUser.uid)}return}
+ if(b=c('[data-range]')){range=b.dataset.range;show();return}
+ if(c('[data-oref]')){flash('Refreshing…');await loadOrders();show();return}
+ if(b=c('[data-of]')){ofilter=b.dataset.of;ordersView();return}
+ if(b=c('[data-gofilter]')){ofilter=b.dataset.gofilter;oq='';cur='Orders';show();scrollTo(0,0);return}
+ if(b=c('[data-goto]')){const o=ORD.find(x=>x.id===b.dataset.goto);cur='Orders';ofilter='all';oq=o?(o.payment||{}).ref||'':'';if(o)openO.add(o.id);show();scrollTo(0,0);return}
+ if(c('[data-csv]')){exportCsv();return}
+ if(b=c('[data-od]')){if(confirm('Delete this order for good? Its payment screenshot stays in your Cloudinary Media Library.')){try{await db.collection('orders').doc(b.dataset.od).delete();ORD=ORD.filter(o=>o.id!==b.dataset.od);flash('Order deleted');show()}catch(err){flash('Could not delete: '+err.message,1)}}return}
+ if(b=c('[data-sale]')){
+  const cat=$('saleCat').value,pct=Number($('salePct').value),clear=b.dataset.sale==='clear';
+  if(!clear&&!(pct>=1&&pct<=95)){flash('Enter a discount between 1 and 95.',1);return}
+  const l=(state.products||[]).filter(p=>!cat||p.category===cat);if(!l.length){flash('No products in that category.',1);return}
+  l.forEach(p=>p.discount=clear?0:pct);dirty();show();flash((clear?'Discount removed from ':pct+'% off set on ')+l.length+' product'+(l.length>1?'s':'')+'. Press Save changes to publish.');return}
+ b=c('[data-a]');if(!b)return;e.preventDefault();
  const {a,p,i}=b.dataset;let arr=getp(state,p);if(!arr){arr=[];setp(state,p,arr)}
  if(a==='add'){const n=NEWS[p.replace(/\.\d+/g,'')];arr.push(n?n():{});open.add(p+'.'+(arr.length-1))}
  else{const j=+i;if(a==='del'){if(!confirm('Delete this item?'))return;arr.splice(j,1);open.clear()}
@@ -147,65 +271,79 @@ document.addEventListener('click',async e=>{
  show();dirty();
 });
 document.addEventListener('input',e=>{
- const t=e.target,p=t.dataset.p;if(!p)return;
- const ty=t.dataset.t,v=ty===B?t.checked:ty===N?(t.value===''?0:Number(t.value)):t.value;
- setp(state,p,v);if(ty===I)t.closest('.img').querySelector('img').src=cld(v,120);dirty();
+ const t=e.target,p=t.dataset.p;
+ if(t.id==='oq'){oq=t.value;olist();return}
+ if(t.id==='psearch'){const q=t.value.trim().toLowerCase();document.querySelectorAll('details.it[data-s]').forEach(d=>d.hidden=!!q&&!d.dataset.s.includes(q));return}
+ if(!p)return;
+ const ty=t.dataset.t,v=ty===B?t.checked:ty===N?(t.value===''?0:Number(t.value)):ty===O?(t.value===''?undefined:Number(t.value)):t.value;
+ v===undefined?delp(state,p):setp(state,p,v);
+ if(ty===I)t.closest('.img').querySelector('img').src=cld(v,120);
+ const d=t.closest('details.it');
+ if(d){if(p.endsWith('.'+d.dataset.ik))d.querySelector('.sn').textContent=t.value||'Untitled';
+  if(d.dataset.k.startsWith('products.')){const it=getp(state,d.dataset.k);d.querySelector('.sm').innerHTML=prodMeta(it);d.dataset.s=((it.name||'')+' '+(it.category||'')).toLowerCase()}}
+ dirty();
 });
 document.addEventListener('change',async e=>{
  const t=e.target;
- if(t.dataset.oid){await db.collection('orders').doc(t.dataset.oid).update({status:t.value});flash('Order updated');return}
+ if(t.dataset.oid){const o=ORD.find(x=>x.id===t.dataset.oid);
+  try{await db.collection('orders').doc(t.dataset.oid).update({status:t.value});if(o)o.status=t.value;flash('Order updated');ordersView();nav()}
+  catch(err){flash('Could not update: '+err.message,1);ordersView()}return}
  if(!t.dataset.up||!t.files[0])return;
  const f=t.files[0];
  if(!/^image\//.test(f.type)){flash('Please choose an image file.',1);return}
  if(f.size>10*1024*1024){flash('That image is over 10 MB. Please choose a smaller one.',1);return}
- flash('Uploading to Cloudinary…');
+ flash('Uploading…');
  try{const url=(await cldUpload(f,{preset:CLOUDINARY.sitePreset,tags:['site']})).secure_url;
-  setp(state,t.dataset.up,url);const bx=t.closest('.img');bx.querySelector('input[data-p]').value=url;bx.querySelector('img').src=cld(url,120);dirty();flash('Uploaded. Remember to Save.')}
+  setp(state,t.dataset.up,url);const bx=t.closest('.img');bx.querySelector('input[data-p]').value=url;bx.querySelector('img').src=cld(url,120);
+  const d=t.closest('details.it');if(d&&d.dataset.k.startsWith('products.'))d.querySelector('.th').src=cld(url,80);dirty();flash('Uploaded. Remember to Save.')}
  catch(err){flash('Upload failed: '+err.message,1)}
  t.value='';
 });
-/* ---------- move every image that is not on Cloudinary yet (local files, Unsplash, old Firebase links) ---------- */
-const imgPaths=()=>['site.logo','site.background','hero.modelImage','about.image'].concat((state.products||[]).flatMap((p,i)=>[`products.${i}.image`,...(p.gallery||[]).map((_,j)=>`products.${i}.gallery.${j}.image`)]));
-$('mig').onclick=async()=>{
- const todo=imgPaths().map(p=>[p,getp(state,p)]).filter(([p,v])=>typeof v==='string'&&v.trim()&&!isCld(v));
- if(!todo.length){flash('Every image is already on Cloudinary.');return}
- if(!confirm(`Copy ${todo.length} image${todo.length>1?'s':''} to Cloudinary and switch the site to them?\nYou still press "Save changes" afterwards.`))return;
- const seen={},fail=[];let ok=0;$('mig').disabled=true;
- for(let n=0;n<todo.length;n++){const [p,v]=todo[n];flash(`Moving image ${n+1} of ${todo.length}…`);
-  try{
-   if(!seen[v]){
-    let src=v;
-    if(!/^https?:\/\//i.test(v)){const r=await fetch(v);if(!r.ok)throw new Error('file not found');src=await r.blob()}
-    seen[v]=(await cldUpload(src,{preset:CLOUDINARY.sitePreset,tags:['site','migrated'],filename:v.split('?')[0].split('/').pop()||'image'})).secure_url;
-   }
-   setp(state,p,seen[v]);ok++;
-  }catch(err){fail.push(`${p} (${err.message})`)}
- }
- $('mig').disabled=false;show();if(ok)dirty();
- flash(fail.length?`Moved ${ok}, failed ${fail.length}: ${fail[0]}${fail.length>1?' …':''}`:`Moved ${ok} image${ok>1?'s':''} to Cloudinary. Press Save changes.`,!!fail.length);
- if(fail.length)console.warn('Images that could not be moved:',fail);
-};
+
+/* ---------- save ---------- */
+function validate(){
+ const ps=state.products||[],s=state.site||{};
+ for(let i=0;i<ps.length;i++){const p=ps[i],bad=m=>{cur='Products';open.add('products.'+i);show();flash((p.name||'Product '+(i+1))+': '+m,1);return false};
+  if(!String(p.name||'').trim())return bad('please enter a name.');
+  if(!(p.price>=0))return bad('price must be 0 or more.');
+  if(p.discount!==undefined&&!(p.discount>=0&&p.discount<=95))return bad('discount must be between 0 and 95.');
+  if(p.gst!==undefined&&!(p.gst>=0&&p.gst<=100))return bad('GST must be between 0 and 100.')}
+ const u=String(s.upiId||'').trim(),sb=m=>{cur='Settings';show();flash(m,1);return false};
+ if(u&&!/^[a-zA-Z0-9._-]{2,256}@[a-zA-Z][a-zA-Z0-9.-]{1,63}$/.test(u))return sb('That UPI ID does not look right (it should look like name@bank).');
+ if(!(s.gstPct>=0&&s.gstPct<=100))return sb('Default GST % must be between 0 and 100.');
+ return true;
+}
 $('save').onclick=async()=>{
- try{const {products=[],...site}=state;products.forEach((p,i)=>{if(!p.id)p.id='p-'+rid();p.order=i+1});
+ if(!validate())return;
+ const btn=$('save');btn.disabled=true;
+ try{state.products.forEach((p,i)=>{if(!p.id)p.id='p-'+rid();p.order=i+1});
+  const {products=[],...site}=state;
   const b=db.batch();b.set(db.doc('site/main'),site);
   products.forEach(p=>b.set(db.collection('products').doc(p.id),p));
   oldIds.filter(id=>!products.some(p=>p.id===id)).forEach(id=>b.delete(db.collection('products').doc(id)));
-  await b.commit();oldIds=products.map(p=>p.id);$('save').textContent='Save changes';flash('Saved. Your site is updated.');
- }catch(err){flash(err.code==='permission-denied'?'Not allowed: paste your UID (bottom-left) into firebase/firestore.rules and publish it.':'Save failed: '+err.message,1)}
+  await b.commit();oldIds=products.map(p=>p.id);isDirty=false;btn.textContent='Save changes';flash('Saved. Your site is updated.');
+ }catch(err){flash(err.code==='permission-denied'?'Not allowed: paste your UID (Copy my UID, bottom-left) into firebase/firestore.rules and publish it.':'Save failed: '+err.message,1)}
+ btn.disabled=false;
 };
 $('lf').onsubmit=async e=>{e.preventDefault();$('lerr').textContent='';
  try{await auth.signInWithEmailAndPassword($('em').value,$('pw').value)}catch(err){$('lerr').textContent=err.message}};
 
 /* ---------- start ---------- */
 auth.onAuthStateChanged(async u=>{
- $('login').hidden=!!u;$('app').hidden=!u;if(!u)return;
+ /* customers sign in on the shop with phone + PIN (same Firebase project): they are not admins, so show the sign-in form instead */
+ const cust=u&&u.email&&u.email.toLowerCase().endsWith('@'+CUSTOMER_DOMAIN);
+ if(cust){$('login').hidden=false;$('app').hidden=true;$('lerr').textContent='This browser is signed in as a shop customer. Sign in with your admin email below.';return}
+ $('login').hidden=!!u;$('app').hidden=!u;
+ if(!u){ORD=[];ordState='loading';return}
  try{const [s,p]=await Promise.all([db.doc('site/main').get(),db.collection('products').get()]);
   state=deepMerge(clone(DEFAULT_DATA),s.exists?s.data():{});fixAssets(state);
   state.products=(s.exists?p.docs.map(d=>({id:d.id,...d.data()})):clone(DEFAULT_DATA.products)).sort((x,y)=>(x.order??0)-(y.order??0));fixAssets(state);
   oldIds=p.docs.map(d=>d.id);
   if(!s.exists)flash('Nothing saved yet. Showing starter content. Press Save to publish it.');
  }catch(err){state=clone(DEFAULT_DATA);flash('Could not read Firestore: '+err.message,1)}
- show();
+ cur='Dashboard';show();
+ await loadOrders();
+ if(cur==='Dashboard'||cur==='Orders')show();else nav();
 });
 </script>
 </body></html>

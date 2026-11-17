@@ -196,16 +196,19 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.intro>*,.rise{opacity:1;transform:none}}
 </style>
+<link rel="stylesheet" href="assets/css/checkout.css">
+<link rel="stylesheet" href="assets/css/account.css">
+<link rel="stylesheet" href="assets/css/pricing.css">
 </head>
 <body class="lock">
 
 <div class="loader" id="loader" aria-hidden="true">
-  <div><img data-src="site.logo" alt=""><div class="lw" data-text="site.brand"></div><div class="lt" data-text="site.tagline"></div><div class="lh" data-text="site.loaderMark"></div></div>
+  <div><img data-src="site.logo" data-w="240" alt=""><div class="lw" data-text="site.brand"></div><div class="lt" data-text="site.tagline"></div><div class="lh" data-text="site.loaderMark"></div></div>
 </div>
 
 <div class="page">
   <header>
-    <a class="brand" href="#top" data-aria="site.name"><img data-src="site.logo" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
+    <a class="brand" href="#top" data-aria="site.name"><img data-src="site.logo" data-w="240" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
     <div class="hline" aria-hidden="true"></div>
     <div class="hctl"><button class="bag" id="bag" data-aria="ui.openBag"><span class="bi"></span><b id="count">0</b></button>
     <button class="burger" id="burger" data-aria="ui.openMenu"><i></i><i></i><i></i></button></div>
@@ -221,7 +224,7 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
       <div class="heroprods" id="heroProds"></div>
     </div>
     <div class="right">
-      <div class="model ph"><img data-src="hero.modelImage" data-alt="hero.modelAlt" alt=""></div>
+      <div class="model ph"><img data-src="hero.modelImage" data-w="1200" data-alt="hero.modelAlt" alt=""></div>
       <div class="reviews" id="reviews"></div>
     </div>
   </div>
@@ -254,18 +257,20 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
   <div class="ph-head"><h2 class="t-bag" data-text="ui.bagTitle"></h2><h2 class="t-det" data-text="checkout.title"></h2><button class="x" data-close data-aria="ui.closeBag">×</button></div>
   <ul id="cartList"></ul>
   <div class="emp"><p data-text="ui.empty"></p><button class="co" id="shopBtn" data-text="ui.browse"></button></div>
-  <div class="df"><div class="sum"><span data-text="ui.subtotal"></span><strong id="subtotal">0</strong></div><small data-text="ui.delivery"></small><button class="co" id="checkout" data-text="ui.checkout"></button></div>
+  <div class="df"><div class="brk" id="brk"></div><div class="sum"><span data-text="tax.total"></span><strong id="subtotal">0</strong></div><small data-text="ui.delivery"></small><button class="co" id="checkout" data-text="pay.proceed"></button></div>
   <form class="cof" id="coForm">
     <div class="cof-sum"><span data-text="ui.total"></span><strong id="coTotal"></strong></div>
     <div class="cof-grid" id="coFields"></div>
-    <button class="co" type="submit" data-text="checkout.submit"></button>
+    <button class="co" type="submit" data-text="pay.continue"></button>
     <button class="cof-back" type="button" id="coBack" data-text="checkout.back"></button>
   </form>
 </aside>
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 /* Firestore: site/main (all text, links, colours, reviews...) + products collection. Edit them in admin.html. */
@@ -275,11 +280,6 @@ async function loadData(){
  const [s,p]=await Promise.all([db.doc('site/main').get(),db.collection('products').get()]);
  if(!s.exists)return DEFAULT_DATA;
  return fixAssets({...deepMerge(DEFAULT_DATA,s.data()),products:p.docs.map(d=>({id:d.id,...d.data()}))});
-}
-async function saveOrder(rows){
- if(!db)return;
- await db.collection('orders').add({customer:{...cust},items:rows.map(p=>({id:p.id,name:p.name,qty:cart[p.id],price:p.price})),
-  total:rows.reduce((t,p)=>t+p.price*cart[p.id],0),status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
 }
 
 /* ================= engine ================= */
@@ -298,9 +298,9 @@ let tt;function toast(m){tEl.textContent=m;tEl.classList.add('show');clearTimeou
 const BIND={text:0,src:'src',alt:'alt',ph:'placeholder',aria:'aria-label'};
 function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).forEach(e=>{
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
- if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],v);if(k==='src')e.style.display=''}})}
+ if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
-const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(p.image)}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(p.image)}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a><div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${money(p.price)}</div></div><button class="arch" data-add="${esc(p.id)}">${esc(D.ui.addToBag)}</button></div></article>`;
+const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div></div><button class="arch" data-add="${esc(p.id)}">${esc(D.ui.addToBag)}</button></div></article>`;
 
 let cur=0,rt;
 function renderReviews(){
@@ -316,7 +316,7 @@ const observe=()=>document.querySelectorAll('.rise:not(.in)').forEach((el,k)=>{e
 function render(data){
  D=data;const {site}=D;
  Object.entries(D.theme||{}).forEach(([k,v])=>root.style.setProperty('--'+k,v));
- root.style.setProperty('--bg-image',site.background?`url("${site.background}")`:'none');
+ root.style.setProperty('--bg-image',site.background?`url("${cld(site.background,1920,{eco:1})}")`:'none');
  document.title=site.title||site.name;
  bind();
  const ps=live(),rest=ps.filter(p=>!p.featured);
@@ -337,8 +337,8 @@ function render(data){
 
 function renderCart(){
  const u=D.ui,rows=live().filter(p=>cart[p.id]),q=rows.reduce((s,p)=>s+cart[p.id],0);
- count.textContent=q;sub.textContent=money(rows.reduce((s,p)=>s+p.price*cart[p.id],0));drawer.classList.toggle('empty',!q);
- list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(p.image)}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${money(p.price)}</div><div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}">+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
+ count.textContent=q;{const c=Price.calc(rows,cart),bk=document.getElementById('brk');sub.textContent=Price.money(c.total);if(bk)bk.innerHTML=Price.brk(c)};drawer.classList.toggle('empty',!q);
+ list.innerHTML=rows.map(p=>`<li class="ci"><div class="th ph"><img src="${esc(cld(p.image,160))}" alt=""></div><div><h5>${esc(p.name)}</h5><div class="price">${Price.html(p)}</div><div class="qty"><button data-k="${esc(p.id)}" data-q="-1" aria-label="${esc(u.decrease)}">−</button><span>${cart[p.id]}</span><button data-k="${esc(p.id)}" data-q="1" aria-label="${esc(u.increase)}">+</button></div></div><button class="rm" data-rm="${esc(p.id)}" aria-label="${esc(u.remove+' '+p.name)}">×</button></li>`).join('');
  try{localStorage.setItem('cozelle-cart',JSON.stringify(cart))}catch(e){}
 }
 let cust={};try{cust=JSON.parse(localStorage.getItem('cozelle-customer'))||{}}catch(e){}
@@ -364,14 +364,6 @@ $('nl').onsubmit=e=>{e.preventDefault();toast(D.ui.thanks);e.target.reset()};
 $('checkout').onclick=()=>{if(!live().some(p=>cart[p.id]))return;$('coTotal').textContent=sub.textContent;drawer.classList.add('details');const f=$('coFields').querySelector('input,textarea');if(f&&!f.value)setTimeout(()=>f.focus(),450)};
 $('coBack').onclick=()=>drawer.classList.remove('details');
 $('coForm').addEventListener('input',e=>{if(!e.target.name)return;cust[e.target.name]=e.target.value;try{localStorage.setItem('cozelle-customer',JSON.stringify(cust))}catch(_){}});
-$('coForm').onsubmit=async e=>{
- e.preventDefault();
- const rows=live().filter(p=>cart[p.id]);if(!rows.length)return;
- const who=(D.checkout.fields||[]).map(f=>[f.label,(cust[f.key]||'').trim()]).filter(x=>x[1]).map(x=>`${x[0]}: ${x[1]}`);
- const msg=[`*${D.ui.orderTitle} - ${D.site.name}*`,'',...rows.map((p,i)=>`${i+1}. ${p.name} x ${cart[p.id]} - ${money(p.price*cart[p.id])}`),'',`*${D.ui.total}: ${sub.textContent}*`,'',`*${D.checkout.customer}*`,...who].join('\n');
- try{await Promise.race([saveOrder(rows),new Promise(r=>setTimeout(r,2500))])}catch(err){console.warn('order not saved',err)}
- location.href='https://wa.me/'+D.site.whatsapp+'?text='+encodeURIComponent(msg);
-};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
 document.addEventListener('error',e=>{if(e.target.tagName==='IMG')e.target.style.display='none'},true);
 
@@ -385,5 +377,9 @@ if(seen)dataReady.then(start);else Promise.all([dataReady,loaded]).then(()=>setT
 setTimeout(start,5000);
 window.Cozelle={render,get data(){return D}};
 </script>
+<script src="assets/js/vendor/qrcode.js"></script>
+<script src="assets/js/account.js"></script>
+<script src="assets/js/checkout.js"></script>
+<script src="assets/js/cookies.js"></script>
 </body>
 </html>

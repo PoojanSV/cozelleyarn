@@ -1,0 +1,51 @@
+/* UPI payment step + "order received" step inside the bag drawer (injected by assets/js/checkout.js) */
+
+/* header title for the payment step */
+.t-pay{display:none}
+#drawer.paying .t-pay{display:block}
+#drawer.paying .t-bag,#drawer.paying .t-det,#drawer.done .t-bag,#drawer.done .t-det,#drawer.done .t-pay{display:none}
+
+/* hide the bag / details views while paying or done */
+#drawer.paying #cartList,#drawer.paying .df,#drawer.paying .emp,#drawer.paying .cof,
+#drawer.done #cartList,#drawer.done .df,#drawer.done .emp,#drawer.done .cof{display:none!important}
+
+.pay,.pdone{display:none;flex:1;flex-direction:column;gap:16px;overflow-y:auto;padding:4px 26px 28px}
+#drawer.paying .pay{display:flex}
+#drawer.done .pdone{display:flex}
+
+.pay-amt{display:flex;justify-content:space-between;align-items:baseline}
+.pay-amt strong{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--copper-d)}
+.pay-qr{align-self:center;width:min(250px,100%);padding:10px;border-radius:22px;background:#fff;box-shadow:0 18px 40px -26px rgba(74,43,27,.7)}
+.pay-qr svg{display:block;width:100%;height:auto}
+.pay-scan{text-align:center;font-size:13px;opacity:.75;margin-top:-6px}
+.pay-id{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:12px 16px;border-radius:16px;background:rgba(255,255,255,.55);border:1px solid rgba(181,105,63,.3)}
+.pay-id span{grid-column:1/-1;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--copper-d)}
+.pay-id b{font-weight:500;font-size:16px;overflow-wrap:anywhere}
+.pay-id button{padding:8px 14px;border-radius:20px;background:rgba(181,105,63,.14);color:var(--copper-d);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.pay-id button:hover{background:rgba(181,105,63,.25)}
+.pay-ref{font-size:13px;opacity:.8;text-align:center}
+.pay-ref b{font-weight:500;letter-spacing:.06em}
+a.pay-app{display:block;text-align:center}
+.pay-step{font-family:var(--serif);font-size:22px;line-height:1.25;color:var(--copper-d);padding-top:10px;border-top:1px solid var(--line)}
+.pay-file{display:block;position:relative;cursor:pointer}
+.pay-file input{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
+.pay-file span{display:block;text-align:center;padding:14px 16px;border-radius:16px;border:1.5px dashed var(--copper);color:var(--copper-d);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.pay-file:focus-within span,.pay-file:hover span{background:rgba(181,105,63,.12)}
+.pay-prev{display:block;max-height:220px;width:auto;max-width:100%;margin:0 auto;border-radius:14px;object-fit:contain;box-shadow:0 12px 30px -20px rgba(74,43,27,.7)}
+.pay-utr span{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--copper-d);margin-bottom:6px}
+.pay-utr input{display:block;width:100%;font:inherit;font-size:15px;color:var(--cocoa);background:rgba(255,255,255,.55);border:1px solid rgba(181,105,63,.3);border-radius:16px;padding:12px 14px;outline:0;transition:.25s}
+.pay-utr input:focus{border-color:var(--copper);background:#fff}
+.pay-err{color:#a3321f;font-size:14px;line-height:1.5}
+.pay-err:empty{display:none}
+.pay .co:disabled{opacity:.45;cursor:not-allowed}
+.pay .co:disabled:hover{background:var(--copper)}
+
+/* payment not set up: show only the message and the back button */
+.pay.off .live{display:none}
+
+.pdone{align-items:center;justify-content:center;text-align:center;gap:18px}
+.pdone .tick{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:var(--copper);color:var(--cream);font-size:36px;line-height:1}
+.pdone h3{font-family:var(--serif);font-weight:500;font-size:32px;color:var(--copper-d)}
+.pdone p{max-width:300px;line-height:1.7;font-size:15px;opacity:.85}
+.pdone .ref{font-size:13px;letter-spacing:.08em;opacity:.7}
+.pdone .co{width:auto}

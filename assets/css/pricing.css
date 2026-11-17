@@ -1,0 +1,20 @@
+/* Discount badge, struck-through price, bag price breakdown, UPI app buttons */
+.pic{position:relative}
+.dbadge{position:absolute;top:12px;left:12px;z-index:3;background:#a3321f;color:#fff;font:600 12px/1 system-ui,sans-serif;letter-spacing:.04em;padding:7px 10px;border-radius:20px;pointer-events:none}
+.pmrp{opacity:.6;font-size:.82em;font-weight:400}
+.poff{display:inline-block;background:#a3321f;color:#fff;font:600 11px/1 system-ui,sans-serif;padding:4px 8px;border-radius:12px;letter-spacing:.03em;vertical-align:middle;margin-left:2px}
+.pnow{font-weight:600}
+.pprice .poff{font-size:13px;padding:6px 10px}.pprice .pmrp{font-size:.6em}
+.brk:empty{display:none}
+.brk{display:grid;gap:4px;margin-bottom:10px}
+.br{display:flex;justify-content:space-between;font-size:14px}
+.br.off{color:#2f7d4f}.br.mut{opacity:.7;font-size:13px}
+.pay-brk{margin:-4px 0 0}
+.o-sub{display:flex;justify-content:space-between;font-size:13px;opacity:.8;padding:2px 0}
+.pay-apps{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pay-apps[hidden]{display:none}
+.pay-apps p{grid-column:1/-1;text-align:center;font-size:12px;opacity:.75;margin:0}
+.pay-apps .lbl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--copper-d);opacity:1}
+.pay-apps a{display:block;text-align:center;padding:13px 10px;border-radius:16px;background:var(--copper);color:#fff;text-decoration:none;font-size:14px;letter-spacing:.04em}
+.pay-apps a:hover{background:var(--copper-d)}
+.pay-apps a.any{grid-column:1/-1;background:rgba(181,105,63,.14);color:var(--copper-d)}

@@ -9,9 +9,8 @@
 (() => {
  const VPA = /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z][a-zA-Z0-9.-]{1,63}$/;
  const MAX_BYTES = 5 * 1024 * 1024;
- const phone = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
  const T = () => D.pay;
- let cur = null, busy = false, starting = false, previewUrl = '';
+ let cur = null, busy = false, starting = false, previewUrl = '', appLaunchPending = false, appWasBackgrounded = false;
 
  /* ---------- build the extra markup once ---------- */
  const head = drawer.querySelector('.ph-head');
@@ -31,7 +30,7 @@
   <div class="pay-id live"><span id="payToL"></span><b id="payVpa"></b><button type="button" id="payCopy"></button></div>
   <p class="pay-ref live"><span id="payRefL"></span> <b id="payRef"></b></p>
   <p class="pay-step live" id="payStep"></p>
-  <label class="pay-file live"><input type="file" accept="image/*" id="payFile"><span id="payFileL"></span></label>
+  <label class="pay-file live" tabindex="-1"><input type="file" accept="image/*" id="payFile"><span id="payFileL"></span></label>
   <img class="pay-prev live" id="payPrev" alt="" hidden>
   <label class="pay-utr live"><span id="payUtrL"></span><input id="payUtr" inputmode="numeric" maxlength="30" autocomplete="off"></label>
   <p class="pay-err" id="payErr" role="alert"></p>
@@ -138,6 +137,22 @@
   g('payPrev').removeAttribute('src');
  }
 
+ function focusScreenshot() {
+  if (!cur || !drawer.classList.contains('paying')) return;
+  const section = g('payFile').closest('.pay-file');
+  if (!section) return;
+  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  section.classList.add('return-focus');
+  setTimeout(() => section.classList.remove('return-focus'), 2600);
+  requestAnimationFrame(() => section.focus({ preventScroll: true }));
+ }
+ function handlePaymentAppReturn() {
+  if (!appWasBackgrounded) return;
+  appWasBackgrounded = false;
+  appLaunchPending = false;
+  setTimeout(focusScreenshot, 300);
+ }
+
  /* ---------- step 1: details form -> payment pane ---------- */
  async function startPay() {
   const rows = live().filter(p => cart[p.id]);
@@ -145,6 +160,8 @@
   const t = T(), s = D.site || {}, vpa = String(s.upiId || '').trim();
   const calc = Price.calc(rows, cart), total = calc.total;
   const ready = VPA.test(vpa) && total > 0;
+  appLaunchPending = false;
+  appWasBackgrounded = false;
 
   /* keep the same order id while the bag is unchanged (e.g. the shopper left to pay in their UPI app and came back) */
   let preferred = '';
@@ -173,7 +190,7 @@
    g('payVpa').textContent = vpa;
    g('payRef').textContent = ref;
    g('payBrk').innerHTML = Price.brk(calc);
-   /* one tap per UPI app (phones). Each app opens straight on the payment screen with the amount filled in. */
+   /* One tap per UPI app, with the QR kept alongside as a fallback. */
    const q = url.slice(url.indexOf('?')), ios = /iphone|ipad|ipod/i.test(navigator.userAgent), ap = t.apps;
    const links = [
     { name: ap.gpay, href: (ios ? 'gpay://upi/pay' : 'tez://upi/pay') + q, logo: 'https://api.iconify.design/logos:google-pay.svg?height=36' },
@@ -181,8 +198,9 @@
     { name: ap.paytm, href: 'paytmmp://pay' + q, logo: 'https://api.iconify.design/simple-icons:paytm.svg?color=%2300BAF2' },
     { name: ap.any, href: url, logo: 'assets/img/upi-mark.svg', any: true }
    ];
-   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(a => '<a href="' + esc(a.href) + '" aria-label="' + esc(a.name) + '" title="' + esc(a.name) + '"' + (a.any ? ' class="any"' : '') + '><img src="' + esc(a.logo) + '" alt="' + esc(a.name) + '" loading="lazy"></a>').join('') + '<p>' + esc(t.appHint) + '</p>';
-   g('payApps').hidden = !phone;
+   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(a => '<a href="' + esc(a.href) + '" aria-label="' + esc(a.name) + '" title="' + esc(a.name) + '"' + (a.any ? ' class="any"' : '') + '><img src="' + esc(a.logo) + '" alt="" loading="eager"><span class="pay-app-name">' + esc(a.name) + '</span></a>').join('') + '<p>' + esc(t.appHint) + '</p>';
+   g('payApps').querySelectorAll('img').forEach(img => img.addEventListener('error', () => { img.hidden = true; img.parentElement.classList.add('logo-fallback'); }));
+   g('payApps').hidden = false;
    setBtn(t.place, true);
   } else {
    setErr(t.notReady);
@@ -292,6 +310,13 @@
   finally { starting = false; if (submit) submit.disabled = false; }
  });
  g('payFile').addEventListener('change', onFile);
+ g('payApps').addEventListener('click', e => { if (e.target.closest('a')) appLaunchPending = true; });
+ document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { if (appLaunchPending) appWasBackgrounded = true; return; }
+  handlePaymentAppReturn();
+ });
+ window.addEventListener('focus', handlePaymentAppReturn);
+ window.addEventListener('pageshow', handlePaymentAppReturn);
  g('payPlace').addEventListener('click', place);
  g('payBack').addEventListener('click', () => {
   if (busy) return;

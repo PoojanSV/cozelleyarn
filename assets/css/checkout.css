@@ -49,3 +49,10 @@ a.pay-app{display:block;text-align:center}
 .pdone p{max-width:300px;line-height:1.7;font-size:15px;opacity:.85}
 .pdone .ref{font-size:13px;letter-spacing:.08em;opacity:.7}
 .pdone .co{width:auto}
+
+.toast.has-action{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 12px 10px 20px;text-align:left}
+.toast.has-action>span{flex:1;min-width:0}
+.toast-action{flex:none;padding:8px 13px;border:1px solid rgba(74,43,27,.12);border-radius:24px;background:var(--cream);color:var(--copper-d);font:500 12px/1.2 var(--sans);white-space:nowrap;cursor:pointer}
+.toast-action:hover{background:#fff;color:var(--cocoa)}
+.toast-action:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+

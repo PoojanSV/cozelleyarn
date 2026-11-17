@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 44" role="img" aria-labelledby="title">
+  <title id="title">UPI</title>
+  <rect width="148" height="44" rx="12" fill="#fff"/>
+  <path d="M24 11 14 33h7l10-22z" fill="#0979bf"/>
+  <path d="M34 11 24 33h7l10-22z" fill="#ed7b24"/>
+  <text x="49" y="31" fill="#0979bf" font-family="Arial,sans-serif" font-size="25" font-style="italic" font-weight="700" letter-spacing="1">UPI</text>
+</svg>

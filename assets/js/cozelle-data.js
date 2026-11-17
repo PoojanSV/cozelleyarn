@@ -150,3 +150,11 @@ const Price={
   if(c.gst>0)h+=c.incl?r(t.gstIncl+(c.rate?' ('+c.rate+'%)':''),this.money(c.gst),'mut'):r(t.gst+(c.rate?' ('+c.rate+'%)':''),'+'+this.money(c.gst));
   return h}
 };
+
+/* Optional inventory count. Products without a stock value remain untracked; a saved count limits buying. */
+const Stock={
+ tracked(p){return !!p&&p.stock!==undefined&&p.stock!==null&&p.stock!==''&&Number.isInteger(Number(p.stock))&&Number(p.stock)>=0},
+ count(p){return this.tracked(p)?Number(p.stock):null},
+ label(p){if(!this.tracked(p))return '';const n=this.count(p);return n===0?'Out of stock':`${n} in stock`},
+ available(p){return !this.tracked(p)||this.count(p)>0}
+};

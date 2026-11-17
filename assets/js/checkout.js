@@ -11,7 +11,7 @@
  const MAX_BYTES = 5 * 1024 * 1024;
  const phone = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
  const T = () => D.pay;
- let cur = null, busy = false, previewUrl = '';
+ let cur = null, busy = false, starting = false, previewUrl = '';
 
  /* ---------- build the extra markup once ---------- */
  const head = drawer.querySelector('.ph-head');
@@ -53,10 +53,31 @@
  const sig = rows => rows.map(p => p.id + ':' + cart[p.id] + ':' + Price.unit(p)).sort().join('|');
  const newRef = () => {
   const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const bytes = new Uint8Array(10);
+  crypto.getRandomValues(bytes);
   let s = 'CZ-';
-  for (let i = 0; i < 6; i++) s += a[Math.floor(Math.random() * a.length)];
+  for (let i = 0; i < bytes.length; i++) s += a[bytes[i] % a.length];
   return s;
  };
+ async function reserveRef(preferred, user) {
+  const refs = db.collection('orderRefs');
+  for (let attempt = 0; attempt < 12; attempt++) {
+   const ref = attempt === 0 && preferred ? preferred : newRef();
+   try {
+    const reserved = await db.runTransaction(async tx => {
+     const doc = refs.doc(ref), snap = await tx.get(doc);
+     if (snap.exists) return snap.data().uid === user.uid && snap.data().status === 'reserved';
+     tx.set(doc, { uid: user.uid, status: 'reserved', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+     return true;
+    });
+    if (reserved) return ref;
+   } catch (err) {
+    /* A reference owned by another customer is intentionally unreadable; try a fresh one. */
+    if (err.code !== 'permission-denied') throw err;
+   }
+  }
+  throw new Error('Could not reserve a unique order ID. Publish the updated Firestore rules and try again.');
+ }
  const upiUrl = (vpa, name, amount, note) =>
   'upi://pay?pa=' + vpa + '&pn=' + encodeURIComponent(name) + '&am=' + amount.toFixed(2) + '&cu=INR&tn=' + encodeURIComponent(note);
 
@@ -118,7 +139,7 @@
  }
 
  /* ---------- step 1: details form -> payment pane ---------- */
- function startPay() {
+ async function startPay() {
   const rows = live().filter(p => cart[p.id]);
   if (!rows.length) return;
   const t = T(), s = D.site || {}, vpa = String(s.upiId || '').trim();
@@ -126,12 +147,14 @@
   const ready = VPA.test(vpa) && total > 0;
 
   /* keep the same order id while the bag is unchanged (e.g. the shopper left to pay in their UPI app and came back) */
-  let ref = '';
+  let preferred = '';
   try {
    const p = JSON.parse(localStorage.getItem('cozelle-pending'));
-   if (p && p.sig === sig(rows) && /^CZ-[A-Z0-9]{6}$/.test(p.ref)) ref = p.ref;
+   if (p && p.sig === sig(rows) && /^CZ-[A-Z0-9]{10}$/.test(p.ref)) preferred = p.ref;
   } catch (e) {}
-  if (!ref) ref = newRef();
+  const user = Account.user();
+  if (!user) throw new Error('Please sign in again before continuing.');
+  const ref = await reserveRef(preferred, user);
   try { localStorage.setItem('cozelle-pending', JSON.stringify({ sig: sig(rows), ref })); } catch (e) {}
 
   clearPreview();
@@ -152,8 +175,13 @@
    g('payBrk').innerHTML = Price.brk(calc);
    /* one tap per UPI app (phones). Each app opens straight on the payment screen with the amount filled in. */
    const q = url.slice(url.indexOf('?')), ios = /iphone|ipad|ipod/i.test(navigator.userAgent), ap = t.apps;
-   const links = [[ap.gpay, (ios ? 'gpay://upi/pay' : 'tez://upi/pay') + q], [ap.phonepe, 'phonepe://pay' + q], [ap.paytm, 'paytmmp://pay' + q], [ap.any, url, 'any']];
-   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(l => '<a href="' + esc(l[1]) + '"' + (l[2] ? ' class="' + l[2] + '"' : '') + '>' + esc(l[0]) + '</a>').join('') + '<p>' + esc(t.appHint) + '</p>';
+   const links = [
+    { name: ap.gpay, href: (ios ? 'gpay://upi/pay' : 'tez://upi/pay') + q, logo: 'https://api.iconify.design/logos:google-pay.svg?height=36' },
+    { name: ap.phonepe, href: 'phonepe://pay' + q, logo: 'https://api.iconify.design/simple-icons:phonepe.svg?color=%235F259F' },
+    { name: ap.paytm, href: 'paytmmp://pay' + q, logo: 'https://api.iconify.design/simple-icons:paytm.svg?color=%2300BAF2' },
+    { name: ap.any, href: url, logo: 'assets/img/upi-mark.svg', any: true }
+   ];
+   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(a => '<a href="' + esc(a.href) + '" aria-label="' + esc(a.name) + '" title="' + esc(a.name) + '"' + (a.any ? ' class="any"' : '') + '><img src="' + esc(a.logo) + '" alt="' + esc(a.name) + '" loading="lazy"></a>').join('') + '<p>' + esc(t.appHint) + '</p>';
    g('payApps').hidden = !phone;
    setBtn(t.place, true);
   } else {
@@ -201,7 +229,13 @@
     cur.uploaded = up.secure_url;
    }
    setBtn(t.placing, true);
-   await db.collection('orders').add({
+   const orderRef = db.collection('orders').doc(), reservationRef = db.collection('orderRefs').doc(cur.ref);let existingOrderId='';
+   await db.runTransaction(async tx => {
+    const reservation = await tx.get(reservationRef);
+    if (!reservation.exists || reservation.data().uid !== user.uid) throw new Error('This order reference is no longer available.');
+    if (reservation.data().status === 'used' && reservation.data().orderId) { existingOrderId = reservation.data().orderId; return; }
+    if (reservation.data().status !== 'reserved') throw new Error('This order reference is no longer available.');
+    tx.set(orderRef, {
     uid: user.uid,
     customer: { ...cust },
     items: cur.rows.map(p => ({ id: p.id, name: p.name, qty: cart[p.id], price: Price.unit(p), mrp: Number(p.price) || 0, discount: Price.pct(p), gstRate: Price.rate(p) })),
@@ -217,7 +251,14 @@
      utr: g('payUtr').value.trim().slice(0, 30),
      screenshotUrl: cur.uploaded
     }
+    });
+    tx.update(reservationRef, { status: 'used', orderId: orderRef.id });
    });
+   if (existingOrderId) {
+    const prior = await db.collection('orders').doc(existingOrderId).get();
+    if (!prior.exists || prior.data().uid !== user.uid || (prior.data().payment || {}).ref !== cur.ref)
+     throw new Error('Could not confirm the previous order. Please contact the shop before retrying payment.');
+   }
    /* success */
    const ref = cur.ref;
    Account.afterOrder(cust);
@@ -240,7 +281,16 @@
  }
 
  /* ---------- events ---------- */
- g('coForm').addEventListener('submit', async e => { e.preventDefault(); if (await Account.ensure()) startPay(); });
+ g('coForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (starting || busy) return;
+  starting = true;
+  const submit = e.submitter || g('coForm').querySelector('[type="submit"]');
+  if (submit) submit.disabled = true;
+  try { if (await Account.ensure()) await startPay(); }
+  catch (err) { console.error('could not reserve order reference', err); toast('We could not prepare a unique order ID. Please try again.'); }
+  finally { starting = false; if (submit) submit.disabled = false; }
+ });
  g('payFile').addEventListener('change', onFile);
  g('payPlace').addEventListener('click', place);
  g('payBack').addEventListener('click', () => {

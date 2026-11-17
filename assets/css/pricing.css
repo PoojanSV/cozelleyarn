@@ -18,7 +18,5 @@
 .pay-apps a{display:grid;place-items:center;min-width:0;min-height:58px;padding:8px;border-radius:14px;background:#fff;border:1px solid rgba(74,43,27,.1);box-shadow:0 5px 18px -16px rgba(74,43,27,.55);text-decoration:none;transition:transform .15s,border-color .15s,box-shadow .15s}
 .pay-apps a:hover{transform:translateY(-2px);border-color:rgba(181,105,63,.42);box-shadow:0 10px 22px -18px rgba(74,43,27,.65)}
 .pay-apps a img{display:block;width:auto;max-width:100%;height:30px;object-fit:contain}
-.pay-apps .pay-app-name{display:none;font-size:10px;line-height:1.2;text-align:center;color:var(--cocoa)}
-.pay-apps a.logo-fallback .pay-app-name{display:block}
 .pay-apps a.any{background:rgba(181,105,63,.08)}
 .pay-file[tabindex="-1"]:focus-visible span,.pay-file.return-focus span{outline:2px solid var(--copper);outline-offset:2px;background:rgba(181,105,63,.12)}

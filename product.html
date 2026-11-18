@@ -23,10 +23,8 @@ a{color:inherit;text-decoration:none}
 .dc{display:contents}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--copper);outline-offset:3px}
 
-/* page sheet (no overflow/backdrop-filter here so sticky + fixed children keep working) */
 .page{position:relative;min-height:100vh;background:var(--glass)}
 
-/* header */
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px clamp(18px,4vw,60px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:14px}
 .brand img{width:50px;height:50px;object-fit:contain;flex:none}
@@ -46,7 +44,6 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 .burger i:nth-child(2){width:14px;margin-left:auto}
 .burger:hover i:nth-child(2){width:20px}
 
-/* product cards */
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,34px)}
 .card{position:relative}
 .pic{position:relative;overflow:hidden;border-radius:26px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 24px 50px -28px rgba(74,43,27,.7)}
@@ -74,7 +71,6 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 .btn{padding:14px 34px;border-radius:30px;border:1px solid var(--copper);color:var(--copper-d);font-size:11px;letter-spacing:.26em;text-transform:uppercase;font-weight:500;transition:.3s}
 .btn:hover{background:var(--copper);color:var(--cream)}
 
-/* footer */
 footer{margin-top:clamp(60px,9vh,100px);padding:60px clamp(18px,4vw,60px) 34px;color:var(--cream);
  background:linear-gradient(to bottom,rgba(181,105,63,0),rgba(142,74,42,.92) 38%)}
 .fgrid{display:grid;grid-template-columns:1.4fr repeat(var(--fcols,2),1fr);gap:36px;max-width:1200px;margin:auto}
@@ -89,7 +85,6 @@ footer input::placeholder{color:rgba(244,232,211,.6)}
 footer form button{padding:11px 22px;border-radius:30px;background:var(--cream);color:var(--copper-d);font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:500}
 .copy{text-align:center;font-size:12px;letter-spacing:.1em;opacity:.65;margin-top:44px}
 
-/* menu + bag drawers (same as the home page) */
 .scrim{position:fixed;inset:0;z-index:60;background:rgba(74,43,27,.35);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:.4s}
 .panel{position:fixed;top:0;right:0;bottom:0;z-index:70;width:min(420px,100%);display:flex;flex-direction:column;background:rgba(244,232,211,.95);
  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);transform:translateX(105%);visibility:hidden;transition:transform .55s cubic-bezier(.2,.8,.2,1),visibility .55s}
@@ -137,7 +132,6 @@ body.menu-open,body.cart-open{overflow:hidden}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,130px);background:var(--copper-d);color:var(--cream);padding:13px 24px;border-radius:40px;font-size:13px;z-index:90;transition:transform .5s cubic-bezier(.2,.8,.2,1);max-width:90vw;text-align:center}
 .toast.show{transform:translate(-50%,0)}
 
-/* product page */
 .prod{--gx:clamp(18px,4vw,60px);padding:clamp(22px,4vh,44px) var(--gx) 10px;min-height:72vh}
 .back{display:inline-block;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:26px}
 .back:hover{color:var(--copper-d)}
@@ -244,7 +238,6 @@ body.menu-open,body.cart-open{overflow:hidden}
 <script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
-/* ================= data (same source as the other pages) ================= */
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
 async function loadData(){
  if(!db)return DEFAULT_DATA;
@@ -253,11 +246,9 @@ async function loadData(){
  return fixAssets({...deepMerge(DEFAULT_DATA,s.data()),products:p.docs.map(d=>({id:d.id,...d.data()}))});
 }
 
-/* Wording for this page. Edit it in admin.html > Product page. */
 const PRODUCT={back:'Back to collection',about:'About this piece',details:'Details',category:'Category',qty:'Quantity',related:'You may also like',notFound:'We could not find that piece.',
  zoom:'View larger',close:'Close',prev:'Previous photo',next:'Next photo',assurances:[]};
 
-/* ================= engine ================= */
 const $=id=>document.getElementById(id),root=document.documentElement,B=document.body;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const get=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
@@ -265,7 +256,6 @@ let D=DEFAULT_DATA,cart={};
 try{cart=JSON.parse(localStorage.getItem('cozelle-cart'))||{}}catch(e){}
 const live=()=>(D.products||[]).filter(p=>p.active!==false).sort((a,b)=>(a.order??0)-(b.order??0));
 const money=n=>(D.site.currency||'')+Number(n).toLocaleString(D.site.locale||'en-IN');
-/* links written for the home page ("#story", "#top"...) are sent to index.html; "#shop" stays on this page */
 const href=h=>h==='wa'?'https://wa.me/'+D.site.whatsapp:(h==='#shop'?'collection.html':(h&&h[0]==='#'?'index.html'+h:h));
 const catList=()=>[...new Set(live().map(p=>p.category).filter(Boolean))];
 const drawer=$('drawer'),list=$('cartList'),bagCount=$('bagCount'),sub=$('subtotal'),bag=$('bag'),tEl=$('toast');
@@ -278,7 +268,6 @@ function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).for
 
 const card=p=>`<article class="card"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
 
-/* ================= product page ================= */
 let P=null,pq=1,imgs=[],gi=0;
 const PW=()=>D.product;
 function showImg(i){
@@ -315,7 +304,6 @@ function renderProduct(){
  ${rel.length?`<section class="related"><h2>${esc(w.related)}</h2><div class="grid">${rel.map(card).join('')}</div></section>`:''}`;
 }
 
-/* ================= render ================= */
 function render(data){
  D=data;
  D.product={...PRODUCT,...(D.product||{})};
@@ -331,7 +319,6 @@ function render(data){
  $('lb').querySelector('.lbx').setAttribute('aria-label',D.product.close);$('lbp').setAttribute('aria-label',D.product.prev);$('lbn').setAttribute('aria-label',D.product.next);
 }
 
-/* ================= bag + checkout (same behaviour as the home page; the bag is shared through localStorage) ================= */
 function renderCart(){
  const u=D.ui,rows=live().filter(p=>cart[p.id]),q=rows.reduce((s,p)=>s+cart[p.id],0);
  bagCount.textContent=q;{const c=Price.calc(rows,cart),bk=document.getElementById('brk');sub.textContent=Price.money(c.total);if(bk)bk.innerHTML=Price.brk(c)};drawer.classList.toggle('empty',!q);
@@ -348,7 +335,6 @@ function renderFields(){
 function setQty(k,d){const p=live().find(x=>x.id===k);if(!p)return;const next=(cart[k]||0)+d;if(Stock.tracked(p)&&next>Stock.count(p)){toast(`Only ${Stock.count(p)} in stock`);return}cart[k]=next;if(cart[k]<=0)delete cart[k];renderCart()}
 const close=()=>{B.classList.remove('menu-open','cart-open');drawer.classList.remove('details')};
 
-/* ================= events ================= */
 bag.onclick=()=>{close();B.classList.add('cart-open')};
 $('burger').onclick=()=>{close();B.classList.add('menu-open')};
 $('shopBtn').onclick=()=>{location.href='collection.html'};

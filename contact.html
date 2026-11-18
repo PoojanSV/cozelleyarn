@@ -23,10 +23,8 @@ a{color:inherit;text-decoration:none}
 .dc{display:contents}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--copper);outline-offset:3px}
 
-/* page sheet (no overflow/backdrop-filter here so sticky + fixed children keep working) */
 .page{position:relative;min-height:100vh;background:var(--glass)}
 
-/* header */
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px clamp(18px,4vw,60px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:14px}
 .brand img{width:50px;height:50px;object-fit:contain;flex:none}
@@ -46,7 +44,6 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 .burger i:nth-child(2){width:14px;margin-left:auto}
 .burger:hover i:nth-child(2){width:20px}
 
-/* footer */
 footer{margin-top:clamp(60px,9vh,100px);padding:60px clamp(18px,4vw,60px) 34px;color:var(--cream);
  background:linear-gradient(to bottom,rgba(181,105,63,0),rgba(142,74,42,.92) 38%)}
 .fgrid{display:grid;grid-template-columns:1.4fr repeat(var(--fcols,2),1fr);gap:36px;max-width:1200px;margin:auto}
@@ -61,7 +58,6 @@ footer input::placeholder{color:rgba(244,232,211,.6)}
 footer form button{padding:11px 22px;border-radius:30px;background:var(--cream);color:var(--copper-d);font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:500}
 .copy{text-align:center;font-size:12px;letter-spacing:.1em;opacity:.65;margin-top:44px}
 
-/* menu + bag drawers (same as the home page) */
 .scrim{position:fixed;inset:0;z-index:60;background:rgba(74,43,27,.35);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:.4s}
 .panel{position:fixed;top:0;right:0;bottom:0;z-index:70;width:min(420px,100%);display:flex;flex-direction:column;background:rgba(244,232,211,.95);
  backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);transform:translateX(105%);visibility:hidden;transition:transform .55s cubic-bezier(.2,.8,.2,1),visibility .55s}
@@ -109,8 +105,6 @@ body.menu-open,body.cart-open{overflow:hidden}
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,130px);background:var(--copper-d);color:var(--cream);padding:13px 24px;border-radius:40px;font-size:13px;z-index:90;transition:transform .5s cubic-bezier(.2,.8,.2,1);max-width:90vw;text-align:center}
 .toast.show{transform:translate(-50%,0)}
 
-
-/* page content */
 .pg{--gx:clamp(18px,4vw,60px);padding:clamp(28px,5vh,56px) var(--gx) 10px;min-height:72vh}
 .pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(36px,5vw,66px);line-height:1}
 .pg h1 em{color:var(--copper)}
@@ -221,7 +215,6 @@ async function loadData(){
  return fixAssets({...deepMerge(DEFAULT_DATA,s.data()),products:p.docs.map(d=>({id:d.id,...d.data()}))});
 }
 
-/* ================= engine ================= */
 const $=id=>document.getElementById(id),root=document.documentElement,B=document.body;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const get=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
@@ -237,7 +230,6 @@ const BIND={text:0,src:'src',alt:'alt',ph:'placeholder',aria:'aria-label'};
 function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).forEach(e=>{
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
  if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
-
 
 function renderCart(){
  const u=D.ui,rows=live().filter(p=>cart[p.id]),q=rows.reduce((s,p)=>s+cart[p.id],0);

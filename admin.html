@@ -2,7 +2,6 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cozelle Admin</title><link rel="icon" type="image/png" href="assets/img/cozelle-logo.png"><link rel="apple-touch-icon" href="assets/img/cozelle-logo.png">
 <style>
-/* three colours: off-white (surfaces), cocoa (text + sidebar), terracotta (main actions + key numbers only) */
 :root{--cream:#faf6ef;--sand:#f1e7d6;--cocoa:#4a2b1b;--ink:#3a2418;--copper:#b5693f;--copper-d:#8e4a2a;--line:rgba(74,43,27,.12);--mut:#8f7d6c;--lab:#8a6a52;--ok:#2f7d4f;--bad:#a3321f;--warn:#c98a1b}
 *{box-sizing:border-box;margin:0}
 body{font:14.5px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--cream);color:var(--ink)}
@@ -100,7 +99,6 @@ details.o summary{display:grid;grid-template-columns:110px 1fr auto auto auto;ga
 @media(max-width:760px){#app{grid-template-columns:minmax(0,1fr)}#nav{position:sticky;top:0;z-index:20;height:auto;flex-direction:row;align-items:center;overflow-x:auto;padding:8px 10px;gap:2px}#nav h2{display:none}#nav>button{flex:none;white-space:nowrap;padding:9px 11px;font-size:12px}.nf{margin:0 0 0 auto;display:flex;flex:none;gap:5px;padding:0 0 0 8px;border:0}.nf span{display:none}.nf button{white-space:nowrap;padding:8px 10px;font-size:11px}main{padding:0 14px 60px;max-width:none}.bar{top:50px;padding:12px 0}.bar h1{font-size:23px}.bar div{gap:6px}.bar a,.bar button{font-size:12px}.catalog-heading h2{font-size:25px}.catalog-actions{width:100%}.catalog-actions .catalog-search{flex:1;min-width:0}.catalog-product{grid-template-columns:54px minmax(0,1fr) auto;gap:10px;padding:10px}.catalog-product-thumb{width:54px;height:58px}.catalog-product-actions{gap:2px}.catalog-product-actions button{padding:7px}.catalog-product .edit{padding:8px 10px}.product-dialog-backdrop{padding:0}.product-dialog{width:100%;height:100vh;height:100dvh;border-radius:0;border:0}.product-editor-top{align-items:flex-start;flex-wrap:wrap;padding:12px 14px}.product-editor-top .back{padding:8px 10px}.product-editor-top>div{flex:1;min-width:140px}.product-editor-top h2{font-size:21px}.product-editor-top>.tag{margin-left:0}.product-editor-layout{display:flex;flex-direction:column;gap:12px;padding:12px;min-height:0}.product-editor-main{width:100%}.product-fields{grid-template-columns:1fr}.product-info-fields .f:nth-child(3),.product-media-fields .img{grid-column:auto}.product-section{padding:14px}.product-preview{display:none}.product-editor-footer{padding:10px 12px}.product-editor-footer p{max-width:36%;line-height:1.3}.product-editor-footer>div{flex:1}.product-editor-footer button{flex:1;padding:10px 8px;font-size:12px}}
 @media(max-width:420px){#nav>button{padding:8px 9px;font-size:11px}.nf button[data-uid]{display:none}main{padding-right:10px;padding-left:10px}.bar h1{font-size:20px}.bar a{font-size:11px}.bar button{padding:8px 10px}.catalog-product{grid-template-columns:48px minmax(0,1fr) auto}.catalog-product-thumb{width:48px;height:52px}.catalog-product-meta .tag{white-space:normal}.product-editor-top h2{font-size:19px}.product-editor-top>div{min-width:120px}.product-editor-footer p{display:none}}
 
-/* ===== QoL redesign ===== */
 body{background:#fbf9f5}
 button{display:inline-flex;align-items:center;justify-content:center;gap:6px}button svg{display:block;flex:none}
 .blk,.box,.kpi,.catalog-product,details.o,.product-section,.product-optional,.product-preview{border-radius:12px;box-shadow:none!important}
@@ -155,7 +153,6 @@ details.o summary>b{grid-area:1/1}details.o summary>span:nth-child(2){grid-area:
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 firebase.initializeApp(FIREBASE_CONFIG);
-/* Firebase = sign-in + Firestore data. Every image goes to Cloudinary (assets/js/cloudinary.js). */
 const auth=firebase.auth(),db=firebase.firestore();
 const $=id=>document.getElementById(id),clone=o=>JSON.parse(JSON.stringify(o)),sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -175,13 +172,11 @@ const P={dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="
 const IC={Dashboard:sv(P.dash,22),Orders:sv(P.ord,22),Products:sv(P.prod,22),'Home page':sv(P.home,22),'About us':sv(P.info,22),'Contact us':sv(P.chat,22),Settings:sv(P.set,22)};
 const pmeta=p=>{const d=Price.pct(p),f=pst(p);return `${d?`<b>${inr(Price.unit(p))}</b> <s>${inr(p.price)}</s> <span class="tag sale">−${d}%</span>`:inr(p.price)}${f.includes('out')?'<span class="tag stock-low">Out of stock</span>':f.includes('low')?'<span class="tag stock-low">Low</span>':''}${p.active===false?'<span class="tag off">Hidden</span>':''}${p.featured?'<span class="tag">Featured</span>':''}`};
 const NX={new:['confirmed','Confirm payment'],confirmed:['shipped','Mark shipped'],shipped:['delivered','Mark delivered']};
-/* stock state: 'out low' (0), 'low' (1-3), 'hidden', or '' */
 const pst=p=>p.active===false?'hidden':!Stock.tracked(p)?'':Number(Stock.count(p))===0?'out low':Number(Stock.count(p))<=3?'low':'';
 function pfilter(){const q=($('psearch')?.value||'').trim().toLowerCase();document.querySelectorAll('.catalog-product[data-s]').forEach(d=>d.hidden=(!!q&&!d.dataset.s.includes(q))||(pf!=='all'&&!d.dataset.f.split(' ').includes(pf)))}
 function addP(){const p=TABS.Products[0].new();(state.products||(state.products=[])).push(p);selectedProductId=p.id;productMode='editor';show();dirty();setTimeout(()=>document.querySelector('[data-p$=".name"]')?.focus(),60)}
 function flash(m,err){const e=$('msg');e.textContent=m;e.className=err?'err':'';e.hidden=false;clearTimeout(tm);tm=setTimeout(()=>e.hidden=true,err?6000:2400)}
 
-/* ---------- what can be edited ---------- */
 const T='t',A='a',I='i',N='n',O='o',B='b',S='s',W='w';
 const prodMeta=it=>{const d=Price.pct(it),st=Stock.tracked(it);return `${d?`<b>${inr(Price.unit(it))}</b> <s>${inr(it.price)}</s> <span class="tag sale">−${d}%</span>`:inr(it.price)}<span class="tag ${st&&Stock.count(it)===0?'stock-low':''}">${st?`Stock: ${Stock.count(it)}`:'Stock not set'}</span>${it.active===false?'<span class="tag off">Hidden</span>':''}${it.featured?'<span class="tag">Featured</span>':''}`};
 const TABS={
@@ -204,7 +199,6 @@ const TABS={
   {path:'site',title:'GST',f:[['gstin','GSTIN'],['gstPct','Default GST %',N],['gstMode','GST',S,[['inclusive','Included in prices'],['exclusive','Added on top']]]]}]
 };
 
-/* ---------- form rendering ---------- */
 function rF(f,pre){
  if(!Array.isArray(f))return rB(f,pre);
  const [k,l,t=T,x]=f,p=pre+'.'+k,v=getp(state,p),d=`data-p="${p}" data-t="${t}"`;
@@ -263,7 +257,6 @@ function nav(){
  $('nav').innerHTML='<h2>COZELLE</h2>'+NAVS.map(t=>`<button class="${t===cur?'on':''}" data-tab="${t}"><i>${IC[t]||''}</i><span>${t}</span>${t==='Orders'&&pend?`<em>${pend}</em>`:''}</button>`).join('')+`<div class="nf"><span>${esc(auth.currentUser.email)}</span><button data-uid title="Paste this UID into firebase/firestore.rules">Copy my UID</button><button data-out>Sign out</button></div>`;
 }
 
-/* ---------- orders data ---------- */
 async function loadOrders(){
  ordState='loading';
  try{const q=await db.collection('orders').orderBy('createdAt','desc').limit(1000).get();ORD=q.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})}));ordState='ok'}
@@ -293,7 +286,6 @@ const parts=o=>{const p=o.pricing;if(p)return {mrp:+p.mrp||0,disc:+p.discount||0
 const fdate=o=>tms(o)?new Date(tms(o)).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}):'';
 const pad=n=>String(n).padStart(2,'0'),dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 
-/* ---------- dashboard ---------- */
 function dash(){
  const v=$('view');
  if(ordState==='loading'){v.innerHTML='<p class="mut">Loading your sales…</p>';return}
@@ -315,7 +307,6 @@ function drawCharts(inR,sales,days){
  Chart.defaults.font.family='system-ui,sans-serif';Chart.defaults.color='#6b5646';
  const COL=['#b5693f','#4a2b1b','#d49a78','#8a6a52','#e3c4a1','#6b8f71','#c98a1b'],SC={new:'#e0a02b',confirmed:'#3b7ea1',shipped:'#7a5ea8',delivered:'#2f7d4f',cancelled:'#a3321f'};
  const mk=(id,cfg)=>{const el=$(id);if(el)charts.push(new Chart(el,cfg))};
- /* time buckets */
  let keys=[];const monthly=!days;
  if(monthly){const first=sales.length?Math.min(...sales.map(tms)):Date.now(),d=new Date(first);d.setDate(1);const end=new Date();while(d<=end){keys.push(d.getFullYear()+'-'+pad(d.getMonth()+1));d.setMonth(d.getMonth()+1)}}
  else for(let i=days-1;i>=0;i--)keys.push(dkey(new Date(Date.now()-i*864e5)));
@@ -334,7 +325,6 @@ function drawCharts(inR,sales,days){
  mk('c4',{type:'doughnut',data:{labels:tc.map(x=>x[0]),datasets:[{data:tc.map(x=>x[1]),backgroundColor:COL,borderWidth:0}]},options:{...base,cutout:'55%',plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>' '+c.label+': '+inr(c.parsed)}}}}});
 }
 
-/* ---------- orders ---------- */
 const hay=o=>[(o.payment||{}).ref,(o.customer||{}).name,(o.customer||{}).phone,(o.customer||{}).city,(o.payment||{}).utr,o.id].join(' ').toLowerCase();
 function ordersView(){
  const v=$('view');
@@ -366,7 +356,6 @@ function exportCsv(){
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(e).join(',')).join('\n')],{type:'text/csv'}));a.download='cozelle-orders-'+dkey(new Date())+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
 
-/* ---------- events ---------- */
 document.addEventListener('toggle',e=>{const t=e.target,k=t.dataset&&t.dataset.k,ok=t.dataset&&t.dataset.ok;if(k)t.open?open.add(k):open.delete(k);if(ok)t.open?openO.add(ok):openO.delete(ok)},true);
 const dirty=()=>{isDirty=true;$('save').textContent='Save changes •'};
 addEventListener('beforeunload',e=>{if(isDirty){e.preventDefault();e.returnValue=''}});
@@ -442,7 +431,6 @@ document.addEventListener('change',async e=>{
 
 document.addEventListener('focusin',e=>{if(e.target.type==='number')e.target.select()});
 
-/* ---------- save ---------- */
 function validate(){
  const ps=state.products||[],s=state.site||{};
  for(let i=0;i<ps.length;i++){const p=ps[i],bad=(m,key='name')=>{cur='Products';selectedProductId=p.id;productMode='editor';show();requestAnimationFrame(()=>{scrollTo(0,0);document.querySelector(`[data-p="products.${i}.${key}"]`)?.focus()});flash((p.name||'Product '+(i+1))+': '+m,1);return false};
@@ -471,9 +459,7 @@ $('save').onclick=async()=>{
 $('lf').onsubmit=async e=>{e.preventDefault();$('lerr').textContent='';
  try{await auth.signInWithEmailAndPassword($('em').value,$('pw').value)}catch(err){$('lerr').textContent=err.message}};
 
-/* ---------- start ---------- */
 auth.onAuthStateChanged(async u=>{
- /* customers sign in on the shop with phone + PIN (same Firebase project): they are not admins, so show the sign-in form instead */
  const cust=u&&u.email&&u.email.toLowerCase().endsWith('@'+CUSTOMER_DOMAIN);
  if(cust){$('login').hidden=false;$('app').hidden=true;$('lerr').textContent='This browser is signed in as a shop customer. Sign in with your admin email below.';return}
  $('login').hidden=!!u;$('app').hidden=!u;

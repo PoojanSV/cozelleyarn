@@ -20,3 +20,5 @@
 .pay-apps a img{display:block;width:auto;max-width:100%;height:30px;object-fit:contain}
 .pay-apps a.any{background:rgba(181,105,63,.08)}
 .pay-file[tabindex="-1"]:focus-visible span,.pay-file.return-focus span{outline:2px solid var(--copper);outline-offset:2px;background:rgba(181,105,63,.12)}
+
+.pay-apps a{font-size:12px;font-weight:600;color:var(--cocoa);text-align:center}

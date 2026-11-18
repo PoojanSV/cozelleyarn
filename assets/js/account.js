@@ -1,16 +1,4 @@
-/* Cozelle customer accounts: phone number = username, 6-digit PIN = password.
-   Shared by every storefront page (home, collection, product, about, contact). Load it AFTER the page's own script and BEFORE checkout.js.
-   It relies on the globals each page already defines: D, cust, db, $, B, esc, money, cld, toast, renderFields, and on the
-   Firebase Auth script (firebase-auth-compat.js).
 
-   How it works
-   - Firebase Auth only knows email + password, so the phone number is turned into <digits>@CUSTOMER_DOMAIN (see cozelle-data.js).
-     No email is ever sent to that address. The PIN is the Firebase password (Firebase asks for at least 6 characters, a 6-digit PIN is exactly that).
-   - Nobody has to log in to browse or add to the bag. At checkout a logged-out shopper only adds a 6-digit PIN: the account is created
-     there (or, if the number already has an account, the same PIN logs them in). Every order then carries the shopper's uid.
-   - The menu (hamburger) gives Log in / Sign up, My orders and Log out. Orders are read live from Firestore
-     (orders where uid == the signed-in customer), so a status change made in admin.html shows up without refreshing.
-   - Public API for checkout.js: Account.ensure(), Account.user(), Account.afterOrder(details), Account.open(view). */
 (() => {
  'use strict';
  const auth = (() => { try { return firebase.auth(); } catch (e) { console.warn('Firebase Auth unavailable', e); return null; } })();
@@ -19,13 +7,11 @@
  const PIN_RE = /^\d{6}$/;
  const STEPS = ['new', 'confirmed', 'shipped', 'delivered'];
 
- /* ---------- identity helpers ---------- */
  const isCust = em => typeof em === 'string' && em.toLowerCase().endsWith('@' + CUSTOMER_DOMAIN);
- const me = () => { const u = auth && auth.currentUser; return u && isCust(u.email) ? u : null; };   /* admin (or anyone else) signed in on this browser is not a customer */
+ const me = () => { const u = auth && auth.currentUser; return u && isCust(u.email) ? u : null; };
  const phoneOf = u => u.email.split('@')[0];
  const emailOf = digits => digits + '@' + CUSTOMER_DOMAIN;
 
- /* any way of typing an Indian number -> 91XXXXXXXXXX; other country codes are kept as typed; '' when it cannot be a phone number */
  function normPhone(raw) {
   let d = String(raw || '').replace(/\D/g, '').replace(/^0+/, '');
   if (d.length === 10) d = '91' + d;
@@ -46,7 +32,6 @@
   return t.generic;
  }
 
- /* ---------- sign up / log in ---------- */
  async function signup(phone, pin, name) {
   const u = (await auth.createUserWithEmailAndPassword(emailOf(phone), pin)).user;
   if (name) { try { await u.updateProfile({ displayName: name.slice(0, 60) }); } catch (e) { console.warn('name not saved', e); } }
@@ -60,7 +45,6 @@
   try { await auth.signOut(); } catch (e) { console.warn(e); }
  }
 
- /* Saved delivery details (customers/<uid>) so a returning shopper on any device does not retype them. Best effort: never blocks an order. */
  async function saveProfile(d) {
   const u = me();
   if (!u || !db) return;
@@ -81,21 +65,18 @@
   put('name', p.name || u.displayName); put('phone', fmt(phoneOf(u))); put('address', p.address); put('city', p.city); put('pincode', p.pincode);
   if (changed) { try { localStorage.setItem('cozelle-customer', JSON.stringify(cust)); } catch (e) {} renderFields(); }
  }
- /* leaving the account on a shared phone: forget the saved delivery details too (the bag stays) */
  function wipe() {
   Object.keys(cust).forEach(k => delete cust[k]);
   try { localStorage.removeItem('cozelle-customer'); localStorage.removeItem('cozelle-pending'); } catch (e) {}
   renderFields();
  }
 
- /* ---------- orders (live) ---------- */
- let orders = null, ordErr = false, unsub = null;   /* orders === null while loading */
+ let orders = null, ordErr = false, unsub = null;
  const stamp = o => o.createdAt && o.createdAt.toMillis ? o.createdAt.toMillis() : 0;
  function stopOrders() { if (unsub) { unsub(); unsub = null; } orders = null; ordErr = false; }
  function startOrders(u) {
   stopOrders();
   if (!db) { orders = []; ordErr = true; renderOrders(); return; }
-  /* equality filter only, so no composite index is needed; newest first is sorted here */
   unsub = db.collection('orders').where('uid', '==', u.uid).onSnapshot(s => {
    orders = s.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) })).sort((a, b) => stamp(b) - stamp(a));
    ordErr = false;
@@ -126,7 +107,6 @@
   else box.innerHTML = orders.map(orderCard).join('');
  }
 
- /* ---------- markup: menu entries, account panel, checkout PIN field ---------- */
  const menuBox = document.createElement('div');
  menuBox.className = 'acct-menu'; menuBox.id = 'menuAcct';
  q('#menu nav').after(menuBox);
@@ -141,7 +121,6 @@
  gate.className = 'gate'; gate.id = 'gate';
  form.insertBefore(gate, q('button[type=submit]', form));
 
- /* ---------- rendering ---------- */
  let tab = 'login', needLogin = false, gateKey = null, panelKey = null;
  const keyOf = () => { const u = me(); return u ? u.uid : ''; };
 
@@ -155,7 +134,7 @@
  }
  function renderGate(force) {
   const k = keyOf();
-  if (!force && k === gateKey) return;      /* never rebuild while a shopper may be typing their PIN */
+  if (!force && k === gateKey) return;
   gateKey = k;
   const t = A(), u = me();
   if (u) { gate.innerHTML = `<p class="gate-as">${esc(t.orderingAs)} <b>${esc(fmt(phoneOf(u)))}</b></p><button type="button" class="cof-back" data-acct="logout">${esc(t.notYou)}</button>`; return; }
@@ -187,7 +166,6 @@
  }
  function renderAll(force) { renderMenu(); renderGate(force); renderPanel(force); }
 
- /* ---------- open / close ---------- */
  function open(view) {
   B.classList.remove('menu-open', 'cart-open', 'filters-open');
   needLogin = view === 'orders' && !me();
@@ -199,7 +177,6 @@
  }
  const closePanel = () => B.classList.remove('acct-open');
 
- /* ---------- checkout: make sure the shopper has an account before the payment step ---------- */
  let ensuring = false;
  async function ensure() {
   if (me()) return true;
@@ -217,7 +194,7 @@
   try {
    try { await signup(phone, pin, ((nm && nm.value) || '').trim()); }
    catch (e) {
-    if (e && e.code === 'auth/email-already-in-use') await login(phone, pin);   /* ordered before: the same PIN logs them in */
+    if (e && e.code === 'auth/email-already-in-use') await login(phone, pin);
     else throw e;
    }
    return !!me();
@@ -229,7 +206,6 @@
   }
  }
 
- /* ---------- events ---------- */
  let busy = false;
  document.addEventListener('click', e => {
   const eye = e.target.closest('[data-eye]');
@@ -243,7 +219,7 @@
   if (a) {
    const v = a.dataset.acct;
    if (v === 'logout') logout();
-   else if (v === 'shop') { closePanel(); const s = $('shop'); if (s) s.scrollIntoView(); else location.href = 'collection.html'; }
+   else if (v === 'shop') { closePanel(); const s = $('shop'); if (s) s.scrollIntoView(); else location.href = 'collection'; }
    else open(v);
    return;
   }
@@ -252,7 +228,7 @@
   if (e.target.closest('#acct [data-close]') || e.target.id === 'scrim') closePanel();
  });
  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
- document.addEventListener('input', e => {   /* PINs are digits only */
+ document.addEventListener('input', e => {
   const el = e.target;
   if (el.classList && el.classList.contains('pin')) { const v = el.value.replace(/\D/g, '').slice(0, 6); if (v !== el.value) el.value = v; }
  });
@@ -277,7 +253,6 @@
   busy = false;
  });
 
- /* ---------- session ---------- */
  let lastUid = null;
  if (auth) auth.onAuthStateChanged(u => {
   const c = u && isCust(u.email) ? u : null, was = lastUid;

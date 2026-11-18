@@ -99,6 +99,42 @@ details.o summary{display:grid;grid-template-columns:110px 1fr auto auto auto;ga
 @media(max-width:1050px){.product-editor-layout{grid-template-columns:minmax(0,1fr) 220px}}
 @media(max-width:760px){#app{grid-template-columns:minmax(0,1fr)}#nav{position:sticky;top:0;z-index:20;height:auto;flex-direction:row;align-items:center;overflow-x:auto;padding:8px 10px;gap:2px}#nav h2{display:none}#nav>button{flex:none;white-space:nowrap;padding:9px 11px;font-size:12px}.nf{margin:0 0 0 auto;display:flex;flex:none;gap:5px;padding:0 0 0 8px;border:0}.nf span{display:none}.nf button{white-space:nowrap;padding:8px 10px;font-size:11px}main{padding:0 14px 60px;max-width:none}.bar{top:50px;padding:12px 0}.bar h1{font-size:23px}.bar div{gap:6px}.bar a,.bar button{font-size:12px}.catalog-heading h2{font-size:25px}.catalog-actions{width:100%}.catalog-actions .catalog-search{flex:1;min-width:0}.catalog-product{grid-template-columns:54px minmax(0,1fr) auto;gap:10px;padding:10px}.catalog-product-thumb{width:54px;height:58px}.catalog-product-actions{gap:2px}.catalog-product-actions button{padding:7px}.catalog-product .edit{padding:8px 10px}.product-dialog-backdrop{padding:0}.product-dialog{width:100%;height:100vh;height:100dvh;border-radius:0;border:0}.product-editor-top{align-items:flex-start;flex-wrap:wrap;padding:12px 14px}.product-editor-top .back{padding:8px 10px}.product-editor-top>div{flex:1;min-width:140px}.product-editor-top h2{font-size:21px}.product-editor-top>.tag{margin-left:0}.product-editor-layout{display:flex;flex-direction:column;gap:12px;padding:12px;min-height:0}.product-editor-main{width:100%}.product-fields{grid-template-columns:1fr}.product-info-fields .f:nth-child(3),.product-media-fields .img{grid-column:auto}.product-section{padding:14px}.product-preview{display:none}.product-editor-footer{padding:10px 12px}.product-editor-footer p{max-width:36%;line-height:1.3}.product-editor-footer>div{flex:1}.product-editor-footer button{flex:1;padding:10px 8px;font-size:12px}}
 @media(max-width:420px){#nav>button{padding:8px 9px;font-size:11px}.nf button[data-uid]{display:none}main{padding-right:10px;padding-left:10px}.bar h1{font-size:20px}.bar a{font-size:11px}.bar button{padding:8px 10px}.catalog-product{grid-template-columns:48px minmax(0,1fr) auto}.catalog-product-thumb{width:48px;height:52px}.catalog-product-meta .tag{white-space:normal}.product-editor-top h2{font-size:19px}.product-editor-top>div{min-width:120px}.product-editor-footer p{display:none}}
+
+/* ===== QoL redesign ===== */
+body{background:#fbf9f5}
+button{display:inline-flex;align-items:center;justify-content:center;gap:6px}button svg{display:block;flex:none}
+.blk,.box,.kpi,.catalog-product,details.o,.product-section,.product-optional,.product-preview{border-radius:12px;box-shadow:none!important}
+.kpi:first-child{background:#fff;border-color:var(--line)}.kpi:first-child small,.kpi:first-child span{color:var(--lab)}.kpi:first-child strong{color:var(--cocoa)}
+.kpi strong{font:600 24px system-ui;margin:6px 0 0}.kpi span:empty{display:none}.kpi small{letter-spacing:.05em}
+.bar h1{font-size:24px}.catalog-heading{align-items:center}.product-catalog{margin-top:6px}
+.product-editor-footer{justify-content:flex-end}.product-editor-top h2{font-size:22px}
+#nav h2{padding-bottom:12px}#nav>button{border-radius:10px}
+input,textarea,select{font-size:16px}button{min-height:38px}
+#nav>button i{font-style:normal;width:22px;text-align:center}
+.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.chip{flex:none;border-radius:999px;padding:8px 14px}
+.catalog-grid{grid-template-columns:repeat(auto-fill,minmax(430px,1fr))}
+.stk{display:flex;align-items:center;gap:6px;margin-top:6px}.stk button{width:34px;height:34px;min-height:0;padding:0;font-size:18px;border-radius:9px}
+.stk b{min-width:30px;text-align:center;font-size:15px;color:var(--cocoa)}.stk .tgl{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);cursor:pointer}
+.catalog-product[data-f~="out"]{border-color:rgba(163,50,31,.4)}
+.oc{flex-wrap:wrap}.oc .big{padding:12px 20px;font-weight:600}
+.ob a{display:inline-block;padding:4px 0}
+.product-editor-footer button{min-height:42px}
+@media(max-width:760px){
+#app{padding-bottom:76px}
+#nav{position:fixed;top:auto;bottom:0;left:0;right:0;z-index:30;padding:6px 6px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -8px 26px rgba(0,0,0,.2)}
+#nav>button{flex-direction:column;gap:1px;align-items:center;font-size:10.5px;padding:6px 10px;min-width:62px;position:relative}
+#nav>button i{font-size:19px}#nav>button.on{box-shadow:none;background:rgba(255,255,255,.17)}#nav em{position:absolute;top:1px;right:6px;margin:0;font-size:10px}
+.nf button{min-width:60px;font-size:10.5px}
+.bar{top:0;padding:10px 0}.bar h1{font-size:22px}
+.kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:12px 14px}.kpi strong{font-size:21px}
+.grid2,.grid2.b{grid-template-columns:1fr}.cv{height:230px}
+details.o summary{grid-template-columns:1fr auto;gap:3px 10px;padding:12px 0}
+details.o summary>b{grid-area:1/1}details.o summary>span:nth-child(2){grid-area:2/1}details.o summary>.amt{grid-area:1/2;text-align:right}details.o summary>.pill{grid-area:2/2;justify-self:end}details.o summary>.mut{grid-area:3/1/4/3;font-size:12px}
+.ob{grid-template-columns:1fr}.oc>*{flex:1}.oc .big{flex:1 0 100%}.oc select{width:100%}
+.catalog-grid{grid-template-columns:1fr}.catalog-product{grid-template-columns:54px minmax(0,1fr)}
+.catalog-product-actions{grid-column:1/-1;justify-content:flex-end;gap:6px}.catalog-product-actions button{min-width:44px}
+#msg{bottom:88px}
+}
 </style></head>
 <body>
 <div class="center" id="login" hidden>
@@ -107,7 +143,7 @@ details.o summary{display:grid;grid-template-columns:110px 1fr auto auto auto;ga
 </div>
 <div id="app" hidden>
  <aside id="nav"></aside>
- <main><div class="bar"><h1 id="ttl"></h1><div><a href="index.html" target="_blank">View site ↗</a><button class="pri" id="save">Save changes</button></div></div><div id="view"></div></main>
+ <main><div class="bar"><h1 id="ttl"></h1><div><a href="index.html" target="_blank" style="display:inline-flex;align-items:center;gap:5px">View site</a><button class="pri" id="save">Save changes</button></div></div><div id="view"></div></main>
 </div>
 <div id="msg" hidden></div>
 
@@ -127,13 +163,22 @@ const getp=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
 const setp=(o,p,v)=>{const ks=p.split('.'),l=ks.pop();ks.reduce((a,k)=>a[k]??(a[k]={}),o)[l]=v};
 const delp=(o,p)=>{const ks=p.split('.'),l=ks.pop(),t=ks.reduce((a,k)=>a==null?a:a[k],o);if(t)delete t[l]};
 const rid=()=>Math.random().toString(36).slice(2,8);
-let state={},oldIds=[],cur='Dashboard',tm,ORD=[],ordState='loading',range='30',ofilter='all',oq='',isDirty=false,selectedProductId='',productMode='catalog';
+let state={},oldIds=[],cur='Dashboard',tm,ORD=[],ordState='loading',range='30',ofilter='all',oq='',isDirty=false,selectedProductId='',productMode='catalog',pf='all';
 const open=new Set(),openO=new Set(),NEWS={},charts=[];
 const inr=n=>Price.money(n);
 const ST=['new','confirmed','shipped','delivered','cancelled'],STL={new:'Payment to verify',confirmed:'Confirmed',shipped:'Shipped',delivered:'Delivered',cancelled:'Cancelled'};
 const SALE=s=>s==='confirmed'||s==='shipped'||s==='delivered';
 const tms=o=>o.createdAt&&o.createdAt.toMillis?o.createdAt.toMillis():0;
 const NAVS=['Dashboard','Orders','Products','Home page','About us','Contact us','Settings'];
+const sv=(d,z=20)=>`<svg viewBox="0 0 24 24" width="${z}" height="${z}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const P={dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',ord:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',prod:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',home:'<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',set:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',plus:'<path d="M12 5v14M5 12h14"/>',minus:'<path d="M5 12h14"/>',back:'<path d="M15 5l-7 7 7 7"/>',copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/>',up:'<path d="M6 14l6-6 6 6"/>',dn:'<path d="M6 10l6 6 6-6"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/>'};
+const IC={Dashboard:sv(P.dash,22),Orders:sv(P.ord,22),Products:sv(P.prod,22),'Home page':sv(P.home,22),'About us':sv(P.info,22),'Contact us':sv(P.chat,22),Settings:sv(P.set,22)};
+const pmeta=p=>{const d=Price.pct(p),f=pst(p);return `${d?`<b>${inr(Price.unit(p))}</b> <s>${inr(p.price)}</s> <span class="tag sale">−${d}%</span>`:inr(p.price)}${f.includes('out')?'<span class="tag stock-low">Out of stock</span>':f.includes('low')?'<span class="tag stock-low">Low</span>':''}${p.active===false?'<span class="tag off">Hidden</span>':''}${p.featured?'<span class="tag">Featured</span>':''}`};
+const NX={new:['confirmed','Confirm payment'],confirmed:['shipped','Mark shipped'],shipped:['delivered','Mark delivered']};
+/* stock state: 'out low' (0), 'low' (1-3), 'hidden', or '' */
+const pst=p=>p.active===false?'hidden':!Stock.tracked(p)?'':Number(Stock.count(p))===0?'out low':Number(Stock.count(p))<=3?'low':'';
+function pfilter(){const q=($('psearch')?.value||'').trim().toLowerCase();document.querySelectorAll('.catalog-product[data-s]').forEach(d=>d.hidden=(!!q&&!d.dataset.s.includes(q))||(pf!=='all'&&!d.dataset.f.split(' ').includes(pf)))}
+function addP(){const p=TABS.Products[0].new();(state.products||(state.products=[])).push(p);selectedProductId=p.id;productMode='editor';show();dirty();setTimeout(()=>document.querySelector('[data-p$=".name"]')?.focus(),60)}
 function flash(m,err){const e=$('msg');e.textContent=m;e.className=err?'err':'';e.hidden=false;clearTimeout(tm);tm=setTimeout(()=>e.hidden=true,err?6000:2400)}
 
 /* ---------- what can be edited ---------- */
@@ -142,8 +187,8 @@ const prodMeta=it=>{const d=Price.pct(it),st=Stock.tracked(it);return `${d?`<b>$
 const TABS={
  Products:[{path:'products',title:'Products (↑ ↓ changes the order on the site)',item:'name',
   sum:it=>`<img class="th" src="${esc(cld(it.image,80))}" alt=""><b class="sn">${esc(it.name||'Untitled')}</b><span class="sm">${prodMeta(it)}</span>`,
-  new:()=>({id:'p-'+rid(),name:'New product',category:'',price:0,discount:0,stock:0,image:'',featured:false,active:true}),
-  f:[['name','Name'],['category','Category'],['price','Price (full price, before discount)',N],['discount','Discount % (0 = no discount)',N],['stock','Stock quantity',W],['gst','GST % for this product (leave empty to use the shop rate)',O],['image','Photo',I],['description','Description',A],['featured','Show at the top of the home page',B,false],['active','Visible on the site',B,true],
+  new:()=>({id:'p-'+rid(),name:'',category:'',price:0,discount:0,stock:0,image:'',featured:false,active:true}),
+  f:[['name','Name'],['category','Category'],['price','Price',N],['discount','Discount %',N],['stock','Stock',W],['gst','GST % (optional)',O],['image','Photo',I],['description','Description',A],['featured','Featured',B,false],['active','Visible',B,true],
    {path:'gallery',title:'More photos',item:'alt',new:()=>({image:'',alt:''}),f:[['image','Photo',I],['alt','Short description']]},
    {path:'details',title:'Details table (e.g. Material, Size)',item:'label',new:()=>({label:'',value:''}),f:[['label','Label'],['value','Value']]}]}],
  'Home page':[
@@ -151,12 +196,12 @@ const TABS={
   {path:'collection',title:'Collection heading',f:[['title','Title'],['accent','Coloured word']]},
   {path:'story',title:'Our promise (also shown on the About page)',item:'title',new:()=>({title:'New point',text:''}),f:[['title','Title'],['text','Text',A]]},
   {path:'reviews',title:'Customer reviews',item:'name',new:()=>({name:'Name',rating:5,text:''}),f:[['name','Name'],['rating','Stars (1 to 5)',N],['text','Review',A]]}],
- 'About us':[{path:'about',title:'About us page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Our story (leave a blank line between paragraphs)',A],['image','Photo (leave empty for no photo)',I]]}],
- 'Contact us':[{path:'contact',title:'Contact page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Short intro',A],['email','Email (leave empty to hide)'],['address','Address (leave empty to hide)',A],['hours','Opening hours (leave empty to hide)']]}],
+ 'About us':[{path:'about',title:'About us page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Our story',A],['image','Photo',I]]}],
+ 'Contact us':[{path:'contact',title:'Contact page',f:[['title','Heading'],['accent','Heading, coloured word'],['text','Short intro',A],['email','Email'],['address','Address',A],['hours','Opening hours']]}],
  Settings:[
-  {path:'site',title:'Shop details',f:[['name','Shop name'],['brand','Name shown in the header'],['tagline','Tagline'],['logo','Logo',I],['whatsapp','WhatsApp number with country code, digits only (Contact page and WhatsApp link)'],['currency','Currency symbol'],['copyright','Copyright line']]},
-  {path:'site',title:'Payments (UPI)',f:[['upiId','UPI ID that receives payments, e.g. shopname@okhdfcbank'],['upiName','Name shown in the customer\'s UPI app']]},
-  {path:'site',title:'GST',f:[['gstin','GSTIN (optional, saved with every order)'],['gstPct','Default GST % (a product can override it)',N],['gstMode','How GST is applied',S,[['inclusive','Already included in my prices (shown as "Includes GST")'],['exclusive','Added on top of my prices at the bag']]]]}]
+  {path:'site',title:'Shop details',f:[['name','Shop name'],['brand','Name shown in the header'],['tagline','Tagline'],['logo','Logo',I],['whatsapp','WhatsApp number (with country code)'],['currency','Currency symbol'],['copyright','Copyright line']]},
+  {path:'site',title:'Payments (UPI)',f:[['upiId','UPI ID'],['upiName','UPI name']]},
+  {path:'site',title:'GST',f:[['gstin','GSTIN'],['gstPct','Default GST %',N],['gstMode','GST',S,[['inclusive','Included in prices'],['exclusive','Added on top']]]]}]
 };
 
 /* ---------- form rendering ---------- */
@@ -167,22 +212,22 @@ function rF(f,pre){
  let inp;
  if(t===A)inp=`<textarea rows="3" ${d}>${esc(v)}</textarea>`;
  else if(t===S)inp=`<select ${d}>${x.map(o=>`<option value="${esc(o[0])}" ${(v===undefined?x[0][0]:v)===o[0]?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`;
- else if(t===I)inp=`<div class="img"><img src="${esc(cld(v,120))}" alt=""><input ${d} value="${esc(v)}" placeholder="Paste a link, or upload →"><label class="up"><button type="button">Upload</button><input type="file" accept="image/*" data-up="${p}"></label></div>`;
- else inp=`<input ${t===N||t===O||t===W?`type="number" step="${t===W?'1':'any'}" min="0"`:''} ${d} value="${esc(v)}">`;
+ else if(t===I)inp=`<div class="img"><img src="${esc(cld(v,120))}" alt=""><input ${d} value="${esc(v)}" placeholder="Image link"><label class="up"><button type="button">Upload</button><input type="file" accept="image/*" data-up="${p}"></label></div>`;
+ else inp=`<input ${k==='category'?'list="cats"':''} ${t===N||t===O||t===W?`type="number" step="${t===W?'1':'any'}" min="0"`:''} ${d} value="${esc(v)}">`;
  return `<label class="f"><span>${l}</span>${inp}</label>`;
 }
 function rB(b,pre){
  const p=pre?pre+'.'+b.path:b.path;
- const head=`<h3>${b.title||''}${b.item?`<button data-a="add" data-p="${p}">+ Add</button>`:''}</h3>`;
+ const head=`<h3>${b.title||''}${b.item?`<button data-a="add" data-p="${p}">${sv(P.plus,15)} Add</button>`:''}</h3>`;
  if(!b.item)return `<section class="blk">${head}${b.f.map(f=>rF(f,p)).join('')}</section>`;
  NEWS[p.replace(/\.\d+/g,'')]=b.new;
  const arr=getp(state,p)||[];
  return `<section class="blk">${head}${arr.map((it,i)=>{const k=p+'.'+i;
-  return `<details class="it" data-k="${k}" data-ik="${b.item}" ${b.sum?`data-s="${esc(((it.name||'')+' '+(it.category||'')).toLowerCase())}"`:''} ${open.has(k)?'open':''}><summary><span class="sl">${b.sum?b.sum(it):`<span class="sn">${esc(it[b.item]||'Item '+(i+1))}</span>`}</span><span class="ctl"><button data-a="up" data-p="${p}" data-i="${i}">↑</button><button data-a="dn" data-p="${p}" data-i="${i}">↓</button><button data-a="del" data-p="${p}" data-i="${i}">×</button></span></summary><div class="in">${b.f.map(f=>rF(f,k)).join('')}</div></details>`}).join('')||'<p class="mut">Nothing here yet. Press + Add.</p>'}</section>`;
+  return `<details class="it" data-k="${k}" data-ik="${b.item}" ${b.sum?`data-s="${esc(((it.name||'')+' '+(it.category||'')).toLowerCase())}"`:''} ${open.has(k)?'open':''}><summary><span class="sl">${b.sum?b.sum(it):`<span class="sn">${esc(it[b.item]||'Item '+(i+1))}</span>`}</span><span class="ctl"><button data-a="up" data-p="${p}" data-i="${i}" aria-label="Move up">${sv(P.up,16)}</button><button data-a="dn" data-p="${p}" data-i="${i}" aria-label="Move down">${sv(P.dn,16)}</button><button data-a="del" data-p="${p}" data-i="${i}" aria-label="Delete">${sv(P.x,16)}</button></span></summary><div class="in">${b.f.map(f=>rF(f,k)).join('')}</div></details>`}).join('')||'<p class="mut">Nothing here yet. Press + Add.</p>'}</section>`;
 }
 function prodTools(){
  const cats=[...new Set((state.products||[]).map(p=>p.category).filter(Boolean))];
- return `<details class="blk product-tools"><summary>Bulk discount <span class="mut">Optional</span></summary><div class="row"><select id="saleCat"><option value="">All products</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select><input id="salePct" type="number" min="1" max="95" placeholder="Discount %"><button class="pri" data-sale="apply">Apply discount</button><button data-sale="clear">Remove discount</button></div><span class="mut">Apply a discount across a category. Save changes when you are ready to publish.</span></details>`;
+ return `<details class="blk product-tools"><summary>Bulk discount</summary><div class="row"><select id="saleCat"><option value="">All products</option>${cats.map(c=>`<option>${esc(c)}</option>`).join('')}</select><input id="salePct" type="number" min="1" max="95" placeholder="Discount %"><button class="pri" data-sale="apply">Apply discount</button><button data-sale="clear">Remove discount</button></div></details>`;
 }
 function productManager(){
  const ps=state.products||[],def=TABS.Products[0];
@@ -191,16 +236,17 @@ function productManager(){
  if(productMode==='editor'){
   const selected=ps.find(p=>p.id===selectedProductId),index=ps.findIndex(p=>p.id===selectedProductId),pre='products.'+index;
   const field=k=>def.f.find(f=>Array.isArray(f)&&f[0]===k),nested=k=>def.f.find(f=>!Array.isArray(f)&&f.path===k);
-  editor=`<div class="product-dialog-backdrop" data-product-backdrop><section class="product-dialog" id="productWorkspace" role="dialog" aria-modal="true" aria-labelledby="productEditorName" tabindex="-1"><header class="product-editor-top"><button type="button" class="back" data-product-back>← Products</button><div><small>Product details</small><h2 id="productEditorName">${esc(selected.name||'New product')}</h2><p>Make your changes here, then save to update the site.</p></div><span class="tag" id="productEditorStock">${esc(Stock.tracked(selected)?Stock.label(selected):'Stock not set')}</span></header><div class="product-editor-layout"><div class="product-editor-main">
-   <section class="product-section"><div class="product-section-head"><h3>Product information</h3><p>What shoppers see on your site.</p></div><div class="product-fields product-info-fields">${['name','category','description'].map(field).map(f=>rF(f,pre)).join('')}</div></section>
-   <section class="product-section"><div class="product-section-head"><h3>Price and stock</h3><p>Set the price and how many are available.</p></div><div class="product-fields">${['price','discount','stock','gst'].map(field).map(f=>rF(f,pre)).join('')}</div></section>
-   <section class="product-section"><div class="product-section-head"><h3>Photo and visibility</h3><p>Choose the main photo and where it appears.</p></div><div class="product-fields product-media-fields">${rF(field('image'),pre)}${rF(field('featured'),pre)}${rF(field('active'),pre)}</div></section>
-   <details class="product-optional"><summary>More photos <span class="mut">Optional</span></summary>${rB({...nested('gallery'),title:''},pre)}</details>
-   <details class="product-optional"><summary>Product details table <span class="mut">Optional</span></summary>${rB({...nested('details'),title:''},pre)}</details>
-  </div><aside class="product-preview"><img class="preview-photo" id="productPreviewPhoto" src="${esc(cld(selected.image,360))}" alt=""><span class="preview-category" id="productPreviewCategory">${esc(selected.category||'Product preview')}</span><h3 id="productPreviewName">${esc(selected.name||'New product')}</h3><div class="preview-price" id="productPreviewPrice">${Price.html(selected)}</div><span class="tag" id="productPreviewStock">${esc(Stock.tracked(selected)?Stock.label(selected):'Stock not set')}</span><p class="preview-note">Preview updates as you type.</p></aside></div><footer class="product-editor-footer"><p>Your changes go live after you save.</p><div><button type="button" data-product-back>Back to products</button><button type="button" class="pri" data-product-save>Save changes</button></div></footer></section></div>`;
+  editor=`<div class="product-dialog-backdrop" data-product-backdrop><section class="product-dialog" id="productWorkspace" role="dialog" aria-modal="true" aria-labelledby="productEditorName" tabindex="-1"><header class="product-editor-top"><button type="button" class="back" data-product-back>${sv(P.back,16)} Products</button><div><h2 id="productEditorName">${esc(selected.name||'New product')}</h2></div><span class="tag" id="productEditorStock">${esc(Stock.tracked(selected)?Stock.label(selected):'Stock not set')}</span></header><div class="product-editor-layout"><div class="product-editor-main">
+   <section class="product-section"><div class="product-section-head"><h3>Basics</h3></div><div class="product-fields product-info-fields">${['name','category','description'].map(field).map(f=>rF(f,pre)).join('')}</div></section>
+   <section class="product-section"><div class="product-section-head"><h3>Price &amp; stock</h3></div><div class="product-fields">${['price','discount','stock','gst'].map(field).map(f=>rF(f,pre)).join('')}</div></section>
+   <section class="product-section"><div class="product-section-head"><h3>Photo</h3></div><div class="product-fields product-media-fields">${rF(field('image'),pre)}${rF(field('featured'),pre)}${rF(field('active'),pre)}</div></section>
+   <details class="product-optional"><summary>More photos</summary>${rB({...nested('gallery'),title:''},pre)}</details>
+   <details class="product-optional"><summary>Details table</summary>${rB({...nested('details'),title:''},pre)}</details>
+  </div><aside class="product-preview"><img class="preview-photo" id="productPreviewPhoto" src="${esc(cld(selected.image,360))}" alt=""><span class="preview-category" id="productPreviewCategory">${esc(selected.category||'Product preview')}</span><h3 id="productPreviewName">${esc(selected.name||'New product')}</h3><div class="preview-price" id="productPreviewPrice">${Price.html(selected)}</div><span class="tag" id="productPreviewStock">${esc(Stock.tracked(selected)?Stock.label(selected):'Stock not set')}</span></aside></div><footer class="product-editor-footer"><div><button type="button" data-product-next>Save &amp; add another</button><button type="button" class="pri" data-product-save>Save changes</button></div></footer></section></div>`;
  }
- const cards=ps.map((p,i)=>`<article class="catalog-product" data-s="${esc(((p.name||'')+' '+(p.category||'')).toLowerCase())}"><img class="catalog-product-thumb" src="${esc(cld(p.image,150))}" alt=""><div class="catalog-product-info"><b class="catalog-product-name">${esc(p.name||'Untitled')}</b><span class="catalog-product-sub">${esc(p.category||'Uncategorised')} · ${inr(Price.unit(p))}</span><span class="catalog-product-meta">${prodMeta(p)}</span></div><div class="catalog-product-actions"><button type="button" data-a="up" data-p="products" data-i="${i}" aria-label="Move product up" title="Move up" ${i===0?'disabled':''}>↑</button><button type="button" data-a="dn" data-p="products" data-i="${i}" aria-label="Move product down" title="Move down" ${i===ps.length-1?'disabled':''}>↓</button><button type="button" class="edit" data-product-select="${esc(p.id)}">Edit</button></div></article>`).join('');
- return `<section class="product-catalog"><header class="catalog-heading"><div><h2>Your products</h2><p>${ps.length} product${ps.length===1?'':'s'} · Search, edit, or add an item.</p></div><div class="catalog-actions"><input id="psearch" class="catalog-search" type="search" placeholder="Search products…" aria-label="Search products"><button type="button" class="pri" data-product-add>＋ Add product</button></div></header><div class="catalog-grid">${cards||'<div class="catalog-empty">No products yet. Select Add product to create your first one.</div>'}</div>${prodTools()}</section>${editor}`;
+ const cards=ps.map((p,i)=>`<article class="catalog-product" data-f="${pst(p)}" data-s="${esc(((p.name||'')+' '+(p.category||'')).toLowerCase())}"><img class="catalog-product-thumb" src="${esc(cld(p.image,150))}" alt=""><div class="catalog-product-info"><b class="catalog-product-name">${esc(p.name||'Untitled')}</b><span class="catalog-product-sub">${esc(p.category||'No category')}</span><span class="catalog-product-meta">${pmeta(p)}</span><div class="stk"><button type="button" data-stk="${esc(p.id)}" data-d="-1" aria-label="One less">${sv(P.minus,16)}</button><b class="stk-n" data-id="${esc(p.id)}">${Stock.tracked(p)?Stock.count(p):'–'}</b><button type="button" data-stk="${esc(p.id)}" data-d="1" aria-label="One more">${sv(P.plus,16)}</button><label class="tgl"><input type="checkbox" data-vis="${esc(p.id)}" ${p.active!==false?'checked':''}>Visible</label></div></div><div class="catalog-product-actions"><button type="button" data-a="up" data-p="products" data-i="${i}" aria-label="Move product up" title="Move up" ${i===0?'disabled':''}>${sv(P.up,17)}</button><button type="button" data-a="dn" data-p="products" data-i="${i}" aria-label="Move product down" title="Move down" ${i===ps.length-1?'disabled':''}>${sv(P.dn,17)}</button><button type="button" data-product-dup="${esc(p.id)}" aria-label="Duplicate" title="Duplicate">${sv(P.copy,17)}</button><button type="button" class="edit" data-product-select="${esc(p.id)}">Edit</button></div></article>`).join('');
+ const cnt=f=>ps.filter(p=>pst(p).split(' ').includes(f)).length,chips=[['all','All',ps.length],['low','Low stock',cnt('low')],['out','Out of stock',cnt('out')],['hidden','Hidden',cnt('hidden')]].map(([k,l,n])=>`<button class="chip ${pf===k?'on':''}" data-pf="${k}">${l}<b>${n}</b></button>`).join('');
+ return `<section class="product-catalog"><header class="catalog-heading"><div><b>${ps.length}</b> <span class="mut">product${ps.length===1?'':'s'}</span></div><div class="catalog-actions"><input id="psearch" class="catalog-search" type="search" placeholder="Search products…" aria-label="Search products"><button type="button" class="pri" data-product-add>${sv(P.plus,16)} Add product</button></div></header><div class="chips">${chips}</div><div class="catalog-grid">${cards||'<div class="catalog-empty">No products yet.</div>'}</div>${prodTools()}</section><datalist id="cats">${[...new Set(ps.map(p=>p.category).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('')}</datalist>${editor}`;
 }
 function closeProductEditor(){productMode='catalog';selectedProductId='';show();$('psearch')?.focus()}
 function show(){
@@ -208,13 +254,13 @@ function show(){
  const y=scrollY;$('ttl').textContent=cur;nav();
  const content=cur!=='Dashboard'&&cur!=='Orders';$('save').hidden=!content;
  if(cur==='Dashboard')dash();else if(cur==='Orders')ordersView();
- else if(cur==='Products')$('view').innerHTML=productManager();
+ else if(cur==='Products'){$('view').innerHTML=productManager();pfilter()}
  else $('view').innerHTML=TABS[cur].map(b=>rB(b,'')).join('');
  scrollTo(0,y);
 }
 function nav(){
  const pend=ORD.filter(o=>o.status==='new').length;
- $('nav').innerHTML='<h2>COZELLE<small>Admin</small></h2>'+NAVS.map(t=>`<button class="${t===cur?'on':''}" data-tab="${t}">${t}${t==='Orders'&&pend?`<em>${pend}</em>`:''}</button>`).join('')+`<div class="nf"><span>${esc(auth.currentUser.email)}</span><button data-uid title="Paste this UID into firebase/firestore.rules">Copy my UID</button><button data-out>Sign out</button></div>`;
+ $('nav').innerHTML='<h2>COZELLE</h2>'+NAVS.map(t=>`<button class="${t===cur?'on':''}" data-tab="${t}"><i>${IC[t]||''}</i><span>${t}</span>${t==='Orders'&&pend?`<em>${pend}</em>`:''}</button>`).join('')+`<div class="nf"><span>${esc(auth.currentUser.email)}</span><button data-uid title="Paste this UID into firebase/firestore.rules">Copy my UID</button><button data-out>Sign out</button></div>`;
 }
 
 /* ---------- orders data ---------- */
@@ -258,10 +304,10 @@ function dash(){
  const k=(l,val,s,c)=>`<div class="kpi ${c||''}"><small>${l}</small><strong>${val}</strong><span>${s}</span></div>`;
  const recent=ORD.slice(0,6);
  v.innerHTML=`<div class="chips">${[['7','7 days'],['30','30 days'],['90','90 days'],['all','All time']].map(([r,l])=>`<button class="chip ${range===r?'on':''}" data-range="${r}">${l}</button>`).join('')}<button class="chip" data-oref style="margin-left:auto">Refresh</button></div>
- <div class="kpis">${k('Sales',inr(rev),'confirmed, shipped &amp; delivered')+k('Orders',n,units+' item'+(units===1?'':'s')+' sold')+k('Average order',inr(n?rev/n:0),'per order')+k('Discounts given',inr(disc),'off full prices')+k('GST in sales',inr(gst),'collected / included')+k('To verify',pend.length,pend.length?inr(sum(pend,o=>+o.total||0))+' waiting':'all clear',pend.length?'hot':'')}</div>
- ${pend.length?`<div class="alert"><span><b>${pend.length}</b> order${pend.length>1?'s are':' is'} waiting for a payment check. Match the amount in your UPI app, then confirm.</span><button data-gofilter="new">Review now</button></div>`:''}
- ${typeof Chart==='undefined'?'<div class="box mut">Charts could not load (check your internet connection and refresh).</div>':`<div class="grid2"><div class="box"><h3>Sales over time</h3><div class="cv"><canvas id="c1"></canvas></div></div><div class="box"><h3>Orders by status</h3><div class="cv"><canvas id="c2"></canvas></div></div></div>
- <div class="grid2 b"><div class="box"><h3>Top products</h3><div class="cv"><canvas id="c3"></canvas></div></div><div class="box"><h3>Sales by category</h3><div class="cv"><canvas id="c4"></canvas></div></div></div>`}
+ <div class="kpis">${k('Sales',inr(rev),'')+k('Orders',n,units+' item'+(units===1?'':'s'))+k('Average order',inr(n?rev/n:0),'')+k('To verify',pend.length,pend.length?inr(sum(pend,o=>+o.total||0)):'',pend.length?'hot':'')}</div>
+ ${pend.length?`<div class="alert"><span><b>${pend.length}</b> order${pend.length>1?'s':''} to verify</span><button data-gofilter="new">Review</button></div>`:''}
+ ${(()=>{const l=(state.products||[]).filter(p=>pst(p).split(' ').includes('low'));return l.length?`<div class="alert"><span><b>${l.length}</b> low on stock: ${esc(l.slice(0,3).map(p=>p.name||'Untitled').join(', '))}${l.length>3?'…':''}</span><button data-golow>Restock</button></div>`:''})()}
+ ${typeof Chart==='undefined'?'<div class="box mut">Charts could not load (check your internet connection and refresh).</div>':`<div class="grid2 b"><div class="box"><h3>Sales</h3><div class="cv"><canvas id="c1"></canvas></div></div><div class="box"><h3>Top products</h3><div class="cv"><canvas id="c3"></canvas></div></div></div>`}
  <div class="box"><h3>Recent orders <button data-tab="Orders">View all</button></h3>${recent.length?`<div style="overflow-x:auto"><table><tr><th>Order</th><th>Customer</th><th class="r">Total</th><th>Status</th><th>Placed</th></tr>${recent.map(o=>`<tr data-goto="${o.id}"><td>${esc((o.payment||{}).ref||o.id.slice(0,8))}</td><td>${esc((o.customer||{}).name||'')}</td><td class="r">${inr(o.total)}</td><td><span class="pill ${esc(o.status)}">${esc(STL[o.status]||o.status)}</span></td><td>${fdate(o)}</td></tr>`).join('')}</table></div>`:'<p class="mut">No orders yet. They will appear here as soon as customers pay.</p>'}</div>`;
  if(typeof Chart!=='undefined')drawCharts(inR,sales,days);
 }
@@ -311,7 +357,7 @@ function ocard(o){
  <div class="ob"><div><h4>Customer</h4><div>${esc(c.name||'')}</div>${c.phone?`<div><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>${wa?` · <a href="${wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div>`:''}<div>${esc([c.address,c.city,c.pincode].filter(Boolean).join(', '))}</div>${c.notes?`<div class="mut">Note: ${esc(c.notes)}</div>`:''}</div>
  <div><h4>Items</h4>${items}${pt.disc>0?`<div class="l g"><span>Discount</span><span>−${inr(pt.disc)}</span></div>`:''}${pt.gst>0?`<div class="l"><span>${pt.incl?'Includes GST':'GST'}</span><span>${pt.incl?'':'+'}${inr(pt.gst)}</span></div>`:''}<div class="l t"><span>Total paid</span><span>${inr(o.total)}</span></div></div>
  <div><h4>Payment</h4><span class="tag">UPI · ${inr(pm.amount??o.total)} to ${esc(pm.upiId||'')}</span>${pm.utr?`<div>UTR: <b>${esc(pm.utr)}</b></div>`:''}${o.pricing&&o.pricing.gstin?`<div class="mut">GSTIN ${esc(o.pricing.gstin)}</div>`:''}</div><div>${shot}</div>
- <div class="oc"><select data-oid="${o.id}">${ST.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${STL[s]}</option>`).join('')}</select><button data-od="${o.id}">Delete order</button></div></div></details>`;
+ <div class="oc">${NX[o.status]?`<button class="pri big" data-ost="${o.id}|${NX[o.status][0]}">${NX[o.status][1]}</button>`:''}${o.status==='new'?`<button data-ost="${o.id}|cancelled">Reject</button>`:''}<select data-oid="${o.id}">${ST.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${STL[s]}</option>`).join('')}</select><button data-od="${o.id}">Delete order</button></div></div></details>`;
 }
 function exportCsv(){
  const q=oq.trim().toLowerCase(),l=ORD.filter(o=>(ofilter==='all'||o.status===ofilter)&&(!q||hay(o).includes(q)));
@@ -332,7 +378,14 @@ document.addEventListener('click',async e=>{
  if(c('[data-uid]')){try{await navigator.clipboard.writeText(auth.currentUser.uid);flash('UID copied')}catch(x){prompt('Your UID',auth.currentUser.uid)}return}
  if(b=c('[data-range]')){range=b.dataset.range;show();return}
  if(e.target.nodeType===1&&e.target.matches('[data-product-backdrop]')){closeProductEditor();return}
- if(c('[data-product-add]')){const p=TABS.Products[0].new();p.id='p-'+rid();(state.products||(state.products=[])).push(p);selectedProductId=p.id;productMode='editor';show();dirty();$('productWorkspace')?.focus({preventScroll:true});return}
+ if(c('[data-product-add]')){addP();return}
+ if(c('[data-product-next]')){await $('save').onclick();if(!isDirty)addP();return}
+ if(b=c('[data-pf]')){pf=b.dataset.pf;document.querySelectorAll('[data-pf]').forEach(x=>x.classList.toggle('on',x===b));pfilter();return}
+ if(c('[data-golow]')){pf='low';productMode='catalog';cur='Products';show();scrollTo(0,0);return}
+ if(b=c('[data-stk]')){const p=state.products.find(x=>x.id===b.dataset.stk),n=document.querySelector(`.stk-n[data-id="${p.id}"]`),card=n.closest('.catalog-product');p.stock=Math.max(0,(Stock.tracked(p)?Number(Stock.count(p)):0)+Number(b.dataset.d));n.textContent=p.stock;card.dataset.f=pst(p);card.querySelector('.catalog-product-meta').innerHTML=pmeta(p);dirty();return}
+ if(b=c('[data-vis]')){const p=state.products.find(x=>x.id===b.dataset.vis);p.active=b.checked;const card=b.closest('.catalog-product');card.dataset.f=pst(p);card.querySelector('.catalog-product-meta').innerHTML=pmeta(p);dirty();return}
+ if(b=c('[data-product-dup]')){const i=state.products.findIndex(x=>x.id===b.dataset.productDup),p=clone(state.products[i]);p.id='p-'+rid();p.name=(p.name||'Product')+' (copy)';state.products.splice(i+1,0,p);show();dirty();flash('Duplicated. Edit the copy, then Save.');return}
+ if(b=c('[data-ost]')){const [id,st]=b.dataset.ost.split('|');if(st==='cancelled'&&!confirm('Reject this order? Stock is restored if it was already deducted.'))return;const sel=document.querySelector(`select[data-oid="${id}"]`);sel.value=st;sel.dispatchEvent(new Event('change',{bubbles:true}));return}
  if(b=c('[data-product-select]')){selectedProductId=b.dataset.productSelect;productMode='editor';show();$('productWorkspace')?.focus({preventScroll:true});return}
  if(c('[data-product-back]')){closeProductEditor();return}
  if(c('[data-product-save]')){$('save').click();return}
@@ -357,7 +410,7 @@ document.addEventListener('click',async e=>{
 document.addEventListener('input',e=>{
  const t=e.target,p=t.dataset.p;
  if(t.id==='oq'){oq=t.value;olist();return}
- if(t.id==='psearch'){const q=t.value.trim().toLowerCase();document.querySelectorAll('.catalog-product[data-s]').forEach(d=>d.hidden=!!q&&!d.dataset.s.includes(q));return}
+ if(t.id==='psearch'){pfilter();return}
  if(!p)return;
  const ty=t.dataset.t,v=ty===B?t.checked:ty===N?(t.value===''?0:Number(t.value)):ty===W||ty===O?(t.value===''?undefined:Number(t.value)):t.value;
  v===undefined?delp(state,p):setp(state,p,v);
@@ -371,7 +424,7 @@ document.addEventListener('input',e=>{
 document.addEventListener('change',async e=>{
  const t=e.target;
  if(t.dataset.oid){const o=ORD.find(x=>x.id===t.dataset.oid);
-  try{const changes=await changeOrderStatus(t.dataset.oid,t.value);if(o){o.status=t.value;if(SALE(t.value))o.stockDeducted=true;if(t.value==='cancelled'&&o.stockDeducted)o.stockDeducted=false}flash(Object.keys(changes).length?'Order updated; stock adjusted.':'Order updated');ordersView();nav()}
+  try{const changes=await changeOrderStatus(t.dataset.oid,t.value);if(o){o.status=t.value;if(SALE(t.value))o.stockDeducted=true;if(t.value==='cancelled'&&o.stockDeducted)o.stockDeducted=false}flash(Object.keys(changes).length?'Order updated':'Order updated');ordersView();nav()}
   catch(err){flash('Could not update: '+err.message,1);ordersView()}return}
  if(!t.dataset.up||!t.files[0])return;
  const f=t.files[0];
@@ -382,10 +435,12 @@ document.addEventListener('change',async e=>{
   setp(state,t.dataset.up,url);const bx=t.closest('.img');bx.querySelector('input[data-p]').value=url;bx.querySelector('img').src=cld(url,120);
   const d=t.closest('details.it');if(d&&d.dataset.k.startsWith('products.')){const th=d.querySelector('.th');if(th)th.src=cld(url,80)}
   const match=t.dataset.up.match(/^products\.(\d+)\.image$/);if(match){const p=state.products[Number(match[1])],preview=$('productPreviewPhoto');if(preview&&selectedProductId===p.id)preview.src=cld(url,360)}
-  dirty();flash('Uploaded. Remember to Save.')}
+  dirty();flash('Uploaded')}
  catch(err){flash('Upload failed: '+err.message,1)}
  t.value='';
 });
+
+document.addEventListener('focusin',e=>{if(e.target.type==='number')e.target.select()});
 
 /* ---------- save ---------- */
 function validate(){
@@ -409,7 +464,7 @@ $('save').onclick=async()=>{
   const b=db.batch();b.set(db.doc('site/main'),site);
   products.forEach(p=>b.set(db.collection('products').doc(p.id),p));
   oldIds.filter(id=>!products.some(p=>p.id===id)).forEach(id=>b.delete(db.collection('products').doc(id)));
-  await b.commit();oldIds=products.map(p=>p.id);isDirty=false;btn.textContent='Save changes';flash('Saved. Your site is updated.');
+  await b.commit();oldIds=products.map(p=>p.id);isDirty=false;btn.textContent='Save changes';flash('Saved');
  }catch(err){flash(err.code==='permission-denied'?'Not allowed: paste your UID (Copy my UID, bottom-left) into firebase/firestore.rules and publish it.':'Save failed: '+err.message,1)}
  btn.disabled=false;
 };

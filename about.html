@@ -139,7 +139,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 
 <div class="page">
   <header>
-    <a class="brand" href="index.html" data-aria="site.name"><img data-src="site.logo" data-w="240" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
+    <a class="brand" href="/" data-aria="site.name"><img data-src="site.logo" data-w="240" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
     <div class="hctl">
       <button class="bag" id="bag" data-aria="ui.openBag"><span class="bi"></span><b id="bagCount">0</b></button>
       <button class="burger" id="burger" data-aria="ui.openMenu"><i></i><i></i><i></i></button>
@@ -151,7 +151,7 @@ body.menu-open,body.cart-open{overflow:hidden}
       <div class="abt-txt">
         <h1><span data-text="about.title"></span> <em data-text="about.accent"></em></h1>
         <div class="body-t" id="aboutText"></div>
-        <a class="btn" href="collection.html" data-text="ui.browse"></a>
+        <a class="btn" href="collection" data-text="ui.browse"></a>
       </div>
       <div class="abt-img ph" id="abtImg"><img data-src="about.image" data-w="1200" data-alt="site.name" alt=""></div>
     </section>
@@ -210,7 +210,7 @@ let D=DEFAULT_DATA,cart={};
 try{cart=JSON.parse(localStorage.getItem('cozelle-cart'))||{}}catch(e){}
 const live=()=>(D.products||[]).filter(p=>p.active!==false).sort((a,b)=>(a.order??0)-(b.order??0));
 const money=n=>(D.site.currency||'')+Number(n).toLocaleString(D.site.locale||'en-IN');
-const href=h=>h==='wa'?'https://wa.me/'+D.site.whatsapp:h;
+const href=h=>{h=cleanUrl(h);return h==='wa'?'https://wa.me/'+D.site.whatsapp:h};
 const drawer=$('drawer'),list=$('cartList'),bagCount=$('bagCount'),sub=$('subtotal'),bag=$('bag'),tEl=$('toast');
 let tt;function toast(m){tEl.textContent=m;tEl.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>tEl.classList.remove('show'),2200)}
 
@@ -250,7 +250,7 @@ function render(data){
 const close=()=>{B.classList.remove('menu-open','cart-open');drawer.classList.remove('details')};
 bag.onclick=()=>{close();B.classList.add('cart-open')};
 $('burger').onclick=()=>{close();B.classList.add('menu-open')};
-$('shopBtn').onclick=()=>{location.href='collection.html'};
+$('shopBtn').onclick=()=>{location.href='collection'};
 $('nl').onsubmit=e=>{e.preventDefault();toast(D.ui.thanks);e.target.reset()};
 $('checkout').onclick=()=>{if(!live().some(p=>cart[p.id]))return;$('coTotal').textContent=sub.textContent;drawer.classList.add('details');const f=$('coFields').querySelector('input,textarea');if(f&&!f.value)setTimeout(()=>f.focus(),450)};
 $('coBack').onclick=()=>drawer.classList.remove('details');

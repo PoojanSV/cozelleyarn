@@ -288,7 +288,7 @@ let D=DEFAULT_DATA,cart={};
 try{cart=JSON.parse(localStorage.getItem('cozelle-cart'))||{}}catch(e){}
 const live=()=>(D.products||[]).filter(p=>p.active!==false).sort((a,b)=>(a.order??0)-(b.order??0));
 const money=n=>(D.site.currency||'')+Number(n).toLocaleString(D.site.locale||'en-IN');
-const href=h=>h==='wa'?'https://wa.me/'+D.site.whatsapp:h;
+const href=h=>{h=cleanUrl(h);return h==='wa'?'https://wa.me/'+D.site.whatsapp:h};
 const drawer=$('drawer'),list=$('cartList'),count=$('count'),sub=$('subtotal'),bag=$('bag'),tEl=$('toast');
 let tt;function toast(m,viewBag=false){tEl.replaceChildren();const text=document.createElement('span');text.textContent=m;tEl.append(text);tEl.classList.toggle('has-action',viewBag);if(viewBag){const action=document.createElement('button');action.type='button';action.className='toast-action';action.textContent='View bag';action.setAttribute('aria-label','View your bag');action.onclick=()=>{clearTimeout(tt);tEl.classList.remove('show');bag.click()};tEl.append(action)}tEl.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>tEl.classList.remove('show'),viewBag?4500:2200)}
 
@@ -297,7 +297,7 @@ function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).for
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
  if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
-const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
+const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
 
 let cur=0,rt;
 function renderReviews(){
@@ -325,7 +325,7 @@ function render(data){
  $('storyList').innerHTML=st.map(s=>`<div class="rise"><h4>${esc(s.title)}</h4><p>${esc(s.text)}</p></div>`).join('');
  const cols=D.footer.columns||[];$('contact').style.setProperty('--fcols',Math.max(cols.length,1));
  $('fcols').innerHTML=cols.map(c=>`<div><h5>${esc(c.title)}</h5><ul>${(c.items||[]).map(i=>i.href?`<li><a href="${esc(href(i.href))}">${esc(i.label)}</a></li>`:`<li>${esc(i.label)}</li>`).join('')}</ul></div>`).join('');
- $('menuNav').innerHTML=(D.menu.links||[]).map(l=>{const h=l.href==='index.html'?'#top':href(l.href);return `<a href="${esc(h)}">${esc(l.label)}</a>`}).join('');
+ $('menuNav').innerHTML=(D.menu.links||[]).map(l=>{const h=cleanUrl(l.href)==='/'?'#top':href(l.href);return `<a href="${esc(h)}">${esc(l.label)}</a>`}).join('');
  renderReviews();
  Object.keys(cart).forEach(k=>{const p=ps.find(x=>x.id===k);if(!p||!(cart[k]>0)||Stock.tracked(p)&&Stock.count(p)===0)delete cart[k];else if(Stock.tracked(p))cart[k]=Math.min(cart[k],Stock.count(p))});
  renderFields();renderCart();observe();

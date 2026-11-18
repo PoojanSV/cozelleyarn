@@ -193,12 +193,15 @@
    /* One tap per UPI app, with the QR kept alongside as a fallback. */
    const q = url.slice(url.indexOf('?')), ios = /iphone|ipad|ipod/i.test(navigator.userAgent), ap = t.apps;
    const links = [
-    { name: ap.gpay, href: (ios ? 'gpay://upi/pay' : 'tez://upi/pay') + q, logo: 'https://api.iconify.design/logos:google-pay.svg?height=36' },
-    { name: ap.phonepe, href: 'phonepe://pay' + q, logo: 'https://api.iconify.design/simple-icons:phonepe.svg?color=%235F259F' },
-    { name: ap.paytm, href: 'paytmmp://pay' + q, logo: 'https://api.iconify.design/simple-icons:paytm.svg?color=%2300BAF2' },
-    { name: ap.any, href: url, logo: 'assets/img/upi-mark.svg', any: true }
+    { name: ap.gpay, href: (ios ? 'gpay://upi/pay' : 'tez://upi/pay') + q, logos: ['assets/img/upi/gpay.svg', 'https://api.iconify.design/logos:google-pay.svg?height=36'] },
+    { name: ap.phonepe, href: 'phonepe://pay' + q, logos: ['assets/img/upi/phonepe.svg', 'https://api.iconify.design/simple-icons:phonepe.svg?color=%235F259F'] },
+    { name: ap.paytm, href: 'paytmmp://pay' + q, logos: ['assets/img/upi/paytm.svg', 'https://api.iconify.design/simple-icons:paytm.svg?color=%2300BAF2'] },
+    { name: ap.any, href: url, logos: ['assets/img/upi/upi.svg', 'assets/img/upi-mark.svg'], any: true }
    ];
-   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(a => '<a href="' + esc(a.href) + '" aria-label="' + esc(a.name) + '" title="' + esc(a.name) + '"' + (a.any ? ' class="any"' : '') + '><img src="' + esc(a.logo) + '" alt="" loading="eager"></a>').join('') + '<p>' + esc(t.appHint) + '</p>';
+   g('payApps').innerHTML = '<p class="lbl">' + esc(t.pickApp) + '</p>' + links.map(a => '<a href="' + esc(a.href) + '" aria-label="' + esc(a.name) + '" title="' + esc(a.name) + '"' + (a.any ? ' class="any"' : '') + '><img src="' + esc(a.logos[0]) + '" data-next="' + esc(a.logos.slice(1).join('|')) + '" alt="" loading="eager"></a>').join('') + '<p>' + esc(t.appHint) + '</p>';
+   /* if a logo fails to load, try the next source, and finally show the app name so a button is never blank */
+   const pe = g('payApps');
+   if (!pe._lg) { pe._lg = 1; pe.addEventListener('error', ev => { const im = ev.target; if (im.tagName !== 'IMG') return; const rest = (im.dataset.next || '').split('|').filter(Boolean); if (rest.length) { im.dataset.next = rest.slice(1).join('|'); im.src = rest[0]; } else { const a = im.parentNode; a.textContent = a.getAttribute('title') || ''; } }, true); }
    g('payApps').hidden = false;
    setBtn(t.place, true);
   } else {

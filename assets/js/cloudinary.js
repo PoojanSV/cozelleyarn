@@ -1,24 +1,15 @@
-/* Cozelle + Cloudinary. Every image on the site is uploaded to and delivered from Cloudinary.
-   Shared by every page and by admin.html. Load it BEFORE cozelle-data.js.
 
-   Only PUBLIC values live here (cloud name + unsigned upload preset names). Never put your
-   Cloudinary API secret in any file of this site. See README.md, "Cloudinary setup". */
 const CLOUDINARY = {
   cloudName: 'qmjuurif',
-  sitePreset: 'cozelle_site',         /* unsigned preset used by admin.html (logo, products, hero, about, gallery) */
-  paymentPreset: 'cozelle_payments'   /* unsigned preset used by checkout for payment screenshots */
+  sitePreset: 'cozelle_site',
+  paymentPreset: 'cozelle_payments'
 };
 
-/* ---------- delivery: turn a stored Cloudinary URL into an optimised one ----------
-   cld(url, 900)  ->  .../image/upload/f_auto,q_auto,w_900,c_limit/v123/cozelle/site/abc.jpg
-   f_auto = best format for the browser (AVIF/WebP/JPEG), q_auto = smart compression, c_limit = never upscale.
-   Anything that is not a Cloudinary upload URL (old Firebase/Unsplash links, local files) is returned unchanged,
-   so the site keeps working until you press "Move images to Cloudinary" once in admin.html. */
 const CLD_URL = /^(https?:\/\/res\.cloudinary\.com\/[^\/]+\/image\/upload\/)(.+)$/;
 function cld(url, w, o) {
   if (typeof url !== 'string') return url;
   const m = url.match(CLD_URL);
-  if (!m || !/^v\d+\//.test(m[2])) return url;   /* not ours, or it already carries its own transformation */
+  if (!m || !/^v\d+\//.test(m[2])) return url;
   o = o || {};
   const t = ['f_auto', 'q_auto' + (o.eco ? ':eco' : '')];
   if (w) t.push('w_' + Math.round(w), 'c_limit');
@@ -26,9 +17,33 @@ function cld(url, w, o) {
 }
 const isCld = u => typeof u === 'string' && CLD_URL.test(u);
 
-/* ---------- upload: browser -> Cloudinary (unsigned preset) ----------
-   file: a File/Blob, or a public http(s) URL (Cloudinary fetches it itself; used to migrate old images).
-   Resolves with Cloudinary's JSON; use .secure_url. Rejects with Error(message) and code 'cloudinary'. */
+// ---- Video helpers ----
+const CLD_VIDEO = /^(https?:\/\/res\.cloudinary\.com\/[^\/]+\/video\/upload\/)(.+)$/;
+const isCldVideo = u => typeof u === 'string' && CLD_VIDEO.test(u);
+function cldVidParts(url) {
+  if (typeof url !== 'string') return null;
+  const m = url.match(CLD_VIDEO);
+  if (!m || !/^v\d+\//.test(m[2])) return null;
+  return { base: m[1], id: m[2].replace(/\.[a-z0-9]+$/i, '') };
+}
+// Playable video for any browser: MP4 + H.264, compressed, limited width.
+// Non-Cloudinary links (a direct .mp4 for example) are returned unchanged.
+function cldVideo(url, w) {
+  const p = cldVidParts(url);
+  if (!p) return url;
+  const t = ['f_mp4', 'vc_h264', 'q_auto'];
+  if (w) t.push('w_' + Math.round(w), 'c_limit');
+  return p.base + t.join(',') + '/' + p.id + '.mp4';
+}
+// Still frame of the video, used as the poster and the thumbnail. '' when it cannot be made.
+function cldPoster(url, w) {
+  const p = cldVidParts(url);
+  if (!p) return '';
+  const t = ['so_0', 'f_jpg', 'q_auto'];
+  if (w) t.push('w_' + Math.round(w), 'c_limit');
+  return p.base + t.join(',') + '/' + p.id + '.jpg';
+}
+
 async function cldUpload(file, opts) {
   opts = opts || {};
   const fd = new FormData();
@@ -38,7 +53,8 @@ async function cldUpload(file, opts) {
   if (opts.tags && opts.tags.length) fd.append('tags', opts.tags.join(','));
   let r, j = {};
   try {
-    r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloudName + '/image/upload', { method: 'POST', body: fd });
+    const kind = opts.resource === 'video' ? 'video' : 'image';
+    r = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY.cloudName + '/' + kind + '/upload', { method: 'POST', body: fd });
     j = await r.json().catch(() => ({}));
   } catch (e) {
     const err = new Error('Could not reach Cloudinary. Check your connection.');

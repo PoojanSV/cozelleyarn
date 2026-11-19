@@ -143,7 +143,9 @@ body.menu-open,body.cart-open{overflow:hidden}
 .gn{position:absolute;top:50%;z-index:2;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:rgba(244,232,211,.85);color:var(--copper-d);font-size:22px;line-height:1;display:grid;place-items:center;transition:.3s}
 .gn:hover{background:var(--cream)}.gn.prev{left:12px}.gn.next{right:12px}
 .thumbs{display:flex;gap:10px;overflow-x:auto;padding:3px 3px 6px}
-.tb{flex:none;width:72px;height:90px;border-radius:14px;overflow:hidden;opacity:.6;border:2px solid transparent;transition:.25s}
+.main video{display:block;width:100%;height:100%;object-fit:contain;background:#1c110b}
+.tb{position:relative;flex:none;width:72px;height:90px;border-radius:14px;overflow:hidden;opacity:.6;border:2px solid transparent;transition:.25s}
+.tb .pl{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:20px;background:rgba(28,17,11,.3);pointer-events:none}
 .tb:hover{opacity:1}.tb[aria-current=true]{opacity:1;border-color:var(--copper)}
 .pinfo{display:grid;gap:22px;position:sticky;top:20px}
 .pcat{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--copper)}
@@ -270,11 +272,23 @@ const card=p=>`<article class="card"><div class="pic"><div class="im ph"><img lo
 
 let P=null,pq=1,imgs=[],gi=0;
 const PW=()=>D.product;
-function showImg(i){
- gi=(i+imgs.length)%imgs.length;const m=imgs[gi],mi=$('mainImg');
- mi.style.display='';mi.src=cld(m.src,1400);mi.alt=m.alt;
+const nPhotos=()=>imgs.filter(m=>m.type!=='video').length;
+function showImg(i,dir){
+ if(!imgs.length)return;
+ dir=dir||1;gi=(i+imgs.length)%imgs.length;
+ // the full-screen viewer only cycles through photos; videos play in the main frame
+ if(!$('lb').hidden)for(let n=0;n<imgs.length&&imgs[gi].type==='video';n++)gi=(gi+dir+imgs.length)%imgs.length;
+ const m=imgs[gi],mi=$('mainImg'),mv=$('mainVid'),isV=m.type==='video';
+ mv.pause();
+ if(isV){
+  mi.style.display='none';mv.style.display='block';$('mz').hidden=true;
+  mv.poster=cldPoster(m.src,1400);mv.src=cldVideo(m.src,1280);mv.setAttribute('aria-label',m.alt);
+ }else{
+  mv.style.display='none';mv.removeAttribute('src');mv.removeAttribute('poster');mv.load();
+  mi.style.display='';$('mz').hidden=false;mi.src=cld(m.src,1400);mi.alt=m.alt;
+ }
  document.querySelectorAll('.tb').forEach((b,k)=>b.setAttribute('aria-current',k===gi));
- if(!$('lb').hidden){$('lbImg').src=cld(m.src,2000);$('lbImg').alt=m.alt}
+ if(!$('lb').hidden&&!isV){$('lbImg').src=cld(m.src,2000);$('lbImg').alt=m.alt}
 }
 function renderProduct(){
  const main=$('prod'),w=PW(),id=new URLSearchParams(location.search).get('id');
@@ -282,14 +296,14 @@ function renderProduct(){
  if(!P){document.title=D.site.name;main.innerHTML=`<a class="back" href="collection">← ${esc(w.back)}</a><div class="miss"><p>${esc(w.notFound)}</p></div>`;return}
  const tracked=Stock.tracked(P),available=Stock.count(P);if(tracked)pq=available===0?0:Math.min(Math.max(1,pq),available);
  document.title=`${P.name} · ${D.site.name}`;
- imgs=[{src:P.image,alt:P.name},...(P.gallery||[]).filter(g=>g&&g.image).map((g,k)=>({src:g.image,alt:g.alt||`${P.name} ${k+2}`}))].filter(x=>x.src);
+ imgs=[{src:P.image,alt:P.name},...(P.gallery||[]).filter(g=>g&&g.image).map((g,k)=>({src:g.image,alt:g.alt||`${P.name} ${k+2}`})),...(P.videos||[]).filter(v=>v&&v.video).map((v,k)=>({type:'video',src:v.video,alt:v.alt||`${P.name} video ${k+1}`}))].filter(x=>x.src);gi=0;
  const many=imgs.length>1,rows=[...(P.category?[[w.category,P.category]]:[]),...(P.details||[]).filter(d=>d&&d.label&&d.value).map(d=>[d.label,d.value])];
  const rel=[...live().filter(x=>x.id!==P.id&&x.category&&x.category===P.category),...live().filter(x=>x.id!==P.id&&x.category!==P.category)].slice(0,3);
  main.innerHTML=`<a class="back" href="collection">← ${esc(w.back)}</a>
  <div class="pgrid">
   <div class="gal">
-   <div class="main ph"><img id="mainImg" src="${esc(cld(imgs[0]?.src,1400))}" alt="${esc(P.name)}"><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
-   ${many?`<div class="thumbs">${imgs.map((m,k)=>`<button class="tb ph" data-img="${k}" aria-label="${esc(m.alt)}" aria-current="${k===0}"><img src="${esc(cld(m.src,200))}" alt=""></button>`).join('')}</div>`:''}
+   <div class="main ph"><img id="mainImg" src="${esc(imgs[0]&&imgs[0].type!=='video'?cld(imgs[0].src,1400):'')}" alt="${esc(P.name)}"><video id="mainVid" controls playsinline preload="metadata" style="display:none"></video><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
+   ${many?`<div class="thumbs">${imgs.map((m,k)=>`<button class="tb ph" data-img="${k}" aria-label="${esc(m.alt)}" aria-current="${k===0}">${m.type==='video'?(cldPoster(m.src,200)?`<img src="${esc(cldPoster(m.src,200))}" alt="">`:'')+'<span class="pl" aria-hidden="true">▶</span>':`<img src="${esc(cld(m.src,200))}" alt="">`}</button>`).join('')}</div>`:''}
   </div>
   <div class="pinfo">
    <div><div class="pcat">${esc(P.category||'')}</div><h1>${esc(P.name)}</h1></div>
@@ -302,6 +316,7 @@ function renderProduct(){
   </div>
  </div>
  ${rel.length?`<section class="related"><h2>${esc(w.related)}</h2><div class="grid">${rel.map(card).join('')}</div></section>`:''}`;
+ showImg(0);
 }
 
 function render(data){
@@ -348,8 +363,8 @@ document.addEventListener('click',e=>{
  if(b=e.target.closest('[data-pq]')){const max=Stock.tracked(P)?Stock.count(P):99;pq=Math.min(max,Math.max(1,pq+ +b.dataset.pq));$('pqty').textContent=pq;document.querySelector('[data-pq="-1"]').disabled=pq<=1;document.querySelector('[data-pq="1"]').disabled=pq>=max;return}
  if(b=e.target.closest('[data-img]')){showImg(+b.dataset.img);return}
  if(b=e.target.closest('[data-gn]')){showImg(gi+ +b.dataset.gn);return}
- if(e.target.closest('#mz')){$('lb').hidden=false;$('lbImg').src=cld(imgs[gi].src,2000);$('lbImg').alt=imgs[gi].alt;const many=imgs.length>1;$('lbp').hidden=$('lbn').hidden=!many;B.style.overflow='hidden';return}
- if(e.target.closest('#lbp')){showImg(gi-1);return}
+ if(e.target.closest('#mz')){$('lb').hidden=false;$('lbImg').src=cld(imgs[gi].src,2000);$('lbImg').alt=imgs[gi].alt;const many=nPhotos()>1;$('lbp').hidden=$('lbn').hidden=!many;B.style.overflow='hidden';return}
+ if(e.target.closest('#lbp')){showImg(gi-1,-1);return}
  if(e.target.closest('#lbn')){showImg(gi+1);return}
  if(e.target.closest('[data-lbclose]')||e.target.id==='lb'){closeLb();return}
  b=e.target.closest('[data-add]');
@@ -361,7 +376,7 @@ document.addEventListener('click',e=>{
 function closeLb(){$('lb').hidden=true;B.style.overflow=''}
 document.addEventListener('keydown',e=>{
  if(e.key==='Escape'){closeLb();close()}
- if(!$('lb').hidden&&imgs.length>1){if(e.key==='ArrowLeft')showImg(gi-1);if(e.key==='ArrowRight')showImg(gi+1)}
+ if(!$('lb').hidden&&nPhotos()>1){if(e.key==='ArrowLeft')showImg(gi-1,-1);if(e.key==='ArrowRight')showImg(gi+1)}
 });
 document.addEventListener('error',e=>{if(e.target.tagName==='IMG')e.target.style.display='none'},true);
 

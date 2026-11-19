@@ -59,10 +59,10 @@ const DEFAULT_DATA={
  story:[
   {title:'Natural fibres',text:'Wool that breathes, softens with every wash and lasts for years.'},
   {title:'Made with care',text:'Each piece is finished by hand and checked before it ships.'},
-  {title:'Easy returns',text:'Not the one? Send it back within 30 days.'}],
+  {title:'Easy returns',text:'Not the one? Send it back within 7 days.'}],
  menu:{links:[{label:'Home',href:'/'},{label:'Collection',href:'collection'},{label:'About us',href:'about'},{label:'Contact us',href:'contact'}]},
  product:{back:'Back to collection',about:'About this piece',details:'Details',category:'Category',qty:'Quantity',related:'You may also like',notFound:'We could not find that piece.',zoom:'View larger',close:'Close',prev:'Previous photo',next:'Next photo',
-  assurances:[{text:'Free delivery across India'},{text:'30-day easy returns'},{text:'Finished by hand and checked before it ships'}]},
+  assurances:[{text:'Free delivery across India'},{text:'7-day easy returns'},{text:'Finished by hand and checked before it ships'}]},
  pay:{proceed:'Pay with UPI',continue:'Continue to payment',title:'Pay with UPI',scan:'Scan with any UPI app',qrLabel:'UPI payment QR code',amount:'Amount to pay',payee:'Paying to',
   copy:'Copy',copied:'Copied',ref:'Order ID',openApp:'Open UPI app',pickApp:'Pay with your UPI app',appHint:'Tap your app, pay, then come back here and attach the screenshot.',apps:{gpay:'Google Pay',phonepe:'PhonePe',paytm:'Paytm',any:'Other UPI app'},step:'After paying, attach a screenshot of the payment',attach:'Attach payment screenshot',change:'Change screenshot',
   utr:'UPI transaction ID (optional)',utrPh:'12-digit UTR from your payment app',place:'I have paid, place my order',uploading:'Uploading screenshot…',placing:'Sending your order…',back:'Back to details',
@@ -92,7 +92,7 @@ const DEFAULT_DATA={
    generic:'Something went wrong. Please try again.',sessionLost:'You are no longer logged in. Please go back and continue again.'}},
  footer:{blurb:'Get new yarn drops and knitting notes in your inbox.',columns:[
   {title:'Explore',items:[{label:'Collection',href:'collection'},{label:'About us',href:'about'},{label:'Contact us',href:'contact'}]},
-  {title:'Help',items:[{label:'Free delivery across India'},{label:'30-day easy returns'},{label:'Chat on WhatsApp',href:'wa'}]}]},
+  {title:'Help',items:[{label:'Free delivery across India'},{label:'7-day easy returns'},{label:'Chat on WhatsApp',href:'wa'}]}]},
  checkout:{title:'Your details',customer:'Customer details',submit:'Send order on WhatsApp',back:'Back to bag',fields:[
   {key:'name',label:'Full name',type:'text',required:true,autocomplete:'name'},
   {key:'phone',label:'Phone number',type:'tel',required:true,autocomplete:'tel',pattern:'[0-9+ ]{10,15}',hint:'Enter a valid phone number'},

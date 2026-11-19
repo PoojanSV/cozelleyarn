@@ -185,6 +185,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <link rel="stylesheet" href="assets/css/checkout.css">
 <link rel="stylesheet" href="assets/css/account.css">
 <link rel="stylesheet" href="assets/css/pricing.css">
+<link rel="stylesheet" href="assets/css/media.css">
 </head>
 <body>
 
@@ -238,6 +239,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="assets/js/cloudinary.js"></script>
+<script src="assets/js/media.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
@@ -268,7 +270,7 @@ function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).for
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
  if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
-const card=p=>`<article class="card"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
+const card=p=>`<article class="card"><div class="pic"><div class="im ph">${cldMedia(p.image,900,p.name)}<img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
 
 let P=null,pq=1,imgs=[],gi=0;
 const PW=()=>D.product;
@@ -281,10 +283,11 @@ function showImg(i,dir){
  const m=imgs[gi],mi=$('mainImg'),mv=$('mainVid'),isV=m.type==='video';
  mv.pause();
  if(isV){
-  mi.style.display='none';mv.style.display='block';$('mz').hidden=true;
+  mi.style.display='none';mv.style.display='block';$('mz').hidden=true;$('vp').hidden=false;
   mv.poster=cldPoster(m.src,1400);mv.src=cldVideo(m.src,1280);mv.setAttribute('aria-label',m.alt);
+  mv.muted=true;Ux.wanted.set(mv,true);Ux.playVideo(mv);   // autoplays; the visitor can pause it
  }else{
-  mv.style.display='none';mv.removeAttribute('src');mv.removeAttribute('poster');mv.load();
+  mv.style.display='none';mv.removeAttribute('src');mv.removeAttribute('poster');mv.load();$('vp').hidden=true;
   mi.style.display='';$('mz').hidden=false;mi.src=cld(m.src,1400);mi.alt=m.alt;
  }
  document.querySelectorAll('.tb').forEach((b,k)=>b.setAttribute('aria-current',k===gi));
@@ -296,13 +299,13 @@ function renderProduct(){
  if(!P){document.title=D.site.name;main.innerHTML=`<a class="back" href="collection">← ${esc(w.back)}</a><div class="miss"><p>${esc(w.notFound)}</p></div>`;return}
  const tracked=Stock.tracked(P),available=Stock.count(P);if(tracked)pq=available===0?0:Math.min(Math.max(1,pq),available);
  document.title=`${P.name} · ${D.site.name}`;
- imgs=[{src:P.image,alt:P.name},...(P.gallery||[]).filter(g=>g&&g.image).map((g,k)=>({src:g.image,alt:g.alt||`${P.name} ${k+2}`})),...(P.videos||[]).filter(v=>v&&v.video).map((v,k)=>({type:'video',src:v.video,alt:v.alt||`${P.name} video ${k+1}`}))].filter(x=>x.src);gi=0;
+ imgs=[{type:isVideoUrl(P.image)?'video':'',src:P.image,alt:P.name},...(P.gallery||[]).filter(g=>g&&g.image).map((g,k)=>({type:isVideoUrl(g.image)?'video':'',src:g.image,alt:g.alt||`${P.name} ${k+2}`})),...(P.videos||[]).filter(v=>v&&v.video).map((v,k)=>({type:'video',src:v.video,alt:v.alt||`${P.name} video ${k+1}`}))].filter(x=>x.src);gi=0;
  const many=imgs.length>1,rows=[...(P.category?[[w.category,P.category]]:[]),...(P.details||[]).filter(d=>d&&d.label&&d.value).map(d=>[d.label,d.value])];
  const rel=[...live().filter(x=>x.id!==P.id&&x.category&&x.category===P.category),...live().filter(x=>x.id!==P.id&&x.category!==P.category)].slice(0,3);
  main.innerHTML=`<a class="back" href="collection">← ${esc(w.back)}</a>
  <div class="pgrid">
   <div class="gal">
-   <div class="main ph"><img id="mainImg" src="${esc(imgs[0]&&imgs[0].type!=='video'?cld(imgs[0].src,1400):'')}" alt="${esc(P.name)}"><video id="mainVid" controls playsinline preload="metadata" style="display:none"></video><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
+   <div class="main ph"><img id="mainImg" src="${esc(imgs[0]&&imgs[0].type!=='video'?cld(imgs[0].src,1400):'')}" alt="${esc(P.name)}"><video id="mainVid" muted loop playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback" style="display:none"></video><button class="vp" id="vp" data-state="paused" aria-label="Play video" hidden><i></i></button><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
    ${many?`<div class="thumbs">${imgs.map((m,k)=>`<button class="tb ph" data-img="${k}" aria-label="${esc(m.alt)}" aria-current="${k===0}">${m.type==='video'?(cldPoster(m.src,200)?`<img src="${esc(cldPoster(m.src,200))}" alt="">`:'')+'<span class="pl" aria-hidden="true">▶</span>':`<img src="${esc(cld(m.src,200))}" alt="">`}</button>`).join('')}</div>`:''}
   </div>
   <div class="pinfo">
@@ -317,6 +320,24 @@ function renderProduct(){
  </div>
  ${rel.length?`<section class="related"><h2>${esc(w.related)}</h2><div class="grid">${rel.map(card).join('')}</div></section>`:''}`;
  showImg(0);
+ wireVideo();
+}
+// The only video control: play / pause. Autoplays muted (browsers block autoplay with sound).
+let vio=null;
+function wireVideo(){
+ const mv=$('mainVid'),vp=$('vp');if(!mv||!vp)return;
+ const sync=()=>{vp.dataset.state=mv.paused?'paused':'playing';vp.setAttribute('aria-label',mv.paused?'Play video':'Pause video')};
+ ['play','playing','pause','ended'].forEach(ev=>mv.addEventListener(ev,sync));sync();
+ mv.addEventListener('contextmenu',e=>e.preventDefault());
+ if(vio)vio.disconnect();
+ if('IntersectionObserver' in window){vio=new IntersectionObserver(es=>es.forEach(x=>{
+  if(mv.style.display==='none')return;
+  if(!x.isIntersecting)mv.pause();else if(Ux.wanted.get(mv)!==false)Ux.playVideo(mv)}),{threshold:.35});vio.observe(mv)}
+}
+function toggleVideo(){
+ const mv=$('mainVid'),vp=$('vp');if(!mv||!mv.getAttribute('src'))return;
+ if(mv.paused){Ux.wanted.set(mv,true);mv.dataset.userPlay='1';Ux.playVideo(mv)}else{Ux.wanted.set(mv,false);mv.pause()}
+ vp.classList.add('flash');clearTimeout(vp._f);vp._f=setTimeout(()=>vp.classList.remove('flash'),900);
 }
 
 function render(data){
@@ -361,6 +382,7 @@ document.addEventListener('click',e=>{
  let b=e.target.closest('[data-padd]');
  if(b&&P){const remaining=Stock.tracked(P)?Stock.count(P)-(cart[P.id]||0):pq,add=Math.min(pq,remaining);if(add<=0){toast('No more of this item is available');return}setQty(P.id,add);bag.classList.remove('bump');void bag.offsetWidth;bag.classList.add('bump');toast(P.name+' '+D.ui.added,true);return}
  if(b=e.target.closest('[data-pq]')){const max=Stock.tracked(P)?Stock.count(P):99;pq=Math.min(max,Math.max(1,pq+ +b.dataset.pq));$('pqty').textContent=pq;document.querySelector('[data-pq="-1"]').disabled=pq<=1;document.querySelector('[data-pq="1"]').disabled=pq>=max;return}
+ if(e.target.closest('#vp')){toggleVideo();return}
  if(b=e.target.closest('[data-img]')){showImg(+b.dataset.img);return}
  if(b=e.target.closest('[data-gn]')){showImg(gi+ +b.dataset.gn);return}
  if(e.target.closest('#mz')){$('lb').hidden=false;$('lbImg').src=cld(imgs[gi].src,2000);$('lbImg').alt=imgs[gi].alt;const many=nPhotos()>1;$('lbp').hidden=$('lbn').hidden=!many;B.style.overflow='hidden';return}

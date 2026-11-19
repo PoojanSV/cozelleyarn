@@ -192,6 +192,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <link rel="stylesheet" href="assets/css/checkout.css">
 <link rel="stylesheet" href="assets/css/account.css">
 <link rel="stylesheet" href="assets/css/pricing.css">
+<link rel="stylesheet" href="assets/css/media.css">
 </head>
 <body>
 
@@ -271,6 +272,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="assets/js/cloudinary.js"></script>
+<script src="assets/js/media.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
@@ -303,7 +305,7 @@ function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).for
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
  if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
-const card=p=>`<article class="card"><div class="pic"><div class="im ph"><img loading="lazy" src="${esc(cld(p.image,900))}" alt="${esc(p.name)}"><img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
+const card=p=>`<article class="card"><div class="pic"><div class="im ph">${cldMedia(p.image,900,p.name)}<img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
 
 const F={q:'',cat:new Set(),sort:'featured',min:'',max:''};
 (()=>{const u=new URLSearchParams(location.search);F.q=u.get('q')||'';F.cat=new Set((u.get('cat')||'').split(',').filter(Boolean));F.sort=u.get('sort')||'featured';F.min=u.get('min')||'';F.max=u.get('max')||''})();
@@ -329,7 +331,7 @@ function view(){
  ce.querySelectorAll('.opt').forEach(l=>{const i=l.querySelector('input');i.checked=F.cat.has(i.value);l.querySelector('em').textContent=base.filter(p=>p.category===i.value).length});
  const rows=filtered().sort(SORT[F.sort]||SORT.featured),n=k=>k===1?L().oneResult:L().results.replace('{n}',k);
  $('sections').setAttribute('aria-busy','false');
- $('sections').innerHTML=rows.length?`<section class="catsec"><div class="grid">${rows.map(card).join('')}</div></section>`:'';
+ Ux.keepScroll(()=>{$('sections').innerHTML=rows.length?`<section class="catsec"><div class="grid">${rows.map(card).join('')}</div></section>`:''});
  $('none').hidden=!!rows.length;
  $('resultCount').textContent=n(rows.length);
  const ch=[...F.cat].map(c=>['cat',c,c]);

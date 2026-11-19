@@ -1,11 +1,8 @@
-/* UPI payment step + "order received" step inside the bag drawer (injected by assets/js/checkout.js) */
 
-/* header title for the payment step */
 .t-pay{display:none}
 #drawer.paying .t-pay{display:block}
 #drawer.paying .t-bag,#drawer.paying .t-det,#drawer.done .t-bag,#drawer.done .t-det,#drawer.done .t-pay{display:none}
 
-/* hide the bag / details views while paying or done */
 #drawer.paying #cartList,#drawer.paying .df,#drawer.paying .emp,#drawer.paying .cof,
 #drawer.done #cartList,#drawer.done .df,#drawer.done .emp,#drawer.done .cof{display:none!important}
 
@@ -40,7 +37,6 @@ a.pay-app{display:block;text-align:center}
 .pay .co:disabled{opacity:.45;cursor:not-allowed}
 .pay .co:disabled:hover{background:var(--copper)}
 
-/* payment not set up: show only the message and the back button */
 .pay.off .live{display:none}
 
 .pdone{align-items:center;justify-content:center;text-align:center;gap:18px}
@@ -56,3 +52,9 @@ a.pay-app{display:block;text-align:center}
 .toast-action:hover{background:#fff;color:var(--cocoa)}
 .toast-action:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
 
+
+/* upload progress bar (payment screenshot, admin uploads use the same look) */
+.up-prog{height:8px;border-radius:8px;background:rgba(181,105,63,.18);overflow:hidden}
+.up-prog i{display:block;height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,var(--copper-d),var(--copper),var(--rose));transition:width .2s}
+.up-prog.proc i{background-size:200% 100%;animation:upslide 1.1s linear infinite}
+@keyframes upslide{to{background-position:-200% 0}}

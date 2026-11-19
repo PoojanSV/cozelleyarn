@@ -1,13 +1,5 @@
-/* Cozelle cookie notice. Self-contained: one script, its styles are injected, nothing else to load.
-   Add <script src="assets/js/cookies.js"></script> before </body> on every page.
 
-   What the shop actually stores (so the wording below is accurate):
-   - essential only: the bag, saved delivery details, the login session (Firebase Auth) and this notice's own choice;
-   - no advertising, analytics or tracking cookies.
-   Because nothing optional is used, the notice informs and asks for an acknowledgement; there is no fake "reject" choice.
-   If you ever add analytics, ads or a chat widget, change this into an Accept / Decline notice and load those only after Accept.
 
-   To show the notice again while testing: localStorage.removeItem('cozelle-cookies') */
 (() => {
  'use strict';
  const KEY = 'cozelle-cookies';
@@ -74,7 +66,6 @@
   setTimeout(() => box.remove(), 700);
  });
 
- /* wait for the logo loading screen (first visit of a session) before appearing */
  const loader = document.getElementById('loader');
  const wait = loader && !loader.classList.contains('done') ? 3200 : 900;
  setTimeout(() => box.classList.add('show'), wait);

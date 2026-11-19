@@ -72,6 +72,7 @@ h1 em{display:block;color:var(--copper)}
 .rv p{font-size:13px;line-height:1.5;margin-top:3px;color:rgba(74,43,27,.8)}
 
 .card,.hp{position:relative}
+.card .poff,.hp .poff{display:none}
 .pic{position:relative;overflow:hidden;border-radius:26px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 24px 50px -28px rgba(74,43,27,.7)}
 .hp .pic{height:clamp(250px,36vh,340px)}.card .pic{aspect-ratio:4/5}
 .pic .im{position:absolute;inset:0;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
@@ -297,7 +298,7 @@ function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).for
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
  if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
-const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph">${cldMedia(p.image,900,p.name)}<img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
+const card=(p,full)=>`<article class="${full?'card':'hp'} rise"><div class="pic"><div class="im ph">${cldMedia(p.image,900,p.name)}<img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a><div class="info"><h3>${esc(p.name)}</h3>${full&&p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div></div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
 
 let cur=0,rt;
 function renderReviews(){

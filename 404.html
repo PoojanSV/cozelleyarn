@@ -30,8 +30,9 @@ a{color:inherit;text-decoration:none}
   border:1px solid var(--line);border-radius:28px
 }
 
-.brand{display:inline-flex;align-items:center;gap:12px;font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.22em;color:var(--copper-d)}
-.brand img{width:38px;height:38px;object-fit:contain}
+.brand{display:inline-flex;align-items:center;gap:12px}
+.brand img{display:block;width:auto;object-fit:contain}
+.brand #logo{height:46px}.brand #wm{height:44px}
 .brand img[src=""]{display:none}
 
 .num{
@@ -83,7 +84,7 @@ a:focus-visible{outline:3px solid var(--cocoa);outline-offset:3px}
 <main class="panel">
   <a class="brand" id="brand" href="/" aria-label="Cozelle home">
     <img id="logo" alt="" src="">
-    <span>COZELLE</span>
+    <img id="wm" alt="Cozelle - Wrapped in comfort" src="">
   </a>
 
   <div class="num" aria-hidden="true">4<svg class="ball" viewBox="0 0 100 100" focusable="false">
@@ -124,6 +125,7 @@ a:focus-visible{outline:3px solid var(--cocoa);outline-offset:3px}
 
   var logo = root + 'assets/img/cozelle-logo.png';
   document.getElementById('logo').src = logo;
+  document.getElementById('wm').src = root + 'assets/img/cozelle-wordmark.png';
 
   var icon = document.createElement('link');
   icon.rel = 'icon';

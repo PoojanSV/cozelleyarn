@@ -27,9 +27,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px clamp(18px,4vw,60px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:14px}
-.brand img{width:50px;height:50px;object-fit:contain;flex:none}
-.brand b{display:block;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.26em;color:var(--copper-d);line-height:1}
-.brand small{display:block;font-size:9px;letter-spacing:.34em;text-transform:uppercase;margin-top:5px;color:var(--copper)}
+.brand img{display:block;flex:none;width:auto;object-fit:contain}.brand .bm{height:50px}.brand .bw{height:48px}
 .hctl{display:flex;align-items:center;gap:12px}
 .bag,.burger{position:relative;display:grid;width:50px;height:50px;border-radius:50%;background:var(--copper);box-shadow:0 10px 24px -10px rgba(74,43,27,.6);transition:.3s}
 .bag{place-items:center}
@@ -115,8 +113,7 @@ body.filters-open .flt{opacity:1;visibility:visible;transform:none}
 footer{margin-top:clamp(60px,9vh,100px);padding:60px clamp(18px,4vw,60px) 34px;color:var(--cream);
  background:linear-gradient(to bottom,rgba(181,105,63,0),rgba(142,74,42,.92) 38%)}
 .fgrid{display:grid;grid-template-columns:1.4fr repeat(var(--fcols,2),1fr);gap:36px;max-width:1200px;margin:auto}
-footer .fb{font-family:var(--serif);font-weight:600;font-size:30px;letter-spacing:.24em}
-footer .ft{font-size:10px;letter-spacing:.34em;text-transform:uppercase;opacity:.8;margin:6px 0 18px}
+footer .flogo{display:block;width:min(270px,100%);height:auto;margin:0 0 20px}
 footer p,footer li{font-size:14px;line-height:1.8;opacity:.85}
 footer ul{list-style:none}footer li a:hover{opacity:.6}
 footer h5{font-family:var(--serif);font-weight:500;font-size:20px;margin-bottom:10px}
@@ -175,7 +172,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 
 @media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.catsec .card:nth-child(3n+2){margin-top:0}.catsec .card:nth-child(even){margin-top:30px}}
 @media(max-width:900px){
- header{padding:16px}.brand img{width:40px;height:40px}.brand b{font-size:20px;letter-spacing:.2em}.brand small{font-size:8px;letter-spacing:.28em}
+ header{padding:16px}.brand .bm{height:40px}.brand .bw{height:38px}
  .bag,.burger{width:44px;height:44px}.hctl{gap:10px}
  .listing{--gx:14px;padding-top:24px}
  .tools{flex-wrap:wrap}.tools input[type=search]{max-width:none;flex:1 1 100%}
@@ -188,6 +185,8 @@ body.menu-open,body.cart-open{overflow:hidden}
  .fgrid{grid-template-columns:1fr}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.mlogo{display:block;width:190px;max-width:70%;height:auto}
+@media(max-width:360px){.brand .bm{height:34px}.brand .bw{height:30px}.brand{gap:10px}}
 </style>
 <link rel="stylesheet" href="assets/css/checkout.css">
 <link rel="stylesheet" href="assets/css/account.css">
@@ -198,7 +197,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 
 <div class="page">
   <header>
-    <a class="brand" href="/" data-aria="site.name"><img data-src="site.logo" data-w="240" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
+    <a class="brand" href="/" data-aria="site.name"><img class="bm" src="assets/img/cozelle-logo.png" alt=""><img class="bw" src="assets/img/cozelle-wordmark.png" alt="Cozelle - Wrapped in comfort"></a>
     <div class="hctl">
       <button class="bag" id="bag" data-aria="ui.openBag"><span class="bi"></span><b id="bagCount">0</b></button>
       <button class="burger" id="burger" data-aria="ui.openMenu"><i></i><i></i><i></i></button>
@@ -239,7 +238,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 
   <footer id="contact">
     <div class="fgrid">
-      <div><div class="fb" data-text="site.brand"></div><div class="ft" data-text="site.tagline"></div>
+      <div><img class="flogo" src="assets/img/cozelle-wordmark-light.png" alt="Cozelle - Wrapped in comfort">
         <p data-text="footer.blurb"></p>
         <form id="nl"><input type="email" required data-ph="ui.emailPh" data-aria="ui.emailPh"><button data-text="ui.join"></button></form></div>
       <div class="dc" id="fcols"></div>
@@ -252,7 +251,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <aside class="panel" id="menu" role="dialog" aria-modal="true" data-aria="ui.menuTitle">
   <div class="ph-head"><h2 data-text="ui.menuTitle"></h2><button class="x" data-close data-aria="ui.closeMenu">×</button></div>
   <nav id="menuNav"></nav>
-  <p data-text="site.tagline"></p>
+  <p><img class="mlogo" src="assets/img/cozelle-wordmark.png" alt="Cozelle - Wrapped in comfort"></p>
 </aside>
 <aside class="panel empty" id="drawer" role="dialog" aria-modal="true" data-aria="ui.bagTitle">
   <div class="ph-head"><h2 class="t-bag" data-text="ui.bagTitle"></h2><h2 class="t-det" data-text="checkout.title"></h2><button class="x" data-close data-aria="ui.closeBag">×</button></div>

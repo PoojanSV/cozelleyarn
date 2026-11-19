@@ -27,10 +27,9 @@ a{color:inherit;text-decoration:none}
 .loader{position:fixed;inset:0;z-index:200;display:grid;place-items:center;text-align:center;
  background:rgba(236,216,189,.12);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);transition:opacity 1s,visibility 1s}
 .loader.done{opacity:0;visibility:hidden}
-.loader img{width:clamp(110px,22vw,170px);height:auto;margin:0 auto 6px;animation:breathe 2.4s ease-in-out infinite}
-.lw{font-family:var(--serif);font-weight:500;font-size:clamp(34px,8vw,54px);letter-spacing:.22em;color:var(--copper-d);padding-left:.22em}
-.lt{font-size:12px;letter-spacing:.4em;text-transform:uppercase;color:var(--copper-d);margin-top:6px}
-.lh{color:var(--copper);margin-top:14px;animation:breathe 1.6s ease-in-out infinite}
+.loader img{display:block;height:auto;margin:0 auto;filter:drop-shadow(0 0 12px rgba(244,232,211,.9))}
+.loader .l1{width:clamp(230px,62vw,360px);animation:breathe 2.4s ease-in-out infinite}
+.loader .l2{width:clamp(160px,44vw,250px);margin-top:20px;animation:breathe 1.6s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.07);opacity:.8}}
 
 .page{position:relative;width:100%;margin:0;overflow:hidden;
@@ -39,9 +38,7 @@ header{position:absolute;z-index:20;top:0;left:0;right:0;display:grid;grid-templ
 .hline{grid-column:1;grid-row:1;align-self:end;height:1px;background:var(--line);pointer-events:none}
 .hctl{grid-column:2;grid-row:1;display:flex;align-items:center;gap:12px;padding-left:clamp(16px,2.6vw,44px)}
 .brand{grid-column:1;grid-row:1;display:flex;align-items:center;gap:14px;padding:22px 0 22px clamp(18px,4vw,60px)}
-.brand img{width:50px;height:50px;object-fit:contain;flex:none}
-.brand b{display:block;font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:.26em;color:var(--copper-d);line-height:1}
-.brand small{display:block;font-size:9px;letter-spacing:.34em;text-transform:uppercase;margin-top:5px;color:var(--copper)}
+.brand img{display:block;flex:none;width:auto;object-fit:contain}.brand .bm{height:50px}.brand .bw{height:48px}
 .bag{position:relative;display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--copper);box-shadow:0 10px 24px -10px rgba(74,43,27,.6);transition:.3s}
 .bag:hover,.burger:hover{background:var(--copper-d)}
 .bi{position:relative;display:block;width:18px;height:15px;margin-top:7px;border-radius:3px 3px 5px 5px;background:var(--cream)}
@@ -107,8 +104,7 @@ section{padding:clamp(60px,10vh,110px) clamp(18px,4vw,60px) 10px}
 footer{margin-top:clamp(60px,9vh,100px);padding:60px clamp(18px,4vw,60px) 34px;color:var(--cream);
  background:linear-gradient(to bottom,rgba(181,105,63,0),rgba(142,74,42,.92) 38%)}
 .fgrid{display:grid;grid-template-columns:1.4fr repeat(var(--fcols,2),1fr);gap:36px;max-width:1200px;margin:auto}
-footer .fb{font-family:var(--serif);font-weight:600;font-size:30px;letter-spacing:.24em}
-footer .ft{font-size:10px;letter-spacing:.34em;text-transform:uppercase;opacity:.8;margin:6px 0 18px}
+footer .flogo{display:block;width:min(270px,100%);height:auto;margin:0 0 20px}
 footer p,footer li{font-size:14px;line-height:1.8;opacity:.85}
 footer ul{list-style:none}footer li a:hover{opacity:.6}
 footer h5{font-family:var(--serif);font-weight:500;font-size:20px;margin-bottom:10px}
@@ -175,7 +171,7 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
 
 @media(max-width:900px){
  header{display:flex;padding:16px;gap:10px}.hline{position:absolute;left:0;right:0;bottom:0}.brand{padding:0}.hctl{margin-left:auto;padding-left:0;gap:10px}.bag,.burger{width:44px;height:44px}
- .brand img{width:40px;height:40px}.brand b{font-size:20px;letter-spacing:.2em}.brand small{font-size:8px;letter-spacing:.28em}
+ .brand .bm{height:40px}.brand .bw{height:38px}
  .hero{display:flex;flex-direction:column;min-height:0}
  .left,.right{display:contents}
  .intro{order:1;padding:96px 20px 0}.model{order:2;position:relative;inset:auto;height:430px;margin-top:10px;
@@ -195,6 +191,8 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
  .reviews{left:7%}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.intro>*,.rise{opacity:1;transform:none}}
+.mlogo{display:block;width:190px;max-width:70%;height:auto}
+@media(max-width:360px){.brand .bm{height:34px}.brand .bw{height:30px}.brand{gap:10px}}
 </style>
 <link rel="stylesheet" href="assets/css/checkout.css">
 <link rel="stylesheet" href="assets/css/account.css">
@@ -204,12 +202,12 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
 <body class="lock">
 
 <div class="loader" id="loader" aria-hidden="true">
-  <div><img data-src="site.logo" data-w="240" alt=""><div class="lw" data-text="site.brand"></div><div class="lt" data-text="site.tagline"></div><div class="lh" data-text="site.loaderMark"></div></div>
+  <div><img class="l1" src="assets/img/cozelle-logo-full.png" alt="Cozelle - Wrapped in comfort"><img class="l2" src="assets/img/cozelle-divider.png" alt=""></div>
 </div>
 
 <div class="page">
   <header>
-    <a class="brand" href="#top" data-aria="site.name"><img data-src="site.logo" data-w="240" alt=""><span><b data-text="site.brand"></b><small data-text="site.tagline"></small></span></a>
+    <a class="brand" href="#top" data-aria="site.name"><img class="bm" src="assets/img/cozelle-logo.png" alt=""><img class="bw" src="assets/img/cozelle-wordmark.png" alt="Cozelle - Wrapped in comfort"></a>
     <div class="hline" aria-hidden="true"></div>
     <div class="hctl"><button class="bag" id="bag" data-aria="ui.openBag"><span class="bi"></span><b id="count">0</b></button>
     <button class="burger" id="burger" data-aria="ui.openMenu"><i></i><i></i><i></i></button></div>
@@ -239,7 +237,7 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
 
   <footer id="contact">
     <div class="fgrid">
-      <div><div class="fb" data-text="site.brand"></div><div class="ft" data-text="site.tagline"></div>
+      <div><img class="flogo" src="assets/img/cozelle-wordmark-light.png" alt="Cozelle - Wrapped in comfort">
         <p data-text="footer.blurb"></p>
         <form id="nl"><input type="email" required data-ph="ui.emailPh" data-aria="ui.emailPh"><button data-text="ui.join"></button></form></div>
       <div class="dc" id="fcols"></div>
@@ -252,7 +250,7 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
 <aside class="panel" id="menu" role="dialog" aria-modal="true" data-aria="ui.menuTitle">
   <div class="ph-head"><h2 data-text="ui.menuTitle"></h2><button class="x" data-close data-aria="ui.closeMenu">×</button></div>
   <nav id="menuNav"></nav>
-  <p data-text="site.tagline"></p>
+  <p><img class="mlogo" src="assets/img/cozelle-wordmark.png" alt="Cozelle - Wrapped in comfort"></p>
 </aside>
 <aside class="panel empty" id="drawer" role="dialog" aria-modal="true" data-aria="ui.bagTitle">
   <div class="ph-head"><h2 class="t-bag" data-text="ui.bagTitle"></h2><h2 class="t-det" data-text="checkout.title"></h2><button class="x" data-close data-aria="ui.closeBag">×</button></div>

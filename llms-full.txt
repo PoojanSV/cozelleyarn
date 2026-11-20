@@ -1,0 +1,55 @@
+# Cozelle - product catalogue
+
+Indian online store for wool yarn, throws, rugs and knitwear. Free delivery across India, 7-day returns, pay by UPI. Prices in INR (include GST).
+Store: https://cozelleyarn.shop/
+
+## Amethyst Hearts collection 
+- Category: Throw , Blanket 
+- Price: Rs. 3600 (MRP Rs. 4000, 10% off)
+- URL: https://cozelleyarn.shop/product?id=cable-knit-throw
+- About: 💜 COZELLE – AMETHYST HEART BLANKET 💜 Collection: Amethyst Collection Product Name: Amethyst Heart Brand: Cozelle Category: Handmade Chunky Yarn Blanket🧶 ❄️ Product Description Wrap yourself in the beauty of Amethyst Dreams. Handcrafted with love, this luxurious chunky blanket features a beautiful combination of deep midnight navy, dreamy lavender and soft white . Delicate heart details add a romantic touch, making it more than just a blanket – it's a statement piece for your home. Its irresistibly soft, plush texture brings warmth, comfort and elegance to every corner of your space. Perfect for cozy evenings, bedroom styling, thoughtful gifting and adding a touch of luxury to your living room. 💜Product Highlights - Beautiful handmade chunky yarn design. - Luxurious navy, lavender and white colour combination. - Adorable handcrafted heart detailing. - Soft, fluffy and cozy texture. - Unique design from Cozelle's Amethyst Collection. - Perfect for gifting and home décor. 🧶 Care Instructions - Handle gently. - Follow the yarn manufacturer's washing instructions. - Avoid harsh detergents. - Dry flat when possible. - Store in a clean, dry place. 🤍 A Little Note from Cozelle Every loop is made with love, and every blanket is created to bring warmth, comfort and happiness into your home. **Cozelle – Wrapped in Comfort.**
+
+## Cloud Merino Yarn
+- Category: Yarn
+- Price: Rs. 1450
+- URL: https://cozelleyarn.shop/product?id=cloud-merino-yarn
+
+## New product
+- Category: -
+- Price: Rs. 5000
+- URL: https://cozelleyarn.shop/product?id=p-6opayg
+
+## New product
+- Category: yarn
+- Price: Rs. 50
+- URL: https://cozelleyarn.shop/product?id=p-5b3bnn
+
+## Cream Wool Skeins
+- Category: Yarn
+- Price: Rs. 1250
+- URL: https://cozelleyarn.shop/product?id=cream-wool-skeins
+
+## Hand-spun Wool
+- Category: Yarn
+- Price: Rs. 1650
+- URL: https://cozelleyarn.shop/product?id=hand-spun-wool
+
+## Plaited Wool Rug
+- Category: Rug
+- Price: Rs. 9800
+- URL: https://cozelleyarn.shop/product?id=plaited-wool-rug
+
+## Ivory Knit Pullover
+- Category: Knitwear
+- Price: Rs. 3200
+- URL: https://cozelleyarn.shop/product?id=ivory-knit-pullover
+
+## Cloud Knit Sweater
+- Category: Knitwear
+- Price: Rs. 3600
+- URL: https://cozelleyarn.shop/product?id=cloud-knit-sweater
+
+## Sunday Lounge Knit
+- Category: Knitwear
+- Price: Rs. 2900
+- URL: https://cozelleyarn.shop/product?id=sunday-lounge-knit

@@ -30,11 +30,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
-<link rel="dns-prefetch" href="https://www.gstatic.com">
-<link rel="icon" type="image/png" href="assets/img/cozelle-logo.png">
-<link rel="apple-touch-icon" href="assets/img/cozelle-logo.png">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="icon" type="image/png" href="assets/img/cozelle-logo.png?v=fe5700c4">
+<link rel="apple-touch-icon" href="assets/img/cozelle-logo.png?v=fe5700c4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap"></noscript>
 <style>
 :root{--cream:#f4e8d3;--sand:#ecd8bd;--copper:#b5693f;--copper-d:#8e4a2a;--rose:#d49a78;--cocoa:#4a2b1b;
 --serif:'Cormorant Garamond',Georgia,serif;--sans:'Jost',system-ui,sans-serif;--glass:rgba(250,245,235,.9);--line:rgba(181,105,63,.45);--bg-image:none}
@@ -208,17 +209,16 @@ body.menu-open,body.cart-open{overflow:hidden}
 .mlogo{display:block;width:190px;max-width:70%;height:auto}
 @media(max-width:360px){.brand .bm{height:34px}.brand .bw{height:30px}.brand{gap:10px}}
 </style>
-<link rel="stylesheet" href="assets/css/checkout.css">
-<link rel="stylesheet" href="assets/css/account.css">
-<link rel="stylesheet" href="assets/css/pricing.css">
-<link rel="stylesheet" href="assets/css/media.css">
+<link rel="stylesheet" href="assets/css/shop.css?v=463f7c72">
+<link rel="preload" as="style" href="assets/css/panels.css?v=0b43caca" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="assets/css/panels.css?v=0b43caca"></noscript>
 </head>
 <body>
 <noscript><h1>Cozelle</h1><p>Wool yarn, throws, rugs and knitwear.</p><nav><a href="/">Home</a> <a href="/collection">Collection</a> <a href="/about">About</a> <a href="/contact">Contact</a></nav></noscript>
 
 <div class="page">
   <header>
-    <a class="brand" href="/" data-aria="site.name"><img class="bm" src="assets/img/cozelle-logo.png" alt=""><img class="bw" src="assets/img/cozelle-wordmark.png" alt="Cozelle - Wrapped in comfort"></a>
+    <a class="brand" href="/" data-aria="site.name"><img class="bm" src="assets/img/cozelle-logo.webp?v=14ba9751" width="112" height="104" alt=""><img class="bw" src="assets/img/cozelle-wordmark.webp?v=efac085f" width="360" height="101" alt="Cozelle - Wrapped in comfort"></a>
     <div class="hctl">
       <button class="bag" id="bag" data-aria="ui.openBag"><span class="bi"></span><b id="bagCount">0</b></button>
       <button class="burger" id="burger" data-aria="ui.openMenu"><i></i><i></i><i></i></button>
@@ -231,7 +231,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 
   <footer id="contact">
     <div class="fgrid">
-      <div><img class="flogo" src="assets/img/cozelle-wordmark-light.png" alt="Cozelle - Wrapped in comfort">
+      <div><img class="flogo" src="assets/img/cozelle-wordmark-light.webp?v=a3d79fa7" width="480" height="135" alt="Cozelle - Wrapped in comfort">
         <p data-text="footer.blurb"></p>
         <form id="nl"><input type="email" required data-ph="ui.emailPh" data-aria="ui.emailPh"><button data-text="ui.join"></button></form></div>
       <div class="dc" id="fcols"></div>
@@ -244,7 +244,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <aside class="panel" id="menu" role="dialog" aria-modal="true" data-aria="ui.menuTitle">
   <div class="ph-head"><h2 data-text="ui.menuTitle"></h2><button class="x" data-close data-aria="ui.closeMenu">×</button></div>
   <nav id="menuNav"></nav>
-  <p><img class="mlogo" src="assets/img/cozelle-wordmark.png" alt="Cozelle - Wrapped in comfort"></p>
+  <p><img class="mlogo" src="assets/img/cozelle-wordmark.webp?v=efac085f" width="360" height="101" alt="Cozelle - Wrapped in comfort"></p>
 </aside>
 <aside class="panel empty" id="drawer" role="dialog" aria-modal="true" data-aria="ui.bagTitle">
   <div class="ph-head"><h2 class="t-bag" data-text="ui.bagTitle"></h2><h2 class="t-det" data-text="checkout.title"></h2><button class="x" data-close data-aria="ui.closeBag">×</button></div>
@@ -265,10 +265,10 @@ body.menu-open,body.cart-open{overflow:hidden}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="assets/js/cloudinary.js"></script>
-<script src="assets/js/media.js"></script>
-<script src="assets/js/cozelle-data.js"></script>
-<script src="assets/js/seo.js"></script>
+<script src="assets/js/cloudinary.min.js?v=82855774"></script>
+<script src="assets/js/media.min.js?v=868111d4"></script>
+<script src="assets/js/cozelle-data.min.js?v=b82b77f4"></script>
+<script src="assets/js/seo.min.js?v=f7174882"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
 async function loadData(){
@@ -296,7 +296,7 @@ let tt;function toast(m,viewBag=false){tEl.replaceChildren();const text=document
 const BIND={text:0,src:'src',alt:'alt',ph:'placeholder',aria:'aria-label'};
 function bind(){for(const k in BIND)document.querySelectorAll(`[data-${k}]`).forEach(e=>{
  const v=get(D,e.getAttribute('data-'+k));if(v==null)return;
- if(k==='text')e.textContent=v;else{e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
+ if(k==='text')e.textContent=v;else{if(k==='src'&&e.dataset.sizes&&isCld(v)){e.sizes=e.dataset.sizes;e.srcset=cldSet(v,[480,800,1200])}e.setAttribute(BIND[k],k==='src'?cld(v,+e.dataset.w||0):v);if(k==='src')e.style.display=''}})}
 
 const card=p=>`<article class="card"><div class="pic"><div class="im ph">${cldMedia(p.image,900,p.name)}<img class="bl" loading="lazy" src="${esc(cld(p.image,200))}" alt="" aria-hidden="true"></div><a class="plink" href="product?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}"></a>${Price.badge(p)}<div class="info"><h3>${esc(p.name)}</h3>${p.category?`<p>${esc(p.category)}</p>`:''}<div class="price">${Price.html(p)}</div>${Stock.tracked(p)?`<p class="stock${Stock.count(p)===0?' out':''}">${esc(Stock.label(p))}</p>`:''}</div><button class="arch" data-add="${esc(p.id)}" ${Stock.tracked(p)&&Stock.count(p)===0?'disabled':''}>${esc(D.ui.addToBag)}</button></div></article>`;
 
@@ -316,7 +316,7 @@ function showImg(i,dir){
   mv.muted=true;Ux.wanted.set(mv,true);Ux.playVideo(mv);   // autoplays; the visitor can pause it
  }else{
   mv.style.display='none';mv.removeAttribute('src');mv.removeAttribute('poster');mv.load();$('vp').hidden=true;
-  mi.style.display='';$('mz').hidden=false;mi.src=cld(m.src,1400);mi.alt=m.alt;
+  mi.style.display='';$('mz').hidden=false;mi.src=cld(m.src,1000);mi.alt=m.alt;
  }
  document.querySelectorAll('.tb').forEach((b,k)=>b.setAttribute('aria-current',k===gi));
  if(!$('lb').hidden&&!isV){$('lbImg').src=cld(m.src,2000);$('lbImg').alt=m.alt}
@@ -333,7 +333,7 @@ function renderProduct(){
  main.innerHTML=`<a class="back" href="collection">← ${esc(w.back)}</a>
  <div class="pgrid">
   <div class="gal">
-   <div class="main ph"><img id="mainImg" src="${esc(imgs[0]&&imgs[0].type!=='video'?cld(imgs[0].src,1400):'')}" alt="${esc(P.name)}"><video id="mainVid" muted loop playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback" style="display:none"></video><button class="vp" id="vp" data-state="paused" aria-label="Play video" hidden><i></i></button><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
+   <div class="main ph"><img id="mainImg" src="${esc(imgs[0]&&imgs[0].type!=='video'?cld(imgs[0].src,1000):'')}" alt="${esc(P.name)}"><video id="mainVid" muted loop playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback" style="display:none"></video><button class="vp" id="vp" data-state="paused" aria-label="Play video" hidden><i></i></button><button class="mz" id="mz" aria-label="${esc(w.zoom)}"></button>${many?`<button class="gn prev" data-gn="-1" aria-label="${esc(w.prev)}">‹</button><button class="gn next" data-gn="1" aria-label="${esc(w.next)}">›</button>`:''}</div>
    ${many?`<div class="thumbs">${imgs.map((m,k)=>`<button class="tb ph" data-img="${k}" aria-label="${esc(m.alt)}" aria-current="${k===0}">${m.type==='video'?(cldPoster(m.src,200)?`<img src="${esc(cldPoster(m.src,200))}" alt="">`:'')+'<span class="pl" aria-hidden="true">▶</span>':`<img src="${esc(cld(m.src,200))}" alt="">`}</button>`).join('')}</div>`:''}
   </div>
   <div class="pinfo">
@@ -433,9 +433,8 @@ document.addEventListener('error',e=>{if(e.target.tagName==='IMG')e.target.style
 loadData().catch(e=>{console.error('loadData failed, using defaults',e);return DEFAULT_DATA}).then(render);
 window.Cozelle={render,get data(){return D}};
 </script>
-<script src="assets/js/vendor/qrcode.js"></script>
-<script src="assets/js/account.js"></script>
-<script src="assets/js/checkout.js"></script>
-<script src="assets/js/cookies.js"></script>
+<script src="assets/js/account.min.js?v=e12b3229"></script>
+<script src="assets/js/checkout.min.js?v=3ee03cb9"></script>
+<script src="assets/js/cookies.min.js?v=b7a808b1"></script>
 </body>
 </html>

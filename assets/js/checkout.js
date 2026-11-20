@@ -67,6 +67,14 @@
   }
   throw new Error('Could not reserve a unique order ID. Publish the updated Firestore rules and try again.');
  }
+ // The QR library (56 KB) is only fetched when the payment step opens, not on every page view.
+ const QR_SRC = 'assets/js/vendor/qrcode.min.js' + ((document.currentScript && document.currentScript.src.match(/\?.*$/)) || [''])[0];
+ let qrLoading = null;
+ const loadQr = () => typeof qrcode === 'function' ? Promise.resolve() : qrLoading || (qrLoading = new Promise((ok, no) => {
+  const s = document.createElement('script');
+  s.src = QR_SRC; s.onload = ok; s.onerror = () => { qrLoading = null; no(new Error('QR library not loaded')); };
+  document.head.appendChild(s);
+ }));
  const upiUrl = (vpa, name, amount, note) =>
   'upi://pay?pa=' + vpa + '&pn=' + encodeURIComponent(name) + '&am=' + amount.toFixed(2) + '&cu=INR&tn=' + encodeURIComponent(note);
 
@@ -173,7 +181,7 @@
    const name = String(s.upiName || s.name || '').trim() || 'Shop';
    const url = upiUrl(vpa, name, total, (s.name || 'Order') + ' ' + ref);
    g('payAmt').textContent = money(total);
-   g('payQr').innerHTML = qrSvg(url);
+   try { await loadQr(); g('payQr').innerHTML = qrSvg(url); } catch (e) { console.warn('QR code not shown', e); g('payQr').innerHTML = ''; }
    g('payVpa').textContent = vpa;
    g('payRef').textContent = ref;
    g('payBrk').innerHTML = Price.brk(calc);

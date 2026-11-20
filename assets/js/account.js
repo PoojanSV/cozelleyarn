@@ -4,12 +4,16 @@
  const auth = (() => { try { return firebase.auth(); } catch (e) { console.warn('Firebase Auth unavailable', e); return null; } })();
  const A = () => D.acct;
  const q = (s, r) => (r || document).querySelector(s);
- const PIN_RE = /^\d{6}$/;
+ const PW_RE = /^.{6,128}$/;   // password: at least 6 characters (Firebase minimum)
+ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
  const STEPS = ['new', 'confirmed', 'shipped', 'delivered'];
 
- const isCust = em => typeof em === 'string' && em.toLowerCase().endsWith('@' + CUSTOMER_DOMAIN);
- const me = () => { const u = auth && auth.currentUser; return u && isCust(u.email) ? u : null; };
- const phoneOf = u => u.email.split('@')[0];
+ // Old accounts log in as <phone digits>@cozelle-phone.com + 6-digit PIN. New accounts use a real email + password.
+ // Customers can log in with either an email or a phone number. After a phone login they are asked to add an email; the old account is upgraded in place (same Firebase uid), so its orders and saved details stay with it.
+ const isLegacy = em => typeof em === 'string' && em.toLowerCase().endsWith('@' + CUSTOMER_DOMAIN);
+ let custUser = null, myPhone = '', holdAuth = false, lastUid = null, skipEmail = false;
+ const me = () => custUser;
+ const phoneOf = u => isLegacy(u.email) ? u.email.split('@')[0] : myPhone;
  const emailOf = digits => digits + '@' + CUSTOMER_DOMAIN;
 
  function normPhone(raw) {
@@ -18,12 +22,20 @@
   return d.length >= 11 && d.length <= 15 ? d : '';
  }
  const fmt = d => d.length === 12 && d.startsWith('91') ? '+91 ' + d.slice(2, 7) + ' ' + d.slice(7) : '+' + d;
- const initial = u => ((u && u.displayName) || cust.name || '').trim().charAt(0) || '✓';
+ const initial = u => ((u && u.displayName) || cust.name || '').trim().charAt(0) || (u && !isLegacy(u.email) && u.email ? u.email.charAt(0).toUpperCase() : '✓');
+
+ const CRED = /invalid-credential|wrong-password|user-not-found|invalid-login/;
+ const credErr = e => CRED.test((e && e.code) || '');
+ const fail = code => Object.assign(new Error(code), { code });
 
  function errMsg(e, ctx) {
   const t = A().err, c = (e && e.code) || '';
-  if (c === 'auth/email-already-in-use') return ctx === 'checkout' ? t.existsWrong : t.exists;
-  if (/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return ctx === 'checkout' ? t.existsWrong : t.wrong;
+  if (c === 'cz/verify-sent') return t.verifySent;
+  if (c === 'cz/phone-taken') return t.phoneTaken;
+  if (c === 'auth/requires-recent-login') return t.recent;
+  if (c === 'auth/email-already-in-use') return ctx === 'upgrade' ? t.emailTaken : t.existsWrong;
+  if (c === 'auth/invalid-email') return t.email;
+  if (CRED.test(c)) return t.wrong;
   if (c === 'auth/too-many-requests') return t.tooMany;
   if (c === 'auth/network-request-failed') return t.network;
   if (c === 'auth/weak-password' || c === 'auth/password-does-not-meet-requirements') return t.policy;
@@ -32,14 +44,56 @@
   return t.generic;
  }
 
- async function signup(phone, pin, name) {
-  const u = (await auth.createUserWithEmailAndPassword(emailOf(phone), pin)).user;
-  if (name) { try { await u.updateProfile({ displayName: name.slice(0, 60) }); } catch (e) { console.warn('name not saved', e); } }
-  saveProfile({ name });
-  renderAll(true);
+ const TS = () => firebase.firestore.FieldValue.serverTimestamp();
+ const prof = (uid, data) => db ? db.collection('customers').doc(uid).set({ ...data, updatedAt: TS() }, { merge: true }) : Promise.resolve();
+ const signIn = (email, pw) => auth.signInWithEmailAndPassword(email, pw).then(r => r.user);
+
+ // Old phone + PIN account -> same account, new login email. The uid never changes, so orders and details stay.
+ async function toNewEmail(u, email, phone) {
+  myPhone = phone;
+  try { await prof(u.uid, { phone }); } catch (e) { console.warn('phone not pinned to profile', e); }   // phone is kept on the profile before the login email changes
+  try { await u.updateEmail(email); }
+  catch (e) {
+   if (e && e.code === 'auth/operation-not-allowed') { await u.verifyBeforeUpdateEmail(email); throw fail('cz/verify-sent'); }   // project has email enumeration protection on: the email changes once the link is opened
+   throw e;
+  }
+  try { await u.getIdToken(true); } catch (e) {}
+  try { await prof(u.uid, { email, phone }); } catch (e) { console.warn('email not saved to profile', e); }
   return u;
  }
- const login = async (phone, pin) => (await auth.signInWithEmailAndPassword(emailOf(phone), pin)).user;
+ // Log in with email + password; if that account does not exist yet: upgrade an old phone account (phone + old PIN as password), else create a new one.
+ async function ensureAccount({ email, phone, pw, name }) {
+  try { return await signIn(email, pw); }
+  catch (e) { if (!credErr(e)) throw e; }
+  let old = null;
+  try { old = await signIn(emailOf(phone), pw); }
+  catch (e) { if (!credErr(e)) throw e; }
+  if (old) return toNewEmail(old, email, phone);
+  let taken = false;
+  try { taken = ((await auth.fetchSignInMethodsForEmail(emailOf(phone))) || []).length > 0; } catch (e) {}
+  if (taken) throw fail('cz/phone-taken');
+  const u = (await auth.createUserWithEmailAndPassword(email, pw)).user;
+  if (name) { try { await u.updateProfile({ displayName: name.slice(0, 60) }); } catch (e) { console.warn('name not saved', e); } }
+  myPhone = phone;
+  try { await prof(u.uid, { email, phone, ...(name ? { name: name.slice(0, 300) } : {}) }); } catch (e) { console.warn('profile not saved', e); }
+  return u;
+ }
+ async function runAuth(fn) {
+  const before = auth.currentUser && auth.currentUser.uid;
+  holdAuth = true;
+  try { const u = await fn(); adopt(u); return u; }
+  catch (e) {
+   const now = auth.currentUser;
+   if (now && now.uid !== before) { try { await auth.signOut(); } catch (_) {} }
+   throw e;
+  }
+  finally { holdAuth = false; }
+ }
+ function adopt(u) {
+  custUser = u; lastUid = u.uid;
+  startOrders(u); loadProfile(u);
+  renderAll(true);
+ }
  async function logout() {
   B.classList.remove('menu-open');
   try { await auth.signOut(); } catch (e) { console.warn(e); }
@@ -49,7 +103,9 @@
   const u = me();
   if (!u || !db) return;
   try {
-   const p = { phone: phoneOf(u), updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+   const p = { updatedAt: TS() }, ph = phoneOf(u);
+   if (ph) p.phone = ph;
+   if (!isLegacy(u.email)) p.email = u.email;
    ['name', 'address', 'city', 'pincode'].forEach(k => { if (d && d[k]) p[k] = String(d[k]).slice(0, 300); });
    await db.collection('customers').doc(u.uid).set(p, { merge: true });
   } catch (e) { console.warn('profile not saved', e); }
@@ -60,13 +116,17 @@
   try { const s = await db.collection('customers').doc(u.uid).get(); if (s.exists) p = s.data(); } catch (e) { console.warn('profile not loaded', e); }
   const now = me();
   if (!now || now.uid !== u.uid) return;
+  if (p.phone) myPhone = String(p.phone);
   let changed = false;
   const put = (k, v) => { if (v && !cust[k]) { cust[k] = v; changed = true; } };
-  put('name', p.name || u.displayName); put('phone', fmt(phoneOf(u))); put('address', p.address); put('city', p.city); put('pincode', p.pincode);
+  const ph = phoneOf(now);
+  put('name', p.name || u.displayName); if (ph) put('phone', fmt(ph)); put('address', p.address); put('city', p.city); put('pincode', p.pincode);
   if (changed) { try { localStorage.setItem('cozelle-customer', JSON.stringify(cust)); } catch (e) {} renderFields(); }
+  renderPanel(true);
  }
  function wipe() {
   Object.keys(cust).forEach(k => delete cust[k]);
+  myPhone = ''; skipEmail = false;
   try { localStorage.removeItem('cozelle-customer'); localStorage.removeItem('cozelle-pending'); } catch (e) {}
   renderFields();
  }
@@ -128,40 +188,61 @@
   const t = A(), b = (v, l) => `<button type="button" data-acct="${v}">${esc(l)}</button>`;
   menuBox.innerHTML = me() ? b('orders', t.orders) + b('logout', t.logout) : b('login', t.menuLogin) + b('orders', t.orders);
  }
- function pinField(auto) {
+ function pwField(auto, id) {
   const t = A();
-  return `<div class="pin-wrap"><input name="pin" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required autocomplete="${auto}" placeholder=" " title="${esc(t.err.pin)}"><button type="button" class="pin-eye" data-eye>${esc(t.show)}</button></div>`;
+  return `<div class="pin-wrap"><input ${id ? `id="${id}" ` : ''}name="password" class="pin" type="password" minlength="6" maxlength="128" required autocomplete="${auto}" placeholder=" " title="${esc(t.err.pin)}"><button type="button" class="pin-eye" data-eye>${esc(t.show)}</button></div>`;
  }
  function renderGate(force) {
   const k = keyOf();
   if (!force && k === gateKey) return;
   gateKey = k;
   const t = A(), u = me();
-  if (u) { gate.innerHTML = `<p class="gate-as">${esc(t.orderingAs)} <b>${esc(fmt(phoneOf(u)))}</b></p><button type="button" class="cof-back" data-acct="logout">${esc(t.notYou)}</button>`; return; }
-  gate.innerHTML = `<label><span>${esc(t.pinNew)}</span><div class="pin-wrap"><input id="gatePin" class="pin" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required autocomplete="new-password" placeholder=" " title="${esc(t.err.pin)}"><button type="button" class="pin-eye" data-eye>${esc(t.show)}</button></div></label><p class="gate-hint">${esc(t.gateHint)}</p><p class="acct-err" id="gateErr" role="alert"></p>`;
+  const emailBox = hint => `<label><span>${esc(t.gateEmail)}</span><input id="gateEmail" type="email" inputmode="email" autocomplete="email" required placeholder=" " title="${esc(t.err.email)}"></label>${hint ? `<p class="gate-hint">${esc(hint)}</p>` : ''}`;
+  if (u) {
+   const legacy = isLegacy(u.email), who = legacy ? fmt(phoneOf(u)) : u.email;
+   gate.innerHTML = `<p class="gate-as">${esc(t.orderingAs)} <b>${esc(who)}</b></p>${legacy ? emailBox(t.gateHintPhone) + '<p class="acct-err" id="gateErr" role="alert"></p>' : ''}<button type="button" class="cof-back" data-acct="logout">${esc(t.notYou)}</button>`;
+   return;
+  }
+  gate.innerHTML = `${emailBox('')}<label><span>${esc(t.gatePw)}</span>${pwField('new-password', 'gatePw')}</label><p class="gate-hint">${esc(t.gateHint)}</p><p class="acct-err" id="gateErr" role="alert"></p>`;
  }
  function renderPanel(force) {
-  const t = A(), u = me(), k = (u ? u.uid : 'out') + '|' + tab + '|' + needLogin, body = $('acctBody');
+  const t = A(), u = me(), legacy = !!u && isLegacy(u.email), ask = legacy && !skipEmail, body = $('acctBody');
+  const k = (u ? u.uid : 'out') + '|' + tab + '|' + needLogin + '|' + (ask ? 'ask' : '');
   if (!force && k === panelKey) { renderOrders(); return; }
   panelKey = k;
-  $('acctTitle').textContent = u ? t.title : tab === 'signup' ? t.signupTitle : t.loginTitle;
+  const mode = tab === 'signup' ? 'signup' : 'login';
+  $('acctTitle').textContent = ask ? t.addEmailTitle : u ? t.title : mode === 'signup' ? t.signupTitle : t.loginTitle;
+  if (ask) {
+   body.innerHTML = `<p class="acct-note">${esc(t.addEmailText)}</p>
+   <form class="acct-form" id="aForm" data-mode="addemail">
+    <label class="af"><span>${esc(t.email)}</span><input name="email" type="email" inputmode="email" autocomplete="email" required placeholder=" " title="${esc(t.err.email)}"></label>
+    <p class="acct-err" role="alert"></p>
+    <button class="co" type="submit">${esc(t.addEmailBtn)}</button>
+    <button type="button" class="acct-link" data-acct="skipemail">${esc(t.later)}</button>
+   </form>`;
+   return;
+  }
   if (u) {
-   body.innerHTML = `<div class="acct-me"><div class="acct-av">${esc(initial(u))}</div><div class="acct-who"><b>${esc(u.displayName || '')}</b><span>${esc(fmt(phoneOf(u)))}</span></div><button type="button" class="acct-out" data-acct="logout">${esc(t.logout)}</button></div><h3 class="acct-h">${esc(t.ordersTitle)}</h3><div id="ordList"></div>`;
+   const em = legacy ? '' : u.email, ph = phoneOf(u);
+   body.innerHTML = `<div class="acct-me"><div class="acct-av">${esc(initial(u))}</div><div class="acct-who"><b>${esc(u.displayName || '')}</b>${em ? `<span>${esc(em)}</span>` : ''}${ph ? `<span>${esc(fmt(ph))}</span>` : ''}</div><button type="button" class="acct-out" data-acct="logout">${esc(t.logout)}</button></div>${legacy ? `<div class="acct-note">${esc(t.addEmailNudge)} <button type="button" class="acct-inline" data-acct="addemail">${esc(t.addEmailNudgeBtn)}</button></div>` : ''}<h3 class="acct-h">${esc(t.ordersTitle)}</h3><div id="ordList"></div>`;
    renderOrders();
    return;
   }
-  const signup = tab === 'signup';
-  const phoneIn = `<input name="phone" type="tel" inputmode="tel" autocomplete="username" pattern="[0-9+ ]{10,15}" required placeholder=" " value="${esc(cust.phone || '')}" title="${esc(t.err.phone)}">`;
+  const idIn = `<input name="id" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required placeholder=" " title="${esc(t.err.id)}">`;
+  const emailIn = `<input name="email" type="email" inputmode="email" autocomplete="email" required placeholder=" " title="${esc(t.err.email)}">`;
+  const phoneIn = `<input name="phone" type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+ ]{10,15}" required placeholder=" " value="${esc(cust.phone || '')}" title="${esc(t.err.phone)}">`;
+  const hint = mode === 'signup' ? t.signupHint + ' ' + t.pinHint : '';
   body.innerHTML = `${needLogin ? `<p class="acct-note">${esc(t.needLogin)}</p>` : ''}
-   <div class="acct-tabs"><button type="button" data-tab="login" class="${signup ? '' : 'on'}">${esc(t.login)}</button><button type="button" data-tab="signup" class="${signup ? 'on' : ''}">${esc(t.signup)}</button></div>
-   <form class="acct-form" id="aForm" data-mode="${signup ? 'signup' : 'login'}">
-    ${signup ? `<label class="af"><span>${esc(t.name)}</span><input name="name" type="text" autocomplete="name" required placeholder=" " value="${esc(cust.name || '')}"></label>` : ''}
-    <label class="af"><span>${esc(t.phone)}</span>${phoneIn}</label>
-    <label class="af"><span>${esc(signup ? t.pinNew : t.pin)}</span>${pinField(signup ? 'new-password' : 'current-password')}</label>
-    <p class="acct-hint">${esc(signup ? t.signupHint + ' ' + t.pinHint : t.pinHint)}</p>
+   <div class="acct-tabs"><button type="button" data-tab="login" class="${mode === 'login' ? 'on' : ''}">${esc(t.login)}</button><button type="button" data-tab="signup" class="${mode === 'signup' ? 'on' : ''}">${esc(t.signup)}</button></div>
+   <form class="acct-form" id="aForm" data-mode="${mode}">
+    ${mode === 'signup' ? `<label class="af"><span>${esc(t.name)}</span><input name="name" type="text" autocomplete="name" required placeholder=" " value="${esc(cust.name || '')}"></label>` : ''}
+    <label class="af"><span>${esc(mode === 'login' ? t.id : t.email)}</span>${mode === 'login' ? idIn : emailIn}</label>
+    ${mode === 'login' ? '' : `<label class="af"><span>${esc(t.phone)}</span>${phoneIn}</label>`}
+    <label class="af"><span>${esc(mode === 'signup' ? t.pinNew : t.pin)}</span>${pwField(mode === 'signup' ? 'new-password' : 'current-password')}</label>
+    ${hint ? `<p class="acct-hint">${esc(hint)}</p>` : ''}
     <p class="acct-err" role="alert"></p>
-    <button class="co" type="submit">${esc(signup ? t.signupBtn : t.loginBtn)}</button>
-    ${signup ? '' : `<a class="acct-link" target="_blank" rel="noopener" href="https://wa.me/${esc(D.site.whatsapp)}?text=${encodeURIComponent(t.forgotMsg)}">${esc(t.forgot)}</a>`}
+    <button class="co" type="submit">${esc(mode === 'signup' ? t.signupBtn : t.loginBtn)}</button>
+    ${mode === 'login' ? `<button type="button" class="acct-link" data-forgot>${esc(t.forgot)}</button>` : ''}
    </form>`;
  }
  function renderAll(force) { renderMenu(); renderGate(force); renderPanel(force); }
@@ -179,24 +260,31 @@
 
  let ensuring = false;
  async function ensure() {
-  if (me()) return true;
+  const u0 = me();
+  if (u0 && !isLegacy(u0.email)) return true;
   const t = A(), say = m => { const e = $('gateErr'); if (e) e.textContent = m || ''; };
   say('');
   if (!auth) { say(t.err.unavailable); return false; }
-  const ph = q('[name="phone"]', form), nm = q('[name="name"]', form), pinEl = $('gatePin');
-  const phone = normPhone(ph && ph.value), pin = (pinEl && pinEl.value) || '';
-  if (!phone) { say(t.err.phone); if (ph) ph.focus(); return false; }
-  if (!PIN_RE.test(pin)) { say(t.err.pin); if (pinEl) pinEl.focus(); return false; }
+  const emEl = $('gateEmail'), email = ((emEl && emEl.value) || '').trim().toLowerCase();
+  if (!EMAIL_RE.test(email) || isLegacy(email)) { say(t.err.email); if (emEl) emEl.focus(); return false; }
   if (ensuring) return false;
-  ensuring = true;
   const go = q('button[type=submit]', form), label = go.textContent;
+  // Signed in with just a phone number: the email they give for this order is added to their account.
+  if (u0) {
+   ensuring = true; go.disabled = true; go.textContent = t.creating;
+   try { await toNewEmail(u0, email, phoneOf(u0)); renderAll(true); }
+   catch (e) { if (!(e && e.code === 'cz/verify-sent')) { say(errMsg(e, 'upgrade')); return false; } }
+   finally { ensuring = false; go.disabled = false; go.textContent = label; }
+   return true;
+  }
+  const ph = q('[name="phone"]', form), nm = q('[name="name"]', form), pwEl = $('gatePw');
+  const phone = normPhone(ph && ph.value), pw = (pwEl && pwEl.value) || '';
+  if (!phone) { say(t.err.phone); if (ph) ph.focus(); return false; }
+  if (!PW_RE.test(pw)) { say(t.err.pin); if (pwEl) pwEl.focus(); return false; }
+  ensuring = true;
   go.disabled = true; go.textContent = t.creating;
   try {
-   try { await signup(phone, pin, ((nm && nm.value) || '').trim()); }
-   catch (e) {
-    if (e && e.code === 'auth/email-already-in-use') await login(phone, pin);
-    else throw e;
-   }
+   await runAuth(() => ensureAccount({ email, phone, pw, name: ((nm && nm.value) || '').trim() }));
    return !!me();
   } catch (e) {
    say(errMsg(e, 'checkout'));
@@ -206,8 +294,47 @@
   }
  }
 
+ // Forgot password: an email gets Firebase's own reset email; a phone number cannot, so a WhatsApp pop-up opens instead.
+ function waPopup(digits) {
+  const t = A(), old = $('waPop');
+  if (old) old.remove();
+  const pop = document.createElement('div');
+  pop.className = 'acct-pop'; pop.id = 'waPop';
+  pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-modal', 'true');
+  const msg = t.forgotMsg + (digits ? fmt(digits) : '');
+  pop.innerHTML = `<div class="acct-pop-card"><h3>${esc(t.popTitle)}</h3><p>${esc(t.popText)}</p><a class="co" target="_blank" rel="noopener" href="https://wa.me/${esc(D.site.whatsapp)}?text=${encodeURIComponent(msg)}">${esc(t.popWa)}</a><button type="button" class="acct-link" data-pop-close>${esc(t.popClose)}</button></div>`;
+  B.appendChild(pop);
+ }
+ async function forgot(btn) {
+  const f = btn.closest('#aForm'), t = A(), say = f.querySelector('.acct-err');
+  say.textContent = ''; say.classList.remove('ok');
+  const el = f.elements.namedItem('id'), id = ((el && el.value) || '').trim();
+  if (!id) { say.textContent = t.resetNeedId; if (el) el.focus(); return; }
+  const mail = id.indexOf('@') >= 0, email = id.toLowerCase();
+  if (!mail || isLegacy(email)) {
+   const ph = mail ? email.split('@')[0] : normPhone(id);
+   if (!ph) { say.textContent = t.err.id; if (el) el.focus(); return; }
+   waPopup(ph);
+   return;
+  }
+  if (!EMAIL_RE.test(email)) { say.textContent = t.err.email; if (el) el.focus(); return; }
+  if (!auth) { say.textContent = t.err.unavailable; return; }
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = t.resetSending;
+  try { await auth.sendPasswordResetEmail(email); say.classList.add('ok'); say.textContent = t.resetSent; }
+  catch (err) {
+   const c = (err && err.code) || '';
+   if (c === 'auth/user-not-found') { say.classList.add('ok'); say.textContent = t.resetSent; }   // do not reveal whether an email has an account
+   else say.textContent = errMsg(err, 'reset');
+  }
+  btn.disabled = false; btn.textContent = label;
+ }
+
  let busy = false;
  document.addEventListener('click', e => {
+  const fg = e.target.closest('#acct [data-forgot]');
+  if (fg) { forgot(fg); return; }
+  if (e.target.closest('[data-pop-close]') || e.target.id === 'waPop') { const p = $('waPop'); if (p) p.remove(); return; }
   const eye = e.target.closest('[data-eye]');
   if (eye) {
    const i = q('input', eye.parentElement), show = i.type === 'password';
@@ -219,6 +346,8 @@
   if (a) {
    const v = a.dataset.acct;
    if (v === 'logout') logout();
+   else if (v === 'skipemail') { skipEmail = true; renderPanel(true); }
+   else if (v === 'addemail') { skipEmail = false; renderPanel(true); }
    else if (v === 'shop') { closePanel(); const s = $('shop'); if (s) s.scrollIntoView(); else location.href = 'collection'; }
    else open(v);
    return;
@@ -227,11 +356,7 @@
   if (tb) { tab = tb.dataset.tab; needLogin = false; renderPanel(true); return; }
   if (e.target.closest('#acct [data-close]') || e.target.id === 'scrim') closePanel();
  });
- document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
- document.addEventListener('input', e => {
-  const el = e.target;
-  if (el.classList && el.classList.contains('pin')) { const v = el.value.replace(/\D/g, '').slice(0, 6); if (v !== el.value) el.value = v; }
- });
+ document.addEventListener('keydown', e => { if (e.key === 'Escape') { const p = $('waPop'); if (p) p.remove(); else closePanel(); } });
  panel.addEventListener('submit', async e => {
   const f = e.target.closest('#aForm');
   if (!f) return;
@@ -239,27 +364,60 @@
   if (busy) return;
   const t = A(), mode = f.dataset.mode, say = f.querySelector('.acct-err'), go = f.querySelector('button[type=submit]');
   const val = n => { const el = f.elements.namedItem(n); return el ? el.value : ''; };
-  const phone = normPhone(val('phone')), pin = val('pin'), name = mode === 'signup' ? val('name').trim() : '';
-  say.textContent = '';
+  say.textContent = ''; say.classList.remove('ok');
   if (!auth) { say.textContent = t.err.unavailable; return; }
-  if (mode === 'signup' && !name) { say.textContent = t.err.name; return; }
-  if (!phone) { say.textContent = t.err.phone; return; }
-  if (!PIN_RE.test(pin)) { say.textContent = t.err.pin; return; }
+
+  // Signed in with a phone number: add the email to the same account (same uid, orders and details stay).
+  if (mode === 'addemail') {
+   const u = me(), email = val('email').trim().toLowerCase();
+   if (!u) return;
+   if (!EMAIL_RE.test(email) || isLegacy(email)) { say.textContent = t.err.email; return; }
+   busy = true;
+   const label = go.textContent;
+   go.disabled = true; go.textContent = t.adding;
+   try { await toNewEmail(u, email, phoneOf(u)); renderAll(true); }
+   catch (err) {
+    if (err && err.code === 'cz/verify-sent') { say.classList.add('ok'); say.textContent = t.err.verifyAdd; }
+    else say.textContent = errMsg(err, 'upgrade');
+    go.disabled = false; go.textContent = label;
+   }
+   busy = false;
+   return;
+  }
+
+  const pw = val('password');
+  let email, phone = '', name = '';
+  if (mode === 'login') {
+   // One field takes an email or a phone number. A phone number logs into the old phone + PIN account.
+   const id = val('id').trim(), isMail = id.indexOf('@') >= 0, ph = isMail ? '' : normPhone(id);
+   if (isMail ? !EMAIL_RE.test(id) : !ph) { say.textContent = t.err.id; return; }
+   if (!pw) { say.textContent = t.err.pin; return; }
+   email = isMail ? id.toLowerCase() : emailOf(ph);
+  } else {
+   email = val('email').trim().toLowerCase(); name = val('name').trim(); phone = normPhone(val('phone'));
+   if (!name) { say.textContent = t.err.name; return; }
+   if (!EMAIL_RE.test(email) || isLegacy(email)) { say.textContent = t.err.email; return; }
+   if (!phone) { say.textContent = t.err.phone; return; }
+   if (!PW_RE.test(pw)) { say.textContent = t.err.pin; return; }
+  }
   busy = true;
   const label = go.textContent;
-  go.disabled = true; go.textContent = mode === 'signup' ? t.creating : t.loggingIn;
-  try { if (mode === 'signup') await signup(phone, pin, name); else await login(phone, pin); }
+  go.disabled = true; go.textContent = mode === 'login' ? t.loggingIn : t.creating;
+  try { await runAuth(() => mode === 'login' ? signIn(email, pw) : ensureAccount({ email, phone, pw, name })); }
   catch (err) { say.textContent = errMsg(err, mode); go.disabled = false; go.textContent = label; }
   busy = false;
  });
 
- let lastUid = null;
- if (auth) auth.onAuthStateChanged(u => {
-  const c = u && isCust(u.email) ? u : null, was = lastUid;
-  lastUid = c ? c.uid : null;
-  if (c) { if (was !== c.uid) { startOrders(c); loadProfile(c); } }
-  else { stopOrders(); if (was) wipe(); }
-  renderAll();
+ // A signed-in user is a customer unless they are the shop admin (the admin check is the same one admin.html uses).
+ if (auth) auth.onAuthStateChanged(async u => {
+  if (holdAuth) return;
+  if (!u) { const was = lastUid; custUser = null; lastUid = null; stopOrders(); if (was) wipe(); renderAll(); return; }
+  if (custUser && custUser.uid === u.uid) { custUser = u; renderAll(); return; }
+  let admin = false;
+  try { if (db) { await db.doc('admin/check').get(); admin = true; } } catch (e) {}
+  if (auth.currentUser !== u || holdAuth) return;
+  if (admin) { if (custUser) { custUser = null; lastUid = null; stopOrders(); wipe(); } renderAll(); return; }
+  adopt(u);
  });
  renderAll(true);
 

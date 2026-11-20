@@ -1,0 +1,42 @@
+/* shop.css: prices and videos on the cards (needed for the first paint) */
+.pic{position:relative}
+.dbadge{position:absolute;top:12px;left:12px;z-index:3;background:#a3321f;color:#fff;font:600 12px/1 system-ui,sans-serif;letter-spacing:.04em;padding:7px 10px;border-radius:20px;pointer-events:none}
+.pmrp{opacity:.6;font-size:.82em;font-weight:400}
+.poff{display:inline-block;background:#a3321f;color:#fff;font:600 11px/1 system-ui,sans-serif;padding:4px 8px;border-radius:12px;letter-spacing:.03em;vertical-align:middle;margin-left:2px}
+.pnow{font-weight:600}
+.pprice .poff{font-size:13px;padding:6px 10px}.pprice .pmrp{font-size:.6em}
+.brk:empty{display:none}
+.brk{display:grid;gap:4px;margin-bottom:10px}
+.br{display:flex;justify-content:space-between;font-size:14px}
+.br.off{color:#2f7d4f}.br.mut{opacity:.7;font-size:13px}
+.pay-brk{margin:-4px 0 0}
+.o-sub{display:flex;justify-content:space-between;font-size:13px;opacity:.8;padding:2px 0}
+.pay-apps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.pay-apps[hidden]{display:none}
+.pay-apps p{grid-column:1/-1;text-align:center;font-size:12px;opacity:.75;margin:0}
+.pay-apps .lbl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--copper-d);opacity:1}
+.pay-apps a{display:grid;place-items:center;min-width:0;min-height:58px;padding:8px;border-radius:14px;background:#fff;border:1px solid rgba(74,43,27,.1);box-shadow:0 5px 18px -16px rgba(74,43,27,.55);text-decoration:none;transition:transform .15s,border-color .15s,box-shadow .15s}
+.pay-apps a:hover{transform:translateY(-2px);border-color:rgba(181,105,63,.42);box-shadow:0 10px 22px -18px rgba(74,43,27,.65)}
+.pay-apps a img{display:block;width:auto;max-width:100%;height:30px;object-fit:contain}
+.pay-apps a.any{background:rgba(181,105,63,.08)}
+.pay-file[tabindex="-1"]:focus-visible span,.pay-file.return-focus span{outline:2px solid var(--copper);outline-offset:2px;background:rgba(181,105,63,.12)}
+
+.pay-apps a{font-size:12px;font-weight:600;color:var(--cocoa);text-align:center}
+/* Videos on cards, and the product page's play / pause button */
+video.vid-auto{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;background:transparent}
+.im video.vid-auto{position:absolute;inset:0}
+.th video.vid-auto{border-radius:inherit}
+
+/* product page: the only control is play / pause */
+.vp{position:absolute;inset:0;z-index:1;width:100%;height:100%;border-radius:26px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.vp i{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;
+ background:rgba(58,32,20,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transform:scale(.85);transition:opacity .3s,transform .3s;pointer-events:none}
+.vp i::before,.vp i::after{content:"";position:absolute}
+/* paused -> show a play triangle */
+.vp[data-state=paused] i::before{left:26px;top:20px;border-style:solid;border-width:12px 0 12px 19px;border-color:transparent transparent transparent #f4e8d3}
+/* playing -> show two pause bars */
+.vp[data-state=playing] i::before,.vp[data-state=playing] i::after{top:21px;width:6px;height:22px;border-radius:2px;background:#f4e8d3}
+.vp[data-state=playing] i::before{left:22px}.vp[data-state=playing] i::after{left:36px}
+.vp[data-state=paused] i,.vp.flash i{opacity:1;transform:none}
+@media(hover:hover){.vp:hover i{opacity:1;transform:none}}
+.vp:focus-visible{outline:2px solid var(--copper);outline-offset:-5px}

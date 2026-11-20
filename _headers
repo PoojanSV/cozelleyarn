@@ -8,9 +8,12 @@
 /admin.html
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: no-store
-/assets/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+# scripts and styles carry a ?v=<hash> in every page, so they can be cached for a year
+/assets/js/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/css/*
+  Cache-Control: public, max-age=31536000, immutable
 /assets/img/*
-  Cache-Control: public, max-age=2592000
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 /sitemap.xml
   Cache-Control: public, max-age=3600

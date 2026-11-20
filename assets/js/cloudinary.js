@@ -18,6 +18,11 @@ function cld(url, w, o) {
   return m[1] + t.join(',') + '/' + m[2];
 }
 const isCld = u => typeof u === 'string' && CLD_URL.test(u);
+// srcset for a Cloudinary picture ('' for anything else): the browser picks the width it needs
+function cldSet(url, widths) {
+  if (!isCld(url) || isCldVideo(url) || !/^v\d+\//.test(url.match(CLD_URL)[2])) return '';
+  return widths.map(w => cld(url, w) + ' ' + Math.round(w) + 'w').join(', ');
+}
 
 // ---- Video helpers ----
 const CLD_VIDEO = /^(https?:\/\/res\.cloudinary\.com\/[^\/]+\/video\/upload\/)(.+)$/;
@@ -51,14 +56,17 @@ const isVideoUrl = u => typeof u === 'string' && (isCldVideo(u) || /\.(mp4|webm|
 const _va = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 // Picture OR video for a card / preview. A video autoplays muted on a loop (media.js keeps it
 // playing only while visible); it has no controls, tapping the card still opens the product.
-function cldMedia(url, w, alt, cls) {
+function cldMedia(url, w, alt, cls, opt) {
+  opt = opt || {};
   if (isVideoUrl(url)) {
     const poster = cldPoster(url, w);
     return '<video class="vid-auto' + (cls ? ' ' + cls : '') + '" src="' + _va(cldVideo(url, Math.min(w || 720, 720))) + '"' +
       (poster ? ' poster="' + _va(poster) + '"' : '') +
       ' muted loop playsinline autoplay preload="metadata" disablepictureinpicture disableremoteplayback tabindex="-1" aria-label="' + _va(alt || '') + '"></video>';
   }
-  return '<img' + (cls ? ' class="' + cls + '"' : '') + ' loading="lazy" src="' + _va(cld(url, w)) + '" alt="' + _va(alt || '') + '">';
+  const set = w ? cldSet(url, [0.4, 0.6, 0.8, 1].map(k => w * k)) : '';
+  return '<img' + (cls ? ' class="' + cls + '"' : '') + (opt.eager ? ' fetchpriority="high"' : ' loading="lazy"') + ' decoding="async" src="' + _va(cld(url, w)) + '"' +
+    (set ? ' srcset="' + _va(set) + '" sizes="' + _va(opt.sizes || '(max-width:700px) 50vw, 380px') + '"' : '') + ' alt="' + _va(alt || '') + '">';
 }
 
 // Upload with real progress. opts.onProgress({loaded,total,pct,done}) is called while sending;

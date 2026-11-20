@@ -6,7 +6,8 @@
 <meta name="robots" content="noindex">
 <title>Page not found · Cozelle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap"></noscript>
 <style>
 :root{
   --cream:#f4e8d3;--sand:#ecd8bd;--copper:#b5693f;--copper-d:#8e4a2a;--rose:#d49a78;--cocoa:#4a2b1b;
@@ -123,9 +124,9 @@ a:focus-visible{outline:3px solid var(--cocoa);outline-offset:3px}
   document.getElementById('home').href = root;
   document.getElementById('shop').href = root + 'collection';
 
-  var logo = root + 'assets/img/cozelle-logo.png';
+  var logo = root + 'assets/img/cozelle-logo.png?v=fe5700c4';
   document.getElementById('logo').src = logo;
-  document.getElementById('wm').src = root + 'assets/img/cozelle-wordmark.png';
+  document.getElementById('wm').src = root + 'assets/img/cozelle-wordmark.png?v=52701744';
 
   var icon = document.createElement('link');
   icon.rel = 'icon';
@@ -133,7 +134,7 @@ a:focus-visible{outline:3px solid var(--cocoa);outline-offset:3px}
   icon.href = logo;
   document.head.appendChild(icon);
 
-  document.documentElement.style.setProperty('--bg-image', 'url("' + root + 'assets/img/cozelle-bg.jpg")');
+  document.documentElement.style.setProperty('--bg-image', 'url("' + root + 'assets/img/cozelle-bg.jpg?v=b66078ff")');
 
   var path = location.pathname + location.search;
   if (path && path !== '/') {

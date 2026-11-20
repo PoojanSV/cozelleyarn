@@ -1,9 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cozelle · Wrapped in comfort</title>
+<title>Cozelle | Wool Knitwear, Yarn, Throws & Rugs</title>
+<meta name="description" content="Natural-fibre wool yarn, throws, rugs and knitwear from Cozelle. Free delivery across India and 7-day easy returns.">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<link rel="canonical" href="https://cozelleyarn.shop/collection">
+<link rel="alternate" hreflang="en-IN" href="https://cozelleyarn.shop/collection">
+<link rel="alternate" hreflang="x-default" href="https://cozelleyarn.shop/collection">
+<meta name="geo.region" content="IN">
+<meta name="geo.placename" content="India">
+<meta name="language" content="en-IN">
+<meta name="theme-color" content="#b5693f">
+<meta name="application-name" content="Cozelle">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cozelle">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Cozelle | Wool Knitwear, Yarn, Throws & Rugs">
+<meta property="og:description" content="Natural-fibre wool yarn, throws, rugs and knitwear from Cozelle. Free delivery across India and 7-day easy returns.">
+<meta property="og:url" content="https://cozelleyarn.shop/collection">
+<meta property="og:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cozelle | Wool Knitwear, Yarn, Throws & Rugs">
+<meta name="twitter:description" content="Natural-fibre wool yarn, throws, rugs and knitwear from Cozelle. Free delivery across India and 7-day easy returns.">
+<meta name="twitter:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
 <link rel="icon" type="image/png" href="assets/img/cozelle-logo.png">
 <link rel="apple-touch-icon" href="assets/img/cozelle-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -187,6 +214,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <link rel="stylesheet" href="assets/css/media.css">
 </head>
 <body>
+<noscript><h1>Cozelle</h1><p>Wool yarn, throws, rugs and knitwear.</p><nav><a href="/">Home</a> <a href="/collection">Collection</a> <a href="/about">About</a> <a href="/contact">Contact</a></nav></noscript>
 
 <div class="page">
   <header>
@@ -240,6 +268,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/media.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
+<script src="assets/js/seo.js"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
 async function loadData(){
@@ -295,9 +324,9 @@ function showImg(i,dir){
 function renderProduct(){
  const main=$('prod'),w=PW(),id=new URLSearchParams(location.search).get('id');
  P=live().find(x=>x.id===id);main.setAttribute('aria-busy','false');
- if(!P){document.title=D.site.name;main.innerHTML=`<a class="back" href="collection">← ${esc(w.back)}</a><div class="miss"><p>${esc(w.notFound)}</p></div>`;return}
+ if(!P){document.title=D.site.name;Seo.page(D,'product',null);main.innerHTML=`<a class="back" href="collection">← ${esc(w.back)}</a><div class="miss"><p>${esc(w.notFound)}</p></div>`;return}
  const tracked=Stock.tracked(P),available=Stock.count(P);if(tracked)pq=available===0?0:Math.min(Math.max(1,pq),available);
- document.title=`${P.name} · ${D.site.name}`;
+ document.title=`${P.name} · ${D.site.name}`;Seo.page(D,'product',P);
  imgs=[{type:isVideoUrl(P.image)?'video':'',src:P.image,alt:P.name},...(P.gallery||[]).filter(g=>g&&g.image).map((g,k)=>({type:isVideoUrl(g.image)?'video':'',src:g.image,alt:g.alt||`${P.name} ${k+2}`})),...(P.videos||[]).filter(v=>v&&v.video).map((v,k)=>({type:'video',src:v.video,alt:v.alt||`${P.name} video ${k+1}`}))].filter(x=>x.src);gi=0;
  const many=imgs.length>1,rows=[...(P.category?[[w.category,P.category]]:[]),...(P.details||[]).filter(d=>d&&d.label&&d.value).map(d=>[d.label,d.value])];
  const rel=[...live().filter(x=>x.id!==P.id&&x.category&&x.category===P.category),...live().filter(x=>x.id!==P.id&&x.category!==P.category)].slice(0,3);

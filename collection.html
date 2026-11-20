@@ -1,9 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cozelle · The cosy collection</title>
+<title>Shop Wool Yarn, Knitwear, Throws & Rugs Online India | Cozelle</title>
+<meta name="description" content="Browse the Cozelle collection: merino and hand-spun wool yarn, cable-knit throws, plaited wool rugs and cosy knitwear. Free delivery across India and 7-day easy returns.">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<link rel="canonical" href="https://cozelleyarn.shop/collection">
+<link rel="alternate" hreflang="en-IN" href="https://cozelleyarn.shop/collection">
+<link rel="alternate" hreflang="x-default" href="https://cozelleyarn.shop/collection">
+<meta name="geo.region" content="IN">
+<meta name="geo.placename" content="India">
+<meta name="language" content="en-IN">
+<meta name="theme-color" content="#b5693f">
+<meta name="application-name" content="Cozelle">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cozelle">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Shop Wool Yarn, Knitwear, Throws & Rugs Online India | Cozelle">
+<meta property="og:description" content="Browse the Cozelle collection: merino and hand-spun wool yarn, cable-knit throws, plaited wool rugs and cosy knitwear. Free delivery across India and 7-day easy returns.">
+<meta property="og:url" content="https://cozelleyarn.shop/collection">
+<meta property="og:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Shop Wool Yarn, Knitwear, Throws & Rugs Online India | Cozelle">
+<meta name="twitter:description" content="Browse the Cozelle collection: merino and hand-spun wool yarn, cable-knit throws, plaited wool rugs and cosy knitwear. Free delivery across India and 7-day easy returns.">
+<meta name="twitter:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
 <link rel="icon" type="image/png" href="assets/img/cozelle-logo.png">
 <link rel="apple-touch-icon" href="assets/img/cozelle-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -194,6 +221,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <link rel="stylesheet" href="assets/css/media.css">
 </head>
 <body>
+<noscript><h1>The cosy collection</h1><p>Cable Knit Throw, Cloud Merino Yarn, Cream Wool Skeins, Hand-spun Wool, Plaited Wool Rug, Ivory Knit Pullover, Cloud Knit Sweater and Sunday Lounge Knit.</p><nav><a href="/">Home</a> <a href="/collection">Collection</a> <a href="/about">About</a> <a href="/contact">Contact</a></nav></noscript>
 
 <div class="page">
   <header>
@@ -273,6 +301,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/media.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
+<script src="assets/js/seo.js"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
 async function loadData(){
@@ -347,7 +376,7 @@ function render(data){
  D.listing={...LISTING,...(D.listing||{}),sorts:{...LISTING.sorts,...((D.listing||{}).sorts||{})}};
  Object.entries(D.theme||{}).forEach(([k,v])=>root.style.setProperty('--'+k,v));
  root.style.setProperty('--bg-image',D.site.background?`url("${cld(D.site.background,1920,{eco:1})}")`:'none');
- document.title=`${D.collection.title} ${D.collection.accent} · ${D.site.name}`;
+ document.title=`${D.collection.title} ${D.collection.accent} · ${D.site.name}`;Seo.page(D,'collection');
  bind();
  const cols=D.footer.columns||[];$('contact').style.setProperty('--fcols',Math.max(cols.length,1));
  $('fcols').innerHTML=cols.map(c=>`<div><h5>${esc(c.title)}</h5><ul>${(c.items||[]).map(i=>i.href?`<li><a href="${esc(href(i.href))}">${esc(i.label)}</a></li>`:`<li>${esc(i.label)}</li>`).join('')}</ul></div>`).join('');

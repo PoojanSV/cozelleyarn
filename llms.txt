@@ -1,0 +1,20 @@
+# Cozelle
+
+> Cozelle is an Indian online store for merino and wool yarn, cable-knit throws, plaited wool rugs and knitwear. Natural fibres, finished by hand and checked before shipping. Free delivery across India, 7-day easy returns, payment by UPI. Website: https://cozelleyarn.shop
+
+## Key pages
+- [Home](https://cozelleyarn.shop/): brand overview and featured pieces
+- [Collection](https://cozelleyarn.shop/collection): all yarn, throws, rugs and knitwear with prices
+- [About us](https://cozelleyarn.shop/about): the story behind Cozelle
+- [Contact](https://cozelleyarn.shop/contact): order help and enquiries on WhatsApp (+91 70469 75673)
+
+## Full catalogue
+- [Live product list with prices (plain text)](https://cozelleyarn.shop/llms-full.txt)
+
+## Quick answers
+- What does Cozelle sell? Merino and wool yarn for knitting, cable-knit throws, plaited wool rugs and knitwear (pullovers, sweaters, lounge knits).
+- Where does Cozelle deliver? Free delivery across India.
+- What is the return policy? 7-day easy returns.
+- How do I pay? UPI (scan the QR or open your UPI app), then attach the payment screenshot. Orders can also be confirmed on WhatsApp.
+- Do I need an account? No. Browse and fill the bag freely; to order you add a phone number and a 6-digit PIN.
+- Currency: Indian Rupees (INR). Prices include GST.

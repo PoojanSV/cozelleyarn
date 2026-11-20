@@ -1,9 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cozelle · About us</title>
+<title>About Cozelle | Natural Wool Yarn, Knitwear & Home Textiles</title>
+<meta name="description" content="The story behind Cozelle: natural-fibre wool yarn, throws, rugs and knitwear that are finished by hand, checked with care and made to last for years.">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<link rel="canonical" href="https://cozelleyarn.shop/about">
+<link rel="alternate" hreflang="en-IN" href="https://cozelleyarn.shop/about">
+<link rel="alternate" hreflang="x-default" href="https://cozelleyarn.shop/about">
+<meta name="geo.region" content="IN">
+<meta name="geo.placename" content="India">
+<meta name="language" content="en-IN">
+<meta name="theme-color" content="#b5693f">
+<meta name="application-name" content="Cozelle">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cozelle">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="About Cozelle | Natural Wool Yarn, Knitwear & Home Textiles">
+<meta property="og:description" content="The story behind Cozelle: natural-fibre wool yarn, throws, rugs and knitwear that are finished by hand, checked with care and made to last for years.">
+<meta property="og:url" content="https://cozelleyarn.shop/about">
+<meta property="og:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About Cozelle | Natural Wool Yarn, Knitwear & Home Textiles">
+<meta name="twitter:description" content="The story behind Cozelle: natural-fibre wool yarn, throws, rugs and knitwear that are finished by hand, checked with care and made to last for years.">
+<meta name="twitter:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
 <link rel="icon" type="image/png" href="assets/img/cozelle-logo.png">
 <link rel="apple-touch-icon" href="assets/img/cozelle-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -136,6 +163,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <link rel="stylesheet" href="assets/css/media.css">
 </head>
 <body>
+<noscript><h1>The story behind Cozelle</h1><p>Natural-fibre wool yarn, throws, rugs and knitwear that are finished by hand and checked before they ship.</p><nav><a href="/">Home</a> <a href="/collection">Collection</a> <a href="/about">About</a> <a href="/contact">Contact</a></nav></noscript>
 
 <div class="page">
   <header>
@@ -195,6 +223,7 @@ body.menu-open,body.cart-open{overflow:hidden}
 <script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/media.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
+<script src="assets/js/seo.js"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
 async function loadData(){
@@ -267,7 +296,7 @@ document.addEventListener('error',e=>{if(e.target.tagName==='IMG')e.target.style
 
 function pageRender(){
  const a=D.about||{};
- document.title=`${a.title||''} ${a.accent||''} · ${D.site.name}`.trim();
+ document.title=`${a.title||''} ${a.accent||''} · ${D.site.name}`.trim();Seo.page(D,'about');
  $('aboutText').innerHTML=String(a.text||'').split(/\n\s*\n/).map(t=>t.trim()).filter(Boolean).map(t=>`<p>${esc(t)}</p>`).join('');
  const hasImg=!!(a.image&&a.image.trim());$('abtImg').hidden=!hasImg;$('abt').classList.toggle('noimg',!hasImg);
  const st=D.story||[];$('vals').hidden=!st.length;$('vals').style.setProperty('--vc',Math.max(st.length,1));

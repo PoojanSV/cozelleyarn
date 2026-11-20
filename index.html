@@ -1,9 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cozelle · Wrapped in comfort</title>
+<title>Cozelle | Merino Wool Yarn, Knitwear, Throws & Rugs - Free Delivery India</title>
+<meta name="description" content="Shop Cozelle for soft merino & wool yarn, cable-knit throws, wool rugs and knitwear. Natural fibres, finished by hand. Free delivery across India, 7-day returns.">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<link rel="canonical" href="https://cozelleyarn.shop/">
+<link rel="alternate" hreflang="en-IN" href="https://cozelleyarn.shop/">
+<link rel="alternate" hreflang="x-default" href="https://cozelleyarn.shop/">
+<meta name="geo.region" content="IN">
+<meta name="geo.placename" content="India">
+<meta name="language" content="en-IN">
+<meta name="theme-color" content="#b5693f">
+<meta name="application-name" content="Cozelle">
+<meta name="format-detection" content="telephone=no">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cozelle">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Cozelle | Merino Wool Yarn, Knitwear, Throws & Rugs - Free Delivery India">
+<meta property="og:description" content="Shop Cozelle for soft merino & wool yarn, cable-knit throws, wool rugs and knitwear. Natural fibres, finished by hand. Free delivery across India, 7-day returns.">
+<meta property="og:url" content="https://cozelleyarn.shop/">
+<meta property="og:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cozelle | Merino Wool Yarn, Knitwear, Throws & Rugs - Free Delivery India">
+<meta name="twitter:description" content="Shop Cozelle for soft merino & wool yarn, cable-knit throws, wool rugs and knitwear. Natural fibres, finished by hand. Free delivery across India, 7-day returns.">
+<meta name="twitter:image" content="https://cozelleyarn.shop/assets/img/cozelle-logo-full.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":["Organization","OnlineStore"],"@id":"https://cozelleyarn.shop/#org","name":"Cozelle","url":"https://cozelleyarn.shop/","slogan":"Wrapped in comfort","logo":{"@type":"ImageObject","url":"https://cozelleyarn.shop/assets/img/cozelle-logo.png"},"image":"https://cozelleyarn.shop/assets/img/cozelle-logo-full.png","description":"Merino and wool yarn, cable-knit throws, plaited wool rugs and knitwear, finished by hand. Free delivery across India.","areaServed":{"@type":"Country","name":"India"},"knowsAbout":["merino wool yarn","hand-spun wool","cable knit throws","plaited wool rugs","knitwear","knitting"],"makesOffer":[{"@type":"Offer","itemOffered":{"@type":"Product","name":"Wool yarn"}},{"@type":"Offer","itemOffered":{"@type":"Product","name":"Knit throws"}},{"@type":"Offer","itemOffered":{"@type":"Product","name":"Wool rugs"}},{"@type":"Offer","itemOffered":{"@type":"Product","name":"Knitwear"}}],"currenciesAccepted":"INR","paymentAccepted":"UPI","contactPoint":{"@type":"ContactPoint","contactType":"customer service","telephone":"+917046975673","availableLanguage":["English","Hindi"],"areaServed":"IN"}},{"@type":"WebSite","@id":"https://cozelleyarn.shop/#website","url":"https://cozelleyarn.shop/","name":"Cozelle","inLanguage":"en-IN","publisher":{"@id":"https://cozelleyarn.shop/#org"}}]}</script>
 <link rel="icon" type="image/png" href="assets/img/cozelle-logo.png">
 <link rel="apple-touch-icon" href="assets/img/cozelle-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -201,6 +229,7 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
 <link rel="stylesheet" href="assets/css/media.css">
 </head>
 <body class="lock">
+<noscript><h1>Cozelle - Wrapped in comfort</h1><p>Merino and wool yarn, cable-knit throws, plaited wool rugs and knitwear, finished by hand. Free delivery across India and 7-day easy returns.</p><nav><a href="/">Home</a> <a href="/collection">Collection</a> <a href="/about">About</a> <a href="/contact">Contact</a></nav></noscript>
 
 <div class="loader" id="loader" aria-hidden="true">
   <div><img class="l1" src="assets/img/cozelle-logo-full.png" alt="Cozelle - Wrapped in comfort"><img class="l2" src="assets/img/cozelle-divider.png" alt=""></div>
@@ -273,6 +302,7 @@ body.ready .intro>*:nth-child(2){animation-delay:.15s}body.ready .intro>*:nth-ch
 <script src="assets/js/cloudinary.js"></script>
 <script src="assets/js/media.js"></script>
 <script src="assets/js/cozelle-data.js"></script>
+<script src="assets/js/seo.js"></script>
 <script>
 let db=null;try{firebase.initializeApp(FIREBASE_CONFIG);db=firebase.firestore()}catch(e){console.warn('Firebase unavailable, using built-in content',e)}
 async function loadData(){
@@ -315,7 +345,7 @@ function render(data){
  D=data;const {site}=D;
  Object.entries(D.theme||{}).forEach(([k,v])=>root.style.setProperty('--'+k,v));
  root.style.setProperty('--bg-image',site.background?`url("${cld(site.background,1920,{eco:1})}")`:'none');
- document.title=site.title||site.name;
+ document.title=site.title||site.name;Seo.page(D,'home');
  bind();
  const ps=live(),rest=ps.filter(p=>!p.featured);
  $('heroProds').innerHTML=ps.filter(p=>p.featured).map(p=>card(p,false)).join('');
